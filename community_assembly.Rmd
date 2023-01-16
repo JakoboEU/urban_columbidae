@@ -1,0 +1,302 @@
+---
+title: "Urban Columbidae Communities"
+output: html_notebook
+---
+
+```{r setup, message = F, warning = false}
+library(dplyr)
+library(purrr)
+library(tidyverse)
+library(tidyr)
+
+
+library(phytools)
+library(picante)
+library(abdiv)
+library(vegan)
+library(FD)
+```
+
+# Introduction
+## Are urban columbidae communities strutured by habitat filtering or via competitive interactions?
+- With competitive interactions we expect the phylogenetic and functional distance between species to higher than expected than within a random community.
+- With habitat filtering we expect the phylogentic and functional distance between species to be lower than expected than within a random community.
+(Swenson et al. 2007; Cavender-Bares et al. 2009).
+
+## Recommended community metrics (Trisos et al. 2014)
+- Functional diversity of all traits (Petchey and Gaston 2002)
+- Convex Hull Volume (CHV) of all traits (a multivariate measure of the range of community values) (Cornwell et al. 2006)
+- Mean taxon distance (MPD)  is mean pairwise phylogenetic distances between co-occurring species and is most sensitive to tree-wide patterns of phylogenetic clustering and evenness.
+- Mean nearest taxon distance (MNTD) is mean pairwise phylogenetic distances separating each species from its closest co-occurring relative and is most sensitive to phylogenetic clustering or evenness at the tips of phylogeny.
+- FD of each trait individually 
+- Variance of each trait within community previously used to measure trait clustering
+- SDNDr (standard deviation of distances between neighbouring species along a single trait axis, divided by the trait range of the community) is used to detect the regular spacing in species trait values predicted by competitive exclusion.
+
+## Recommended traits (Trisos et al. 2014)
+- Overall body size.
+- Trophic - beak shape (beak length, width, depth) - measures competitive exclusion (e.g. over-dispersion) via accentuation of foraging differences
+- Locomotory (wing, tail, tarsus length)
+
+## Recommended null model (Milar et al. 2017)
+Many metrics sensitive to species richness. Urban communities are governed by the surrounding regional pool. For each urban community, we can generate all of the possible communities with the same species richness as the urban community with species from the regional pool.  The average of all possible communities gives us a null model.
+
+# Community data
+We used all cities with a population of 250,000 or more, and that have at least 167 complete checklists that are more than 5 and less than 240 minutes in length and cover no more than 10km. We then included any Columbidae species in the urban community that appeared on at least 5% of all of these checklists recorded within the city.
+
+This criteria comes from choosing all cities with at least 1000 checklists, and then testing 1000 times how many checklists are required to find all those species that appear on at least 5% of the total checklists. 269 cities were included in this test, and 167 was the maximum number of checklists required to find all min-5% species (which was in Auckland).
+
+## Read in data exported from bigquery
+```{yaml metadata all_columbidae_communities}
+models:
+  - name: all_columbidae_communities
+    description: Regional and urban communities for all cities with a population of at least 250,000 from GHSL Data Package 2019 (Pesaresi et al. 2019), which contain at leasts 167 eBird checklists, and have at least one Columbidae species within their regional pools.
+    columns:
+      - name: city_id
+        description: Vector ID from GHSL Data Package 2019 (Pesaresi et al. 2019)
+      - name: city_name
+        description: City name from Vector from GHSL Data Package 2019 (Pesaresi et al. 2019)
+      - name: jetz_scientific_name
+        description: The mapped name of each species whose distribution from BirdLife International’s species distribution maps (BirdLife International and Handbook of the Birds of the World 2020), overlaps with the city vector from GHSL Data Package 2019 (Pesaresi et al. 2019). Species mapped from eBird and Birdlife to JETZ taxonomy using birdlife alternative names and Avibase (Lepage 2011).
+      - name: present_in_city
+        description: True if the species is present on at least 5% of all valid checklists within the city
+```
+
+```{r read all_columbidae_communities}
+all_columbidae_communities = read_csv('bigquery_export__columbidae_jetz_urban_locations.csv')
+head(all_columbidae_communities)
+```
+# Site Selection
+Our site metrics all compare species within communities, therefore we must have more than one species in each urban community for our analysis.
+Our null model requires us to create a range of dissimilar communities with the same richness as the actual urban community using species from the regional pool, therefore we must have less than the number of species in our regional pool in our urban pool.
+
+Here we exclude then two sets of urban communities that are interesting in their own right, (1) those with 1 or less species, and (2) those with all the species from the regional pool
+
+```{r}
+urban_communities_tmp = all_columbidae_communities %>% group_by(city_id, city_name) %>% summarise(regional_pool_size = n(), urban_pool_size = sum(present_in_city))
+head(urban_communities_tmp)
+```
+Communities with 1 or less pigeon species
+```{r}
+urban_communities_tmp[urban_communities_tmp$urban_pool_size < 2,]
+```
+Communities with all regional species
+```{r}
+urban_communities_tmp[urban_communities_tmp$urban_pool_size == urban_communities_tmp$regional_pool_size,]
+```
+
+```{yaml metadata selected_urban_communities}
+models:
+  - name: selected_urban_communities
+    description: Sites that we will analyse that have more than 1 species, and less species than the entire regional pool
+    columns:
+      - name: city_id
+        description: Vector ID from GHSL Data Package 2019 (Pesaresi et al. 2019)
+      - name: city_name
+        description: City name from Vector from GHSL Data Package 2019 (Pesaresi et al. 2019)
+      - name: regional_pool_size
+        description: the number of columbidae species in the city regional pool, e.g. number of species where the city vector overlaps the birdlife distribution vector
+      - name: urban_pool_size
+        description: the number of columbidae species that occur inside the city, e.g. the number of columbidae species that appear on at least 5% of all valid checklists within the city vector.
+```
+
+Selected sites:
+```{r create selected_urban_communities}
+selected_urban_communities = urban_communities_tmp[urban_communities_tmp$urban_pool_size > 1 & urban_communities_tmp$urban_pool_size != urban_communities_tmp$regional_pool_size,]
+nrow(selected_urban_communities)
+head(selected_urban_communities)
+```
+And therefore
+```{r}
+selected_columbidae_communities = all_columbidae_communities[all_columbidae_communities$city_id %in% selected_urban_communities$city_id,]
+head(selected_columbidae_communities)
+```
+
+# Trait Data
+```{yaml metadata avonet_birdlife}
+models:
+  - name: avonet_birdlife
+    description: Functional traits taken from Avonet (Tobias et al. 2022) which includes core morphologic measurements, along with habitat preference
+    columns:
+      - name: species_name
+        description: The birdlife species name
+      - name: beak_length
+        description: measured from tip to skull along the culmen
+      - name: beak_width
+        description: 
+      - name: beak_depth
+        description:
+      - name: tail_length
+        description:
+      - name: wing_length
+        description: carpal joint to wingtip measured on the unflattened wing
+      - name: tarsus_length
+        description:
+      - name: habitat
+        description: habitat preference; one of: forest, grassland, human modified, rock, shrubland, woodland, desert
+      - name: habitat_density
+        description: habitat density preference (1 open to 3 dense)
+      - name: trophic_niche
+        description: frugivore, granivore, omnivore
+      - name: primary_lifestyle
+        description: generalist, insessorial, terrestrial
+      - name: range_size
+        description: extracted range size (km2) from Birdlife
+      - name: mass
+        description: body mass (grams)
+```
+
+```{r read avonet_birdlife}
+avonet_birdlife_input_tmp = read_csv('avonet_birdlife.csv')
+avonet_birdlife = avonet_birdlife_input_tmp[,c('Species1', 'Beak.Length_Culmen', 'Beak.Width', 'Beak.Depth', 'Tail.Length', 'Wing.Length', 'Tarsus.Length', 'Habitat', 'Habitat.Density', 'Trophic.Niche', 'Primary.Lifestyle', 'Range.Size', 'Mass')]
+names(avonet_birdlife) = c('species_name', 'beak_length', 'beak_width', 'beak_depth', 'tail_length', 'wing_length', 'tarsus_length', 'habitat', 'habitat_density', 'trophic_niche', 'primary_lifestyle', 'range_size', 'mass')
+head(avonet_birdlife)
+```
+## Mapping trait data to JETZ taxonomy
+```{yaml metadata birdlife_to_jetz_mapping}
+models:
+  - name: birdlife_to_jetz_mapping
+    description: Mapping from birdlife to jetz taxonomies
+    columns:
+      - name: species_name
+        description: The birdlife species name
+      - name: jetz_scientific_name
+        description: The Jetz species name
+```
+
+```{r read birdlife_to_jetz_mapping}
+birdlife_to_jetz_mapping = read_csv('bigquery_export__columbidae_taxonomic_mapping.csv')
+head(birdlife_to_jetz_mapping)
+```
+Drop species in taxonomy mapping that are not in our communities - to avoid worrying about species not in our datasets
+```{r clean birdlife_to_jetz_mapping}
+paste("Species not in dataset", nrow(birdlife_to_jetz_mapping[!birdlife_to_jetz_mapping$jetz_scientific_name %in% selected_columbidae_communities$jetz_scientific_name,]))
+paste("Total mapped species", nrow(birdlife_to_jetz_mapping))
+
+birdlife_to_jetz_mapping = birdlife_to_jetz_mapping[birdlife_to_jetz_mapping$jetz_scientific_name %in% selected_columbidae_communities$jetz_scientific_name,]
+
+paste("Remaining species after removal", nrow(birdlife_to_jetz_mapping))
+```
+
+Check that we have AVONET data for all species - expect empty set
+```{r}
+birdlife_to_jetz_mapping[!birdlife_to_jetz_mapping$species_name %in% avonet_birdlife$species_name,]
+```
+
+Check that we have mapping entry for all community species - expect empty set
+```{r}
+selected_columbidae_communities[!selected_columbidae_communities$jetz_scientific_name %in% birdlife_to_jetz_mapping$jetz_scientific_name,]
+```
+
+When we map, how many duplicates do we have, and how dissimilar are they?
+```{r}
+avonet_birdlife_mapped_to_jetz_tmp = left_join(birdlife_to_jetz_mapping, avonet_birdlife)
+duplicated_jetz_species_in_avonet = avonet_birdlife_mapped_to_jetz_tmp$jetz_scientific_name[duplicated(avonet_birdlife_mapped_to_jetz_tmp$jetz_scientific_name)]
+avonet_birdlife_mapped_to_jetz_tmp[avonet_birdlife_mapped_to_jetz_tmp$jetz_scientific_name %in% duplicated_jetz_species_in_avonet,] %>% arrange(jetz_scientific_name)
+```
+```{r}
+avonet_jetz = avonet_birdlife_mapped_to_jetz_tmp %>% group_by(jetz_scientific_name) %>% summarize(
+  beak_length = mean(beak_length),
+  beak_width = mean(beak_width),
+  beak_depth = mean(beak_depth),
+  tail_length = mean(tail_length),
+  wing_length = mean(wing_length),
+  tarsus_length = mean(tarsus_length),
+  trophic_niche = first(trophic_niche),
+  habitat = first(habitat),
+  habitat_density = first(habitat_density),
+  primary_lifestyle = first(primary_lifestyle),
+  range_size = sum(range_size),
+  mass = mean(mass)
+)
+head(avonet_jetz)
+```
+Check duplicates
+```{r}
+avonet_jetz[avonet_jetz$jetz_scientific_name %in% duplicated_jetz_species_in_avonet,]
+```
+
+## Creating trait values
+
+### Trophic trait
+```{r}
+trophic_trait_pca = rda(avonet_jetz[,c('beak_length', 'beak_width', 'beak_depth')])
+summary(trophic_trait_pca)
+```
+Does the new trophic trait explain trophic niche?
+```{r}
+summary(glm(formula = niche ~ pc1, data = data.frame(niche = as.factor(avonet_jetz$trophic_niche), pc1 = trophic_trait_pca$Ybar[,1]), family = binomial))
+```
+Is PC1 correlated to mass?
+```{r}
+cor(trophic_trait_pca$Ybar[,1], avonet_jetz$mass)
+```
+
+```{r}
+avonet_jetz$trophic_trait = trophic_trait_pca$Ybar[,1]
+```
+
+### Locomotory trait
+```{r}
+locomotry_trait_pca = rda(avonet_jetz[,c('tarsus_length', 'wing_length', 'tail_length')])
+summary(locomotry_trait_pca)
+```
+
+Is PC1 correlated to mass?
+```{r}
+cor(locomotry_trait_pca$Ybar[,1], avonet_jetz$mass)
+```
+
+```{r}
+avonet_jetz$locomotory_trait = locomotry_trait_pca$Ybar[,1]
+```
+
+# Calculate city wide community values
+
+```{r}
+species_in_cities = pivot_wider(selected_columbidae_communities[selected_columbidae_communities$present_in_city,], names_from = jetz_scientific_name, values_from = "present_in_city", values_fill = list(present_in_city = F))
+species_in_cities = tibble::column_to_rownames(species_in_cities, var='city_id')
+species_in_cities = species_in_cities[,-1]
+species_in_cities
+```
+## Read in phylogeny
+```{r}
+all_avian_species_tree <- read.tree("./phylogeny__stage2_hackett_mcc_no_neg.tre")
+columbidae_tree <- ladderize(drop.tip(all_avian_species_tree, setdiff(all_avian_species_tree$tip.label, selected_columbidae_communities$jetz_scientific_name)))
+```
+
+Check that we have all species in our tree - expect empty dataset
+```{r}
+selected_columbidae_communities[!selected_columbidae_communities$jetz_scientific_name %in% columbidae_tree$tip.label,]
+```
+
+## MNTD
+```{r}
+phydist_urban_columbidae = cophenetic(columbidae_tree)
+```
+
+```{r}
+urban_community_mntd_result = mntd(as.matrix(species_in_cities), phydist_urban_columbidae)
+```
+
+```{r}
+selected_urban_communities = right_join(selected_urban_communities, data.frame(city_id = as.double(rownames(species_in_cities)), urban_community_mntd = urban_community_mntd_result))
+head(selected_urban_communities)
+```
+
+## MPD
+```{r}
+urban_community_mpd_result = mpd(as.matrix(species_in_cities), phydist_urban_columbidae)
+```
+
+```{r}
+selected_urban_communities = right_join(selected_urban_communities, data.frame(city_id = as.double(rownames(species_in_cities)), urban_community_mpd = urban_community_mpd_result))
+head(selected_urban_communities)
+```
+## FD - Petchey and Gaston
+```{r}
+traits = avonet_jetz[avonet_jetz$jetz_scientific_name %in% colnames(species_in_cities),c('jetz_scientific_name', 'mass', 'trophic_trait', 'locomotory_trait')]
+traits = tibble::column_to_rownames(traits, var='jetz_scientific_name')
+traits = traits[order(match(rownames(traits), colnames(species_in_cities))),]
+res = dbFD(as.matrix(traits), as.matrix(species_in_cities), calc.FRic = T, calc.CWM = F, calc.FDiv = F, calc.FGR = T)
+res$FRic
+```
