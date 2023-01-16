@@ -294,7 +294,7 @@ head(selected_urban_communities)
 ```
 ## FD - Petchey and Gaston
 ```{r}
-traits = avonet_jetz[avonet_jetz$jetz_scientific_name %in% colnames(species_in_cities),c('jetz_scientific_name', 'mass', 'trophic_trait', 'locomotory_trait')]
+traits = avonet_jetz[avonet_jetz$jetz_scientific_name %in% colnames(species_in_cities),c('jetz_scientific_name', 'locomotory_trait')]
 traits = tibble::column_to_rownames(traits, var='jetz_scientific_name')
 traits = traits[order(match(rownames(traits), colnames(species_in_cities))),]
 res = dbFD(as.matrix(traits), as.matrix(species_in_cities), calc.FRic = T, calc.CWM = F, calc.FDiv = F, calc.FGR = T)
