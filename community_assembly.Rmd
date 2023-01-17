@@ -339,8 +339,13 @@ species_names_in_514
 ```
 
 ```{r}
-traits[species_names_in_514, c('mass')]
-var(traits[species_names_in_514, c('mass')])
+trait_values = function(trait, community_row) {
+  species_names_in_community = names(community_row)[which(community_row == 1, arr.ind=T)[, "col"]]
+  traits[species_names_in_community, c(trait)]
+}
+
+trait_values('mass', species_in_cities[c('514'),])
+var(trait_values('mass', species_in_cities[c('514'),]))
 ```
 
 ```{r}
@@ -350,7 +355,7 @@ single_trait_variance = function(trait, communities) {
     community_row = communities[c(row),]
     species_names_in_community = names(community_row)[which(community_row == 1, arr.ind=T)[, "col"]]
     
-    result = data.frame(city_id = row, variance = var(traits[species_names_in_community, c(trait)]))
+    result = data.frame(city_id = row, variance = var(trait_values(trait, community_row)))
     variance_of_trait = rbind(variance_of_trait, result)
   }
   
@@ -360,3 +365,36 @@ single_trait_variance = function(trait, communities) {
 single_trait_variance('mass', species_in_cities)
 ```
 ## SDNDr
+Standard deviation of distances between neighbouring species along a single trait axis, divided by the trait range of the community.
+
+```{r}
+print('trait values:')
+sorted_loco_traits_in_1291 = sort(trait_values('locomotory_trait', species_in_cities[c('1291'),]))
+sorted_loco_traits_in_1291 
+
+print('diff in neighbouring trait values:')
+diff(sorted_loco_traits_in_1291)
+
+print('SDNDr:')
+sd(diff(sorted_loco_traits_in_1291)) / (max(sorted_loco_traits_in_1291) - min(sorted_loco_traits_in_1291))
+```
+
+```{r}
+SDNDr = function(trait, communities) {
+  sdndr_of_trait = data.frame()
+  for(row in rownames(communities)) {
+    community_row = communities[c(row),]
+    
+    sorted_trait_values = sort(trait_values(trait, community_row))
+    
+    sdndr_value = sd(diff(sorted_trait_values)) / (max(sorted_trait_values) - min(sorted_trait_values))
+    
+    sdndr_of_trait = rbind(sdndr_of_trait, data.frame(city_id = row, sdndr = sdndr_value))
+  }
+  
+  sdndr_of_trait
+}
+
+SDNDr('locomotory_trait', species_in_cities)
+```
+
