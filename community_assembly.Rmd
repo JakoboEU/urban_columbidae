@@ -14,7 +14,7 @@ library(phytools)
 library(picante)
 library(abdiv)
 library(vegan)
-library(FD)
+library(fundiversity)
 ```
 
 # Introduction
@@ -279,8 +279,7 @@ urban_community_mntd_result = mntd(as.matrix(species_in_cities), phydist_urban_c
 ```
 
 ```{r}
-selected_urban_communities = right_join(selected_urban_communities, data.frame(city_id = as.double(rownames(species_in_cities)), urban_community_mntd = urban_community_mntd_result))
-head(selected_urban_communities)
+ data.frame(city_id = as.double(rownames(species_in_cities)), urban_community_mntd = urban_community_mntd_result)
 ```
 
 ## MPD
@@ -289,11 +288,13 @@ urban_community_mpd_result = mpd(as.matrix(species_in_cities), phydist_urban_col
 ```
 
 ```{r}
-selected_urban_communities = right_join(selected_urban_communities, data.frame(city_id = as.double(rownames(species_in_cities)), urban_community_mpd = urban_community_mpd_result))
-head(selected_urban_communities)
+data.frame(city_id = as.double(rownames(species_in_cities)), urban_community_mpd = urban_community_mpd_result)
 ```
 
 ## FD - Petchey and Gaston
+From
+https://github.com/NGSwenson/SwensonSESYNCWorkshop2017/blob/5a966564d6896ff0f41dc4ac0a6216f97b9d18e1/day.1.pm/tree.based.alpha.R
+
 Create dentrogram
 ```{r fig.height=4}
 get_dentrogram_for_traits = function(required_traits_for_dentro) {
@@ -321,10 +322,41 @@ head(urban_community_fd_result)
 ```
 
 ```{r}
-selected_urban_communities = right_join(selected_urban_communities, urban_community_fd_result[,c('city_id', 'urban_community_fd')])
-head(selected_urban_communities)
-```
-```{r}
 urban_community_fd_mass_result = get_pd_for_traits(species_in_cities, c('locomotory_trait'))
 head(urban_community_fd_mass_result)
 ```
+## Trait Variance
+### FRic - Convex Hull of all traits
+```{r}
+fd_fric(traits, species_in_cities)
+```
+
+### Single Trait Variance
+```{r}
+species_in_514 = species_in_cities[c('514'),]
+species_names_in_514 = names(species_in_514)[which(species_in_514 == 1, arr.ind=T)[, "col"]]
+species_names_in_514
+```
+
+```{r}
+traits[species_names_in_514, c('mass')]
+var(traits[species_names_in_514, c('mass')])
+```
+
+```{r}
+single_trait_variance = function(trait, communities) {
+  variance_of_trait = data.frame()
+  for(row in rownames(communities)) {
+    community_row = communities[c(row),]
+    species_names_in_community = names(community_row)[which(community_row == 1, arr.ind=T)[, "col"]]
+    
+    result = data.frame(city_id = row, variance = var(traits[species_names_in_community, c(trait)]))
+    variance_of_trait = rbind(variance_of_trait, result)
+  }
+  
+  variance_of_trait
+}
+
+single_trait_variance('mass', species_in_cities)
+```
+## SDNDr
