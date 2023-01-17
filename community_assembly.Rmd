@@ -271,24 +271,22 @@ selected_columbidae_communities[!selected_columbidae_communities$jetz_scientific
 
 ## MNTD
 ```{r}
-phydist_urban_columbidae = cophenetic(columbidae_tree)
-```
+get_mntd_for_communities = function(communities, phydist_urban_columbidae = cophenetic(columbidae_tree)) {
+  urban_community_mntd_result = mntd(as.matrix(communities), phydist_urban_columbidae)
+  data.frame(site = rownames(communities), urban_community_mntd = urban_community_mntd_result)
+}
 
-```{r}
-urban_community_mntd_result = mntd(as.matrix(species_in_cities), phydist_urban_columbidae)
-```
-
-```{r}
- data.frame(city_id = as.double(rownames(species_in_cities)), urban_community_mntd = urban_community_mntd_result)
+get_mntd_for_communities(species_in_cities)
 ```
 
 ## MPD
 ```{r}
-urban_community_mpd_result = mpd(as.matrix(species_in_cities), phydist_urban_columbidae)
-```
+get_mpd_for_communities = function(communities, phydist_urban_columbidae = cophenetic(columbidae_tree)) {
+  urban_community_mpd_result = mpd(as.matrix(communities), phydist_urban_columbidae)
+  data.frame(site = rownames(species_in_cities), urban_community_mpd = urban_community_mpd_result)
+}
 
-```{r}
-data.frame(city_id = as.double(rownames(species_in_cities)), urban_community_mpd = urban_community_mpd_result)
+get_mpd_for_communities(species_in_cities)
 ```
 
 ## FD - Petchey and Gaston
@@ -297,7 +295,7 @@ https://github.com/NGSwenson/SwensonSESYNCWorkshop2017/blob/5a966564d6896ff0f41d
 
 Create dentrogram
 ```{r fig.height=4}
-analysis_traits = c('mass', 'locomotory_trait', 'trophic_trait')
+analysis_all_traits = c('mass', 'locomotory_trait', 'trophic_trait')
 
 get_traits_data_frame = function(trait_names) {
   trait_names = prepend('jetz_scientific_name', trait_names)
@@ -311,32 +309,34 @@ get_dentrogram_for_traits = function(required_traits_for_dentro) {
   hclust(dist(traits,method="euclidean"), method="average")
 }
 
-dentro = get_dentrogram_for_traits(analysis_traits)
+dentro = get_dentrogram_for_traits(analysis_all_traits)
 plot(dentro)
 ```
 
 Petchey and Gaston's FD
 ```{r}
-get_pd_for_traits = function(species_matrix, required_traits_for_pd, dentorgram = get_dentrogram_for_traits(required_traits_for_pd)) {
-  result = pd(species_in_cities, as.phylo(dentorgram))
-  names(result) = c('urban_community_fd', 'species_richness')
-  result$city_id = as.double(rownames(result))
-  result[,c('city_id', 'urban_community_fd')]
+get_fd_for_traits = function(required_traits_for_pd, communities, dentorgram = get_dentrogram_for_traits(required_traits_for_pd)) {
+  result = pd(communities, as.phylo(dentorgram))
+  data.frame(site = rownames(result), urban_community_fd = result$PD)
 }
 
-urban_community_fd_result = get_pd_for_traits(species_in_cities, c('mass', 'locomotory_trait', 'trophic_trait'))
+urban_community_fd_result = get_fd_for_traits(analysis_all_traits, species_in_cities)
 head(urban_community_fd_result)
 ```
 
 ```{r}
-urban_community_fd_mass_result = get_pd_for_traits(species_in_cities, c('locomotory_trait'))
+urban_community_fd_mass_result = get_fd_for_traits(c('locomotory_trait'), species_in_cities)
 head(urban_community_fd_mass_result)
 ```
 ## Trait Variance
 ### FRic - Convex Hull of all traits
 ```{r}
-analysis_trait_values = get_traits_data_frame(analysis_traits)
-fd_fric(analysis_trait_values, species_in_cities)
+get_convex_hull = function(trait_names, communities) {
+  analysis_trait_values = get_traits_data_frame(trait_names)
+  fd_fric(analysis_trait_values, species_in_cities)
+}
+
+get_convex_hull(analysis_all_traits)
 ```
 
 ### Single Trait Variance
@@ -347,10 +347,10 @@ species_names_in_514
 ```
 
 ```{r}
-
 trait_values = function(trait, community_row) {
   species_names_in_community = names(community_row)[which(community_row == 1, arr.ind=T)[, "col"]]
-  analysis_trait_values[species_names_in_community, c(trait)]
+  traits_for_species_in_community = avonet_jetz[avonet_jetz$jetz_scientific_name %in% species_names_in_community, ]
+  traits_for_species_in_community[[c(trait)]]
 }
 
 trait_values('mass', species_in_cities[c('514'),])
@@ -364,7 +364,7 @@ single_trait_variance = function(trait, communities) {
     community_row = communities[c(row),]
     species_names_in_community = names(community_row)[which(community_row == 1, arr.ind=T)[, "col"]]
     
-    result = data.frame(city_id = row, variance = var(trait_values(trait, community_row)))
+    result = data.frame(site = row, variance = var(trait_values(trait, community_row)))
     variance_of_trait = rbind(variance_of_trait, result)
   }
   
@@ -398,12 +398,45 @@ SDNDr = function(trait, communities) {
     
     sdndr_value = sd(diff(sorted_trait_values)) / (max(sorted_trait_values) - min(sorted_trait_values))
     
-    sdndr_of_trait = rbind(sdndr_of_trait, data.frame(city_id = row, sdndr = sdndr_value))
+    sdndr_of_trait = rbind(sdndr_of_trait, data.frame(site = row, sdndr = sdndr_value))
   }
   
   sdndr_of_trait
 }
 
 SDNDr('locomotory_trait', species_in_cities)
+```
+
+## Put it all together
+```{r}
+get_community_metrics = function(communities, included_traits = analysis_all_traits) {
+
+  mntd_result = get_mntd_for_communities(communities)
+  mpd_result = get_mpd_for_communities(communities)
+  fd_all_traits = get_fd_for_traits(included_traits, communities)
+  convex_hull = get_convex_hull(included_traits, communities)
+  
+  result = right_join(right_join(mntd_result, mpd_result), right_join(fd_all_traits, convex_hull))
+  
+  for (trait in included_traits) {
+    col_name = function(value) {
+      paste(trait, value, sep = '_')
+    }
+  
+    fd_single_trait = get_fd_for_traits(trait, communities)
+    var_single_trait = single_trait_variance(trait, communities)
+    sdndr_single_trait = SDNDr(trait, communities)
+    
+    single_trait_result = right_join(right_join(fd_single_trait, var_single_trait), sdndr_single_trait)
+    names(single_trait_result) = c('site', col_name('fd'), col_name('var'), col_name('sdndr'))
+    result = right_join(result, single_trait_result)
+  }
+  
+  result
+}
+
+
+urban_community_values = get_community_metrics(species_in_cities)
+urban_community_values
 ```
 
