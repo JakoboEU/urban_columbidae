@@ -297,14 +297,21 @@ https://github.com/NGSwenson/SwensonSESYNCWorkshop2017/blob/5a966564d6896ff0f41d
 
 Create dentrogram
 ```{r fig.height=4}
-get_dentrogram_for_traits = function(required_traits_for_dentro) {
-  required_traits_for_dentro = prepend('jetz_scientific_name', required_traits_for_dentro)
-  traits = avonet_jetz[,required_traits_for_dentro]
+analysis_traits = c('mass', 'locomotory_trait', 'trophic_trait')
+
+get_traits_data_frame = function(trait_names) {
+  trait_names = prepend('jetz_scientific_name', trait_names)
+  traits = avonet_jetz[,trait_names]
   traits = tibble::column_to_rownames(traits, var='jetz_scientific_name')
+  traits
+}
+
+get_dentrogram_for_traits = function(required_traits_for_dentro) {
+  traits = get_traits_data_frame(required_traits_for_dentro)
   hclust(dist(traits,method="euclidean"), method="average")
 }
 
-dentro = get_dentrogram_for_traits(c('mass', 'locomotory_trait', 'trophic_trait'))
+dentro = get_dentrogram_for_traits(analysis_traits)
 plot(dentro)
 ```
 
@@ -313,7 +320,7 @@ Petchey and Gaston's FD
 get_pd_for_traits = function(species_matrix, required_traits_for_pd, dentorgram = get_dentrogram_for_traits(required_traits_for_pd)) {
   result = pd(species_in_cities, as.phylo(dentorgram))
   names(result) = c('urban_community_fd', 'species_richness')
-  result$city_id = as.double(rownames(urban_community_fd_result))
+  result$city_id = as.double(rownames(result))
   result[,c('city_id', 'urban_community_fd')]
 }
 
@@ -328,7 +335,8 @@ head(urban_community_fd_mass_result)
 ## Trait Variance
 ### FRic - Convex Hull of all traits
 ```{r}
-fd_fric(traits, species_in_cities)
+analysis_trait_values = get_traits_data_frame(analysis_traits)
+fd_fric(analysis_trait_values, species_in_cities)
 ```
 
 ### Single Trait Variance
@@ -339,9 +347,10 @@ species_names_in_514
 ```
 
 ```{r}
+
 trait_values = function(trait, community_row) {
   species_names_in_community = names(community_row)[which(community_row == 1, arr.ind=T)[, "col"]]
-  traits[species_names_in_community, c(trait)]
+  analysis_trait_values[species_names_in_community, c(trait)]
 }
 
 trait_values('mass', species_in_cities[c('514'),])
