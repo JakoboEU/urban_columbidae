@@ -292,11 +292,39 @@ urban_community_mpd_result = mpd(as.matrix(species_in_cities), phydist_urban_col
 selected_urban_communities = right_join(selected_urban_communities, data.frame(city_id = as.double(rownames(species_in_cities)), urban_community_mpd = urban_community_mpd_result))
 head(selected_urban_communities)
 ```
+
 ## FD - Petchey and Gaston
+Create dentrogram
+```{r fig.height=4}
+get_dentrogram_for_traits = function(required_traits_for_dentro) {
+  required_traits_for_dentro = prepend('jetz_scientific_name', required_traits_for_dentro)
+  traits = avonet_jetz[,required_traits_for_dentro]
+  traits = tibble::column_to_rownames(traits, var='jetz_scientific_name')
+  hclust(dist(traits,method="euclidean"), method="average")
+}
+
+dentro = get_dentrogram_for_traits(c('mass', 'locomotory_trait', 'trophic_trait'))
+plot(dentro)
+```
+
+Petchey and Gaston's FD
 ```{r}
-traits = avonet_jetz[avonet_jetz$jetz_scientific_name %in% colnames(species_in_cities),c('jetz_scientific_name', 'locomotory_trait')]
-traits = tibble::column_to_rownames(traits, var='jetz_scientific_name')
-traits = traits[order(match(rownames(traits), colnames(species_in_cities))),]
-res = dbFD(as.matrix(traits), as.matrix(species_in_cities), calc.FRic = T, calc.CWM = F, calc.FDiv = F, calc.FGR = T)
-res$FRic
+get_pd_for_traits = function(species_matrix, required_traits_for_pd, dentorgram = get_dentrogram_for_traits(required_traits_for_pd)) {
+  result = pd(species_in_cities, as.phylo(dentorgram))
+  names(result) = c('urban_community_fd', 'species_richness')
+  result$city_id = as.double(rownames(urban_community_fd_result))
+  result[,c('city_id', 'urban_community_fd')]
+}
+
+urban_community_fd_result = get_pd_for_traits(species_in_cities, c('mass', 'locomotory_trait', 'trophic_trait'))
+head(urban_community_fd_result)
+```
+
+```{r}
+selected_urban_communities = right_join(selected_urban_communities, urban_community_fd_result[,c('city_id', 'urban_community_fd')])
+head(selected_urban_communities)
+```
+```{r}
+urban_community_fd_mass_result = get_pd_for_traits(species_in_cities, c('locomotory_trait'))
+head(urban_community_fd_mass_result)
 ```
