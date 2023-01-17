@@ -193,7 +193,8 @@ avonet_birdlife_mapped_to_jetz_tmp = left_join(birdlife_to_jetz_mapping, avonet_
 duplicated_jetz_species_in_avonet = avonet_birdlife_mapped_to_jetz_tmp$jetz_scientific_name[duplicated(avonet_birdlife_mapped_to_jetz_tmp$jetz_scientific_name)]
 avonet_birdlife_mapped_to_jetz_tmp[avonet_birdlife_mapped_to_jetz_tmp$jetz_scientific_name %in% duplicated_jetz_species_in_avonet,] %>% arrange(jetz_scientific_name)
 ```
-```{r}
+De-duplicate avonet morphology using mean
+```{r create avonet_jetz}
 avonet_jetz = avonet_birdlife_mapped_to_jetz_tmp %>% group_by(jetz_scientific_name) %>% summarize(
   beak_length = mean(beak_length),
   beak_width = mean(beak_width),
@@ -252,13 +253,16 @@ avonet_jetz$locomotory_trait = locomotry_trait_pca$Ybar[,1]
 
 # Calculate city wide community values
 
-```{r}
+## First build out matrix of all urban communities
+```{r create species_in_cities}
 species_in_cities = pivot_wider(selected_columbidae_communities[selected_columbidae_communities$present_in_city,], names_from = jetz_scientific_name, values_from = "present_in_city", values_fill = list(present_in_city = F))
 species_in_cities = tibble::column_to_rownames(species_in_cities, var='city_id')
 species_in_cities = species_in_cities[,-1]
 species_in_cities
 ```
 ## Read in phylogeny
+Phylogenetic maximum clade tree based on a set of trees from Jetz et al. (2012) using the Hacket et al. (2008) backbone.
+Trim tree to just species within our urban communities
 ```{r}
 all_avian_species_tree <- read.tree("./phylogeny__stage2_hackett_mcc_no_neg.tre")
 columbidae_tree <- ladderize(drop.tip(all_avian_species_tree, setdiff(all_avian_species_tree$tip.label, selected_columbidae_communities$jetz_scientific_name)))
@@ -270,7 +274,9 @@ selected_columbidae_communities[!selected_columbidae_communities$jetz_scientific
 ```
 
 ## MNTD
-```{r}
+Using picante package https://cran.r-project.org/web/packages/picante/index.html
+Kembel, S.W., Cowan,P.D., Helmus, M.R., Cornwell, W.K., Morlon, H., Ackerly, D.D., Blomberg, S.P., Webb, C.O. (2010) Picante: {R} tools for integrating phylogenies and ecology. Bioinformatics, 26, 1463-1464
+```{r get_mntd_for_communities}
 get_mntd_for_communities = function(communities, phydist_urban_columbidae = cophenetic(columbidae_tree)) {
   urban_community_mntd_result = mntd(as.matrix(communities), phydist_urban_columbidae)
   data.frame(site = rownames(communities), urban_community_mntd = urban_community_mntd_result)
@@ -280,7 +286,9 @@ get_mntd_for_communities(species_in_cities)
 ```
 
 ## MPD
-```{r}
+Using picante package https://cran.r-project.org/web/packages/picante/index.html
+Citation above.
+```{r get_mpd_for_communities}
 get_mpd_for_communities = function(communities, phydist_urban_columbidae = cophenetic(columbidae_tree)) {
   urban_community_mpd_result = mpd(as.matrix(communities), phydist_urban_columbidae)
   data.frame(site = rownames(species_in_cities), urban_community_mpd = urban_community_mpd_result)
@@ -293,8 +301,10 @@ get_mpd_for_communities(species_in_cities)
 From
 https://github.com/NGSwenson/SwensonSESYNCWorkshop2017/blob/5a966564d6896ff0f41dc4ac0a6216f97b9d18e1/day.1.pm/tree.based.alpha.R
 
+Petchey, O.L. and Gaston, K.J. (2002), Functional diversity (FD), species richness and community composition. Ecology Letters, 5: 402-411
+
 Create dentrogram
-```{r fig.height=4}
+```{r get_dentrogram_for_traits, fig.height=4}
 analysis_all_traits = c('mass', 'locomotory_trait', 'trophic_trait')
 
 get_traits_data_frame = function(trait_names) {
@@ -314,7 +324,7 @@ plot(dentro)
 ```
 
 Petchey and Gaston's FD
-```{r}
+```{r get_fd_for_traits}
 get_fd_for_traits = function(required_traits_for_pd, communities, dentorgram = get_dentrogram_for_traits(required_traits_for_pd)) {
   result = pd(communities, as.phylo(dentorgram))
   data.frame(site = rownames(result), urban_community_fd = result$PD)
@@ -330,7 +340,10 @@ head(urban_community_fd_mass_result)
 ```
 ## Trait Variance
 ### FRic - Convex Hull of all traits
-```{r}
+Using fundiversity package https://cran.r-project.org/web/packages/fundiversity/index.html
+Grenié M, Gruson H (2022). fundiversity: Easy Computation of Functional Diversity Indices. doi:10.5281/zenodo.4761754, R package version 1.1.1
+
+```{r get_convex_hull}
 get_convex_hull = function(trait_names, communities) {
   analysis_trait_values = get_traits_data_frame(trait_names)
   fd_fric(analysis_trait_values, species_in_cities)
@@ -340,13 +353,15 @@ get_convex_hull(analysis_all_traits)
 ```
 
 ### Single Trait Variance
+How to get names of species in urban community:
 ```{r}
 species_in_514 = species_in_cities[c('514'),]
 species_names_in_514 = names(species_in_514)[which(species_in_514 == 1, arr.ind=T)[, "col"]]
 species_names_in_514
 ```
 
-```{r}
+How to get values of traits for species in urban community, and then var of those traits:
+```{r trait_values}
 trait_values = function(trait, community_row) {
   species_names_in_community = names(community_row)[which(community_row == 1, arr.ind=T)[, "col"]]
   traits_for_species_in_community = avonet_jetz[avonet_jetz$jetz_scientific_name %in% species_names_in_community, ]
@@ -357,7 +372,8 @@ trait_values('mass', species_in_cities[c('514'),])
 var(trait_values('mass', species_in_cities[c('514'),]))
 ```
 
-```{r}
+Turn into a function:
+```{r single_trait_variance}
 single_trait_variance = function(trait, communities) {
   variance_of_trait = data.frame()
   for(row in rownames(communities)) {
@@ -376,6 +392,7 @@ single_trait_variance('mass', species_in_cities)
 ## SDNDr
 Standard deviation of distances between neighbouring species along a single trait axis, divided by the trait range of the community.
 
+How to calculate SDNDr using trait values for an urban community:
 ```{r}
 print('trait values:')
 sorted_loco_traits_in_1291 = sort(trait_values('locomotory_trait', species_in_cities[c('1291'),]))
@@ -387,8 +404,8 @@ diff(sorted_loco_traits_in_1291)
 print('SDNDr:')
 sd(diff(sorted_loco_traits_in_1291)) / (max(sorted_loco_traits_in_1291) - min(sorted_loco_traits_in_1291))
 ```
-
-```{r}
+Turn into a function:
+```{r SDNDr}
 SDNDr = function(trait, communities) {
   sdndr_of_trait = data.frame()
   for(row in rownames(communities)) {
@@ -408,7 +425,7 @@ SDNDr('locomotory_trait', species_in_cities)
 ```
 
 ## Put it all together
-```{r}
+```{r get_community_metrics}
 get_community_metrics = function(communities, included_traits = analysis_all_traits) {
 
   mntd_result = get_mntd_for_communities(communities)
