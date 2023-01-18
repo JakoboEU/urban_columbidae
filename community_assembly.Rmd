@@ -279,7 +279,7 @@ Kembel, S.W., Cowan,P.D., Helmus, M.R., Cornwell, W.K., Morlon, H., Ackerly, D.D
 ```{r get_mntd_for_communities}
 get_mntd_for_communities = function(communities, phydist_urban_columbidae = cophenetic(columbidae_tree)) {
   urban_community_mntd_result = mntd(as.matrix(communities), phydist_urban_columbidae)
-  data.frame(site = rownames(communities), urban_community_mntd = urban_community_mntd_result)
+  data.frame(site = rownames(communities), mntd = urban_community_mntd_result)
 }
 
 get_mntd_for_communities(species_in_cities)
@@ -291,7 +291,7 @@ Citation above.
 ```{r get_mpd_for_communities}
 get_mpd_for_communities = function(communities, phydist_urban_columbidae = cophenetic(columbidae_tree)) {
   urban_community_mpd_result = mpd(as.matrix(communities), phydist_urban_columbidae)
-  data.frame(site = rownames(communities), urban_community_mpd = urban_community_mpd_result)
+  data.frame(site = rownames(communities), mpd = urban_community_mpd_result)
 }
 
 get_mpd_for_communities(species_in_cities)
@@ -327,7 +327,7 @@ Petchey and Gaston's FD
 ```{r get_fd_for_traits}
 get_fd_for_traits = function(required_traits_for_pd, communities, dentorgram = get_dentrogram_for_traits(required_traits_for_pd)) {
   result = pd(communities, as.phylo(dentorgram))
-  data.frame(site = rownames(result), urban_community_fd = result$PD)
+  data.frame(site = rownames(result), fd = result$PD)
 }
 
 urban_community_fd_result = get_fd_for_traits(analysis_all_traits, species_in_cities)
@@ -451,8 +451,9 @@ get_community_metrics = function(communities, included_traits = analysis_all_tra
   
   result
 }
+```
 
-
+```{r create urban_community_values}
 urban_community_values = get_community_metrics(species_in_cities)
 urban_community_values
 ```
@@ -490,6 +491,7 @@ create_null_model_communities = function(city_id) {
 
 create_null_model_communities(test_city_id)
 ```
+
 What were the results for the actual urban community in Manchester?
 ```{r}
 urban_community_values[urban_community_values$site == test_city_id,]
@@ -504,5 +506,100 @@ test_null_model_community_values
 ```
 
 # Compare Urban Communities to regional null models
+```{r normalise}
+normalise = function(actual_value, min_value, max_value) {
+  (actual_value - min_value) / (max_value - min_value)
+}
 
+normalise(1.5, 1, 2)
+```
+
+```{r standardise}
+standardise = function(actual_value, mean_value, sd) {
+  (actual_value - mean_value) / sd
+}
+
+standardise(1.5, 1, 0.25)
+```
+
+Test creating normalised and standardised FRic
+```{r}
+property = 'FRic'
+actual_value = urban_community_values[urban_community_values$site == test_city_id,c(property)]
+null_model_values = test_null_model_community_values[,c(property)]
+
+print(paste('Normalised', property, 'at site', test_city_id))
+normalise(actual_value, min(null_model_values), max(null_model_values))
+print(paste('Standardised', property, 'at site', test_city_id))
+standardise(actual_value, mean(null_model_values), sd(null_model_values))
+```
+
+Create function to test actual value against all possible null model values
+```{r compare_community_to_null_model}
+compare_community_to_null_model = function(metric_name, actual_metric_value, null_model_metric_values) {
+  min_value = min(null_model_metric_values)
+  max_value = max(null_model_metric_values)
+  mean_value = min(null_model_metric_values)
+  sd_value = max(null_model_metric_values)
+  
+  result = data.frame(
+    normalised = normalise(actual_metric_value, min_value, max_value),
+    stanardised = standardise(actual_metric_value, mean_value, sd_value),
+    actual = actual_metric_value,
+    min = min_value,
+    max = max_value,
+    mean = mean_value,
+    sd = sd_value
+  )
+  
+  col_name = function(value) {
+      paste(metric_name, value, sep = '_')
+  }
+  
+  colnames(result) = c(col_name('normalised'), col_name('standardised'), col_name('actual'), col_name('min'), col_name('max'), col_name('mean'), col_name('sd'))
+  result
+}
+
+compare_community_to_null_model(property, actual_value, null_model_values)
+```
+
+The metrics we want to test:
+```{r create all_metrics_to_test}
+all_metrics_to_test = colnames(urban_community_values)[-1]
+all_metrics_to_test
+```
+
+```{r create_null_model_test_values}
+create_null_model_test_values = function(city_id) {
+  null_models = create_null_model_communities(city_id)
+  null_model_community_values = get_community_metrics(null_models)
+  
+  actual_values = urban_community_values[urban_community_values$site == city_id,]
+  
+  result = data.frame(city_id = city_id)
+  
+  for (metric in all_metrics_to_test) {
+    result = cbind(result, 
+                   compare_community_to_null_model(metric, actual_values[,c(metric)], null_model_community_values[,c(metric)]))
+  }
+  result
+}
+
+create_null_model_test_values(test_city_id)
+```
+
+```{r create urban_community_result, eval=FALSE}
+urban_community_result = data.frame()
+
+for (city_id in selected_urban_communities$city_id) {
+  urban_community_result = rbind(urban_community_result, create_null_model_test_values(city_id))
+}
+
+write_csv(urban_community_result, './community_assembly_result.csv')
+```
+
+```{r}
+urban_community_result = read_csv('./community_assembly_result.csv')
+urban_community_result
+```
 
