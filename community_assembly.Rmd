@@ -264,11 +264,12 @@ avonet_jetz$locomotory_trait = locomotry_trait_pca$Ybar[,1]
 
 ## First build out matrix of all urban communities
 ```{r create species_in_cities}
-species_in_cities = pivot_wider(selected_columbidae_communities[selected_columbidae_communities$present_in_city,], names_from = jetz_scientific_name, values_from = "present_in_city", values_fill = list(present_in_city = F))
+species_in_cities = pivot_wider(selected_columbidae_communities[selected_columbidae_communities$present_in_city,c('jetz_scientific_name', 'present_in_city', 'city_id')], names_from = jetz_scientific_name, values_from = "present_in_city", values_fill = list(present_in_city = F))
 species_in_cities = tibble::column_to_rownames(species_in_cities, var='city_id')
 species_in_cities = species_in_cities[,-1]
 species_in_cities
 ```
+
 ## Read in phylogeny
 Phylogenetic maximum clade tree based on a set of trees from Jetz et al. (2012) using the Hacket et al. (2008) backbone.
 Trim tree to just species within our urban communities
@@ -976,6 +977,11 @@ We can check the normalised response for FD against urban community size to see 
 ```{r}
 ggplot(urban_community_result, aes(y = fd_normalised, x = as.factor(urban_pool_size))) + geom_boxplot()
 ```
+```{r}
+jpeg('./figures/community_assembly_community.jpg', width = 1200, height = 800)
+ggarrange(norm_mntd_analysis_plot, norm_mpd_analysis_plot, norm_fric_analysis_plot, norm_fd_analysis_plot, ncol = 2, nrow = 2)
+dev.off()
+```
 
 ### Single Traits
 Standardised
@@ -998,3 +1004,13 @@ ggarrange(
 Higher than expected values for the locomotory trait FD and mass FD, along with lower than expected values for the locomotory trait SDNDr and mass SDNDr give some evidence that both these traits are selected under competitive exclusion.  VAR in both cases gives the opposite view, this is the single trait version of FRic.
 While the trophic trait has a higher than expected FD, its SDNDr value is fairly close to the mean and therefore this trait may not be selected under competitive exclusion.
 Also, Trisos et al. (2014) discourage the use of multi-pattern metrics such as variance and range, which are sensitive to both clustering and over-dispersion, in single-pattern, one-tailed hypothesis tests.
+
+```{r}
+jpeg('./figures/community_assembly_single_traits.jpg', width = 1200, height = 800)
+ggarrange(
+  norm_loco_trait_fd_analysis_plot, norm_loco_trait_var_analysis_plot, norm_loco_trait_sdndr_analysis_plot,
+  norm_trophic_trait_fd_analysis_plot, norm_trophic_trait_var_analysis_plot, norm_trophic_trait_sdndr_analysis_plot,
+  norm_mass_fd_analysis_plot, norm_mass_var_analysis_plot, norm_mass_sdndr_analysis_plot,
+  ncol = 3, nrow = 3)
+dev.off()
+```

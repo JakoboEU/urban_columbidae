@@ -15,7 +15,7 @@ library(phytools)
 
 
 ## Read in data exported from bigquery
-```{yaml metadata all_columbidae_communities}
+```{yaml metadata all_columbidae_presence}
 models:
   - name: all_columbidae_communities
     description: Regional and urban communities for all cities with a population of at least 250,000 from GHSL Data Package 2019 (Pesaresi et al. 2019), which contain at leasts 167 eBird checklists, and have at least one Columbidae species within their regional pools.
@@ -38,7 +38,7 @@ models:
         description: Textual description of Birdlife's origin code
 ```
 
-```{r read all_columbidae_communities}
+```{r read all_columbidae_presence}
 all_columbidae_presence = read_csv('bigquery_export__columbidae_jetz_urban_locations.csv')
 head(all_columbidae_presence)
 ```
