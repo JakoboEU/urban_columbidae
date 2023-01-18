@@ -603,3 +603,338 @@ urban_community_result = read_csv('./community_assembly_result.csv')
 urban_community_result
 ```
 
+# Analysis
+Total number of cities in analysis
+```{r}
+nrow(urban_community_result)
+```
+
+## Analysis of all traits across entire community
+
+### MNTD
+Pairwise phylogenetic distances separating each species from its closest co-occurring relative and is most sensitive to phylogenetic clustering or evenness at the tips of phylogeny.
+
+```{r}
+fmt_p_value = function(test_result) {
+  ifelse(test_result$p.value > 0.001, paste('=', round(test_result$p.value, 3)), '< 0.001')
+}
+
+geom_standardised_histogram = function(name, gg, test_result, mean) {
+    gg + geom_histogram(color = "#000000", fill = "#0099F8", binwidth = 0.25) +
+    geom_vline(aes(xintercept = 0), color = "#000000", size = 1.25) +
+    geom_vline(aes(xintercept = -1), color = "#000000", size = 1, linetype = "dashed") +
+    geom_vline(aes(xintercept = 1), color = "#000000", size = 1, linetype = "dashed") + 
+    ylab("Number of cities") + xlab("Standardised Response") + ylim(c(0, 220)) +
+    labs(title = paste(name, ' (V=', test_result$statistic, ', p-value ', fmt_p_value(test_result), ', mean = ', round(mean, 2), ')', sep=''))
+}
+
+geom_normalised_histogram = function(name, gg, test_result, mean) {
+  gg + geom_histogram(color = "#000000", fill = "#0099F8", binwidth = 0.25) +
+  geom_vline(aes(xintercept = 0.5), color = "#000000", size = 1.25) +
+  geom_vline(aes(xintercept = 0), color = "#000000", size = 1, linetype = "dashed") +
+  geom_vline(aes(xintercept = 1), color = "#000000", size = 1, linetype = "dashed") + 
+  ylab("Number of cities") + xlab("Normalised Response") + ylim(c(0, 220)) +
+  labs(title = paste(name, ' (V=', test_result$statistic, ', p-value ', fmt_p_value(test_result), ', mean = ', round(mean, 2), ')', sep=''))
+}
+```
+
+```{r}
+std_mntd_analysis_plot = geom_standardised_histogram(
+  'MNTD', 
+  ggplot(urban_community_result, aes(mntd_standardised)), 
+  wilcox.test(urban_community_result$mntd_standardised, mu = 0), 
+  mean(urban_community_result$mntd_standardised)
+)
+std_mntd_analysis_plot
+```
+
+```{r}
+norm_mntd_analysis_plot = geom_normalised_histogram(
+  'MNTD', 
+  ggplot(urban_community_result, aes(mntd_normalised)), 
+  wilcox.test(urban_community_result$mntd_normalised, mu = 0.5), 
+  mean(urban_community_result$mntd_normalised)
+)
+norm_mntd_analysis_plot
+```
+
+### MPD
+Mean pairwise phylogenetic distances between co-occurring species and is most sensitive to tree-wide patterns of phylogenetic clustering and evenness.
+
+```{r}
+std_mpd_analysis_plot = geom_standardised_histogram(
+  'MPD', 
+  ggplot(urban_community_result, aes(mpd_standardised)), 
+  wilcox.test(urban_community_result$mpd_standardised, mu = 0), 
+  mean(urban_community_result$mpd_standardised)
+)
+std_mpd_analysis_plot
+```
+
+```{r}
+norm_mpd_analysis_plot = geom_normalised_histogram(
+  'MNTD', 
+  ggplot(urban_community_result, aes(mpd_normalised)), 
+  wilcox.test(urban_community_result$mpd_normalised, mu = 0.5), 
+  mean(urban_community_result$mpd_normalised)
+)
+norm_mpd_analysis_plot
+```
+
+
+### All Traits FD
+Test normalised value
+```{r}
+std_fd_analysis_plot = geom_standardised_histogram(
+  'FD', 
+  ggplot(urban_community_result, aes(fd_standardised)), 
+  wilcox.test(urban_community_result$fd_standardised, mu = 0), 
+  mean(urban_community_result$fd_standardised)
+)
+std_fd_analysis_plot
+```
+
+```{r}
+norm_fd_analysis_plot = geom_normalised_histogram(
+  'FD', 
+  ggplot(urban_community_result, aes(fd_normalised)), 
+  wilcox.test(urban_community_result$fd_normalised, mu = 0.5), 
+  mean(urban_community_result$fd_normalised)
+)
+norm_fd_analysis_plot
+```
+
+### FRic
+Number of cities that we could calculate FRic for, need 4 or more species (as require more species than traits)
+```{r}
+std_fric_analysis_plot = geom_standardised_histogram(
+  'FRic', 
+  ggplot(urban_community_result, aes(FRic_standardised)), 
+  wilcox.test(urban_community_result$FRic_standardised, mu = 0), 
+  mean(urban_community_result$FRic_standardised, na.rm = T)
+)
+std_fric_analysis_plot
+```
+
+```{r}
+norm_fric_analysis_plot = geom_normalised_histogram(
+  'FRic', 
+  ggplot(urban_community_result, aes(FRic_normalised)), 
+  wilcox.test(urban_community_result$FRic_normalised, mu = 0.5), 
+  mean(urban_community_result$FRic_normalised, na.rm = T)
+)
+norm_fric_analysis_plot
+```
+
+## Single Trait Metrics
+
+Number of cities we can calculate SDNDr for - require at least 3 species
+```{r}
+nrow(urban_community_result[!is.na(urban_community_result$mass_sdndr_actual),])
+```
+
+### Locomotory Trait
+
+#### FD
+```{r}
+std_loco_trait_fd_analysis_plot = geom_standardised_histogram(
+  'Locomotory Trait - FD', 
+  ggplot(urban_community_result, aes(locomotory_trait_fd_standardised)), 
+  wilcox.test(urban_community_result$locomotory_trait_fd_standardised, mu = 0), 
+  mean(urban_community_result$locomotory_trait_fd_standardised, na.rm = T)
+)
+std_loco_trait_fd_analysis_plot
+```
+
+```{r}
+norm_loco_trait_fd_analysis_plot = geom_normalised_histogram(
+  'Locomotory Trait - FD', 
+  ggplot(urban_community_result, aes(locomotory_trait_fd_normalised)), 
+  wilcox.test(urban_community_result$locomotory_trait_fd_normalised, mu = 0.5), 
+  mean(urban_community_result$locomotory_trait_fd_normalised, na.rm = T)
+)
+norm_loco_trait_fd_analysis_plot
+```
+
+#### VAR
+```{r}
+std_loco_trait_var_analysis_plot = geom_standardised_histogram(
+  'Locomotory Trait - VAR', 
+  ggplot(urban_community_result, aes(locomotory_trait_var_standardised)), 
+  wilcox.test(urban_community_result$locomotory_trait_var_standardised, mu = 0), 
+  mean(urban_community_result$locomotory_trait_var_standardised, na.rm = T)
+)
+std_loco_trait_var_analysis_plot
+```
+
+```{r}
+norm_loco_trait_var_analysis_plot = geom_normalised_histogram(
+  'Locomotory Trait - VAR', 
+  ggplot(urban_community_result, aes(locomotory_trait_var_normalised)), 
+  wilcox.test(urban_community_result$locomotory_trait_var_normalised, mu = 0.5), 
+  mean(urban_community_result$locomotory_trait_var_normalised, na.rm = T)
+)
+norm_loco_trait_var_analysis_plot
+```
+
+#### SDNDr
+```{r}
+std_loco_trait_sdndr_analysis_plot = geom_standardised_histogram(
+  'Locomotory Trait - SDNDr', 
+  ggplot(urban_community_result, aes(locomotory_trait_sdndr_standardised)), 
+  wilcox.test(urban_community_result$locomotory_trait_sdndr_standardised, mu = 0), 
+  mean(urban_community_result$locomotory_trait_sdndr_standardised, na.rm = T)
+)
+std_loco_trait_sdndr_analysis_plot
+```
+
+```{r}
+norm_loco_trait_sdndr_analysis_plot = geom_normalised_histogram(
+  'Locomotory Trait - SDNDr', 
+  ggplot(urban_community_result, aes(locomotory_trait_sdndr_normalised)), 
+  wilcox.test(urban_community_result$locomotory_trait_sdndr_normalised, mu = 0.5), 
+  mean(urban_community_result$locomotory_trait_sdndr_normalised, na.rm = T)
+)
+norm_loco_trait_sdndr_analysis_plot
+```
+
+
+### Trophic Trait
+
+#### FD
+```{r}
+std_trophic_trait_fd_analysis_plot = geom_standardised_histogram(
+  'Trophic Trait - FD', 
+  ggplot(urban_community_result, aes(trophic_trait_fd_standardised)), 
+  wilcox.test(urban_community_result$trophic_trait_fd_standardised, mu = 0), 
+  mean(urban_community_result$trophic_trait_fd_standardised, na.rm = T)
+)
+std_trophic_trait_fd_analysis_plot
+```
+
+```{r}
+norm_trophic_trait_fd_analysis_plot = geom_normalised_histogram(
+  'Trophic Trait - FD', 
+  ggplot(urban_community_result, aes(trophic_trait_fd_normalised)), 
+  wilcox.test(urban_community_result$trophic_trait_fd_normalised, mu = 0.5), 
+  mean(urban_community_result$trophic_trait_fd_normalised, na.rm = T)
+)
+norm_trophic_trait_fd_analysis_plot
+```
+
+
+#### VAR
+```{r}
+std_trophic_trait_var_analysis_plot = geom_standardised_histogram(
+  'Trophic Trait - VAR', 
+  ggplot(urban_community_result, aes(trophic_trait_var_standardised)), 
+  wilcox.test(urban_community_result$trophic_trait_var_standardised, mu = 0), 
+  mean(urban_community_result$trophic_trait_var_standardised, na.rm = T)
+)
+std_trophic_trait_var_analysis_plot
+```
+
+```{r}
+norm_trophic_trait_var_analysis_plot = geom_normalised_histogram(
+  'Trophic Trait - VAR', 
+  ggplot(urban_community_result, aes(trophic_trait_var_normalised)), 
+  wilcox.test(urban_community_result$trophic_trait_var_normalised, mu = 0.5), 
+  mean(urban_community_result$trophic_trait_var_normalised, na.rm = T)
+)
+norm_trophic_trait_var_analysis_plot
+```
+
+
+#### SDNDr
+```{r}
+std_trophic_trait_sdndr_analysis_plot = geom_standardised_histogram(
+  'Trophic Trait - SDNDr', 
+  ggplot(urban_community_result, aes(trophic_trait_sdndr_standardised)), 
+  wilcox.test(urban_community_result$trophic_trait_sdndr_standardised, mu = 0), 
+  mean(urban_community_result$trophic_trait_sdndr_standardised, na.rm = T)
+)
+std_trophic_trait_sdndr_analysis_plot
+```
+
+```{r}
+norm_trophic_trait_sdndr_analysis_plot = geom_normalised_histogram(
+  'Trophic Trait - SDNDr', 
+  ggplot(urban_community_result, aes(trophic_trait_sdndr_normalised)), 
+  wilcox.test(urban_community_result$trophic_trait_sdndr_normalised, mu = 0.5), 
+  mean(urban_community_result$trophic_trait_var_normalised, na.rm = T)
+)
+norm_trophic_trait_sdndr_analysis_plot
+```
+
+
+### Mass
+
+#### FD
+```{r}
+std_mass_fd_analysis_plot = geom_standardised_histogram(
+  'Mass - FD', 
+  ggplot(urban_community_result, aes(mass_fd_standardised)), 
+  wilcox.test(urban_community_result$mass_fd_standardised, mu = 0), 
+  mean(urban_community_result$mass_fd_standardised, na.rm = T)
+)
+std_mass_fd_analysis_plot
+```
+
+```{r}
+norm_mass_fd_analysis_plot = geom_normalised_histogram(
+  'Mass - FD', 
+  ggplot(urban_community_result, aes(mass_fd_normalised)), 
+  wilcox.test(urban_community_result$mass_fd_normalised, mu = 0.5), 
+  mean(urban_community_result$mass_fd_normalised, na.rm = T)
+)
+norm_mass_fd_analysis_plot
+```
+
+
+#### VAR
+```{r}
+std_mass_var_analysis_plot = geom_standardised_histogram(
+  'Mass - VAR', 
+  ggplot(urban_community_result, aes(mass_var_standardised)), 
+  wilcox.test(urban_community_result$mass_var_standardised, mu = 0), 
+  mean(urban_community_result$mass_var_standardised, na.rm = T)
+)
+std_mass_var_analysis_plot
+```
+
+```{r}
+norm_mass_var_analysis_plot = geom_normalised_histogram(
+  'Mass - VAR', 
+  ggplot(urban_community_result, aes(mass_var_normalised)), 
+  wilcox.test(urban_community_result$mass_var_normalised, mu = 0.5), 
+  mean(urban_community_result$mass_var_normalised, na.rm = T)
+)
+norm_mass_var_analysis_plot
+```
+
+
+#### SDNDr
+```{r}
+std_mass_sdndr_analysis_plot = geom_standardised_histogram(
+  'Mass - SDNDr', 
+  ggplot(urban_community_result, aes(mass_sdndr_standardised)), 
+  wilcox.test(urban_community_result$mass_sdndr_standardised, mu = 0), 
+  mean(urban_community_result$mass_sdndr_standardised, na.rm = T)
+)
+std_mass_sdndr_analysis_plot
+```
+
+```{r}
+norm_mass_sdndr_analysis_plot = geom_normalised_histogram(
+  'Mass - SDNDr', 
+  ggplot(urban_community_result, aes(mass_sdndr_normalised)), 
+  wilcox.test(urban_community_result$mass_sdndr_normalised, mu = 0.5), 
+  mean(urban_community_result$mass_sdndr_normalised, na.rm = T)
+)
+norm_mass_sdndr_analysis_plot
+```
+
+
+
+
+
