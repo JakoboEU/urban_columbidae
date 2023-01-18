@@ -609,6 +609,7 @@ for (city_id in selected_urban_communities$city_id) {
   urban_community_result = rbind(urban_community_result, create_null_model_test_values(city_id))
 }
 
+urban_community_result = right_join(urban_community_result, selected_urban_communities)
 write_csv(urban_community_result, './community_assembly_result.csv')
 head(urban_community_result)
 ```
@@ -671,11 +672,6 @@ norm_mntd_analysis_plot = geom_normalised_histogram(
   mean(urban_community_result$mntd_normalised)
 )
 norm_mntd_analysis_plot
-```
-
-```{r}
-cities_ids_for_low_normalised_mntd = urban_community_result$city_id[urban_community_result$mntd_normalised < 0.2]
-selected_urban_communities[selected_urban_communities$city_id %in% cities_ids_for_low_normalised_mntd,]
 ```
 
 ### MPD
@@ -881,7 +877,7 @@ norm_trophic_trait_sdndr_analysis_plot = geom_normalised_histogram(
   'Trophic Trait - SDNDr', 
   ggplot(urban_community_result, aes(trophic_trait_sdndr_normalised)), 
   wilcox.test(urban_community_result$trophic_trait_sdndr_normalised, mu = 0.5), 
-  mean(urban_community_result$trophic_trait_var_normalised, na.rm = T)
+  mean(urban_community_result$trophic_trait_sdndr_normalised, na.rm = T)
 )
 norm_trophic_trait_sdndr_analysis_plot
 ```
@@ -966,6 +962,13 @@ Normalised
 ```{r, fig.height=3, fig.width=3}
 ggarrange(norm_mntd_analysis_plot, norm_mpd_analysis_plot, norm_fric_analysis_plot, norm_fd_analysis_plot, ncol = 2, nrow = 2)
 ```
+Strong evidence for competitive exclusion shaping urban communities, three of the four metrics are significantly higher than would be expected by random.  The only metric that is not higher than expected nor significant is FRic. Could this be because FRic only includes urban communities with 3 or more species?
+
+We can check the normalised response for FD against urban community size to see if there is any evidence of larger communities being less likely to be shaped by competitive exclusion. This shows that larger pools do have a much lower mean for normalised FD response and therefore the FRic result could be down to only larger pools being included.  More species could well be present when more habitat is available in the city, and thus there is sufficient habitat to help species avoid getting involved in competitive interactions.
+```{r}
+ggplot(urban_community_result, aes(y = fd_normalised, x = as.factor(urban_pool_size))) + geom_boxplot()
+```
+
 ### Single Traits
 Standardised
 ```{r, fig.height=6, fig.width=6}
@@ -975,6 +978,7 @@ ggarrange(
   std_mass_fd_analysis_plot, std_mass_var_analysis_plot, std_mass_sdndr_analysis_plot,
   ncol = 3, nrow = 3)
 ```
+
 Normalised
 ```{r, fig.height=6, fig.width=6}
 ggarrange(
@@ -983,3 +987,5 @@ ggarrange(
   norm_mass_fd_analysis_plot, norm_mass_var_analysis_plot, norm_mass_sdndr_analysis_plot,
   ncol = 3, nrow = 3)
 ```
+Higher than expected values for the locomotory trait FD and mass FD, along with lower than expected values for the locomotory trait SDNDr and mass SDNDr give some evidence that both these traits are selected under competitive exclusion.  VAR in both cases gives the opposite view, this is the single trait version of FRic.
+While the trophic trait has a higher than expected FD, its SDNDr value is fairly close to the mean and therefore this trait may not be selected under competitive exclusion.
