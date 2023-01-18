@@ -291,7 +291,7 @@ Citation above.
 ```{r get_mpd_for_communities}
 get_mpd_for_communities = function(communities, phydist_urban_columbidae = cophenetic(columbidae_tree)) {
   urban_community_mpd_result = mpd(as.matrix(communities), phydist_urban_columbidae)
-  data.frame(site = rownames(species_in_cities), urban_community_mpd = urban_community_mpd_result)
+  data.frame(site = rownames(communities), urban_community_mpd = urban_community_mpd_result)
 }
 
 get_mpd_for_communities(species_in_cities)
@@ -346,7 +346,7 @@ Grenié M, Gruson H (2022). fundiversity: Easy Computation of Functional Diversi
 ```{r get_convex_hull}
 get_convex_hull = function(trait_names, communities) {
   analysis_trait_values = get_traits_data_frame(trait_names)
-  fd_fric(analysis_trait_values, species_in_cities)
+  fd_fric(analysis_trait_values, communities)
 }
 
 get_convex_hull(analysis_all_traits)
@@ -456,4 +456,53 @@ get_community_metrics = function(communities, included_traits = analysis_all_tra
 urban_community_values = get_community_metrics(species_in_cities)
 urban_community_values
 ```
+
+# Calculate the null models
+Our null model is every possible community of species from the regional pool with the same richness as the urban pool
+
+Find all species in regional pool:
+```{r}
+test_city_id = 1786 # Manchester
+
+all_columbidae_communities$jetz_scientific_name[all_columbidae_communities$city_id == test_city_id]
+```
+
+Find urban richness
+```{r}
+selected_urban_communities$urban_pool_size[selected_urban_communities$city_id == test_city_id]
+```
+
+Function to build every possible community
+```{r create_null_model_communities}
+create_null_model_communities = function(city_id) {
+  regional_species = all_columbidae_communities$jetz_scientific_name[all_columbidae_communities$city_id == city_id]
+  regional_richness = length(regional_species)
+  urban_richness = selected_urban_communities$urban_pool_size[selected_urban_communities$city_id == city_id]
+  
+  null_model_sites = expand.grid(rep(list(TRUE:FALSE), regional_richness))
+  null_model_sites_species_richness =  data.frame(species_richness = pmap_dbl(null_model_sites, sum))
+  null_model_sites = cbind(null_model_sites, null_model_sites_species_richness)
+  
+  null_model_sites = null_model_sites[null_model_sites$species_richness == urban_richness,1:regional_richness]
+  colnames(null_model_sites) = regional_species
+  null_model_sites
+}
+
+create_null_model_communities(test_city_id)
+```
+What were the results for the actual urban community in Manchester?
+```{r}
+urban_community_values[urban_community_values$site == test_city_id,]
+```
+
+Test creating community metrics for our null model
+```{r}
+test_null_models = create_null_model_communities(test_city_id)
+
+test_null_model_community_values = get_community_metrics(test_null_models)
+test_null_model_community_values
+```
+
+# Compare Urban Communities to regional null models
+
 
