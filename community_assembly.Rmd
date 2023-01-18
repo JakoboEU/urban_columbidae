@@ -15,6 +15,7 @@ library(picante)
 library(abdiv)
 library(vegan)
 library(fundiversity)
+library(ggpubr)
 ```
 
 # Introduction
@@ -464,7 +465,12 @@ Our null model is every possible community of species from the regional pool wit
 Find all species in regional pool:
 ```{r}
 test_city_id = 1786 # Manchester
+test_city_id2 = 2284 # Geneva
 
+all_columbidae_communities$jetz_scientific_name[all_columbidae_communities$city_id == test_city_id]
+```
+
+```{r}
 all_columbidae_communities$jetz_scientific_name[all_columbidae_communities$city_id == test_city_id]
 ```
 
@@ -505,6 +511,10 @@ test_null_model_community_values = get_community_metrics(test_null_models)
 test_null_model_community_values
 ```
 
+```{r}
+get_community_metrics(create_null_model_communities(test_city_id2))
+```
+
 # Compare Urban Communities to regional null models
 ```{r normalise}
 normalise = function(actual_value, min_value, max_value) {
@@ -539,8 +549,8 @@ Create function to test actual value against all possible null model values
 compare_community_to_null_model = function(metric_name, actual_metric_value, null_model_metric_values) {
   min_value = min(null_model_metric_values)
   max_value = max(null_model_metric_values)
-  mean_value = min(null_model_metric_values)
-  sd_value = max(null_model_metric_values)
+  mean_value = mean(null_model_metric_values)
+  sd_value = sd(null_model_metric_values)
   
   result = data.frame(
     normalised = normalise(actual_metric_value, min_value, max_value),
@@ -588,7 +598,11 @@ create_null_model_test_values = function(city_id) {
 create_null_model_test_values(test_city_id)
 ```
 
-```{r create urban_community_result, eval=FALSE}
+```{r}
+create_null_model_test_values(test_city_id2)
+```
+
+```{r create urban_community_result, eval = FALSE}
 urban_community_result = data.frame()
 
 for (city_id in selected_urban_communities$city_id) {
@@ -596,6 +610,7 @@ for (city_id in selected_urban_communities$city_id) {
 }
 
 write_csv(urban_community_result, './community_assembly_result.csv')
+head(urban_community_result)
 ```
 
 ```{r}
@@ -624,17 +639,17 @@ geom_standardised_histogram = function(name, gg, test_result, mean) {
     geom_vline(aes(xintercept = 0), color = "#000000", size = 1.25) +
     geom_vline(aes(xintercept = -1), color = "#000000", size = 1, linetype = "dashed") +
     geom_vline(aes(xintercept = 1), color = "#000000", size = 1, linetype = "dashed") + 
-    ylab("Number of cities") + xlab("Standardised Response") + ylim(c(0, 220)) +
-    labs(title = paste(name, ' (V=', test_result$statistic, ', p-value ', fmt_p_value(test_result), ', mean = ', round(mean, 2), ')', sep=''))
+    ylab("Number of cities") + xlab("Standardised Response") + ylim(c(0, 150)) + xlim(c(-3, 3)) +
+    labs(title = name, subtitle=paste('(V=', test_result$statistic, ', p-value ', fmt_p_value(test_result), ', mean = ', round(mean, 2), ')', sep=''))
 }
 
 geom_normalised_histogram = function(name, gg, test_result, mean) {
-  gg + geom_histogram(color = "#000000", fill = "#0099F8", binwidth = 0.25) +
+  gg + geom_histogram(color = "#000000", fill = "#0099F8", binwidth = 0.1) +
   geom_vline(aes(xintercept = 0.5), color = "#000000", size = 1.25) +
   geom_vline(aes(xintercept = 0), color = "#000000", size = 1, linetype = "dashed") +
   geom_vline(aes(xintercept = 1), color = "#000000", size = 1, linetype = "dashed") + 
-  ylab("Number of cities") + xlab("Normalised Response") + ylim(c(0, 220)) +
-  labs(title = paste(name, ' (V=', test_result$statistic, ', p-value ', fmt_p_value(test_result), ', mean = ', round(mean, 2), ')', sep=''))
+  ylab("Number of cities") + xlab("Normalised Response") + ylim(c(0, 200)) +
+  labs(title = name, subtitle = paste('(V=', test_result$statistic, ', p-value ', fmt_p_value(test_result), ', mean = ', round(mean, 2), ')', sep=''))
 }
 ```
 
@@ -656,6 +671,11 @@ norm_mntd_analysis_plot = geom_normalised_histogram(
   mean(urban_community_result$mntd_normalised)
 )
 norm_mntd_analysis_plot
+```
+
+```{r}
+cities_ids_for_low_normalised_mntd = urban_community_result$city_id[urban_community_result$mntd_normalised < 0.2]
+selected_urban_communities[selected_urban_communities$city_id %in% cities_ids_for_low_normalised_mntd,]
 ```
 
 ### MPD
@@ -934,7 +954,32 @@ norm_mass_sdndr_analysis_plot = geom_normalised_histogram(
 norm_mass_sdndr_analysis_plot
 ```
 
+## Create Figures
 
+### All Traits
 
-
-
+Standardised
+```{r, fig.height=3, fig.width=3}
+ggarrange(std_mntd_analysis_plot, std_mpd_analysis_plot, std_fric_analysis_plot, std_fd_analysis_plot, ncol = 2, nrow = 2)
+```
+Normalised
+```{r, fig.height=3, fig.width=3}
+ggarrange(norm_mntd_analysis_plot, norm_mpd_analysis_plot, norm_fric_analysis_plot, norm_fd_analysis_plot, ncol = 2, nrow = 2)
+```
+### Single Traits
+Standardised
+```{r, fig.height=6, fig.width=6}
+ggarrange(
+  std_loco_trait_fd_analysis_plot, std_loco_trait_var_analysis_plot, std_loco_trait_sdndr_analysis_plot,
+  std_trophic_trait_fd_analysis_plot, std_trophic_trait_var_analysis_plot, std_trophic_trait_sdndr_analysis_plot,
+  std_mass_fd_analysis_plot, std_mass_var_analysis_plot, std_mass_sdndr_analysis_plot,
+  ncol = 3, nrow = 3)
+```
+Normalised
+```{r, fig.height=6, fig.width=6}
+ggarrange(
+  norm_loco_trait_fd_analysis_plot, norm_loco_trait_var_analysis_plot, norm_loco_trait_sdndr_analysis_plot,
+  norm_trophic_trait_fd_analysis_plot, norm_trophic_trait_var_analysis_plot, norm_trophic_trait_sdndr_analysis_plot,
+  norm_mass_fd_analysis_plot, norm_mass_var_analysis_plot, norm_mass_sdndr_analysis_plot,
+  ncol = 3, nrow = 3)
+```
