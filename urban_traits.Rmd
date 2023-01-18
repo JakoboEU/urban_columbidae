@@ -1,0 +1,310 @@
+---
+title: "Urban Trait Predictors for Pigeons"
+output: html_notebook
+---
+
+```{r setup, message = F, warning = false}
+library(dplyr)
+library(purrr)
+library(tidyverse)
+library(tidyr)
+
+library(corrplot)
+library(phytools)
+```
+
+
+## Read in data exported from bigquery
+```{yaml metadata all_columbidae_communities}
+models:
+  - name: all_columbidae_communities
+    description: Regional and urban communities for all cities with a population of at least 250,000 from GHSL Data Package 2019 (Pesaresi et al. 2019), which contain at leasts 167 eBird checklists, and have at least one Columbidae species within their regional pools.
+    columns:
+      - name: city_id
+        description: Vector ID from GHSL Data Package 2019 (Pesaresi et al. 2019)
+      - name: city_name
+        description: City name from Vector from GHSL Data Package 2019 (Pesaresi et al. 2019)
+      - name: jetz_scientific_name
+        description: The mapped name of each species whose distribution from BirdLife International’s species distribution maps (BirdLife International and Handbook of the Birds of the World 2020), overlaps with the city vector from GHSL Data Package 2019 (Pesaresi et al. 2019). Species mapped from eBird and Birdlife to JETZ taxonomy using birdlife alternative names and Avibase (Lepage 2011).
+      - name: present_in_city
+        description: True if the species is present on at least 5% of all valid checklists within the city
+      - name: season_code 
+        description: season code from BirdLife International and Handbook of the Birds of the World 2020
+      - name: season
+        description: Textual description of Birdlife's season code
+      - name: origin_code 
+        description: origin code from BirdLife International and Handbook of the Birds of the World 2020
+      - name: origin
+        description: Textual description of Birdlife's origin code
+```
+
+```{r read all_columbidae_communities}
+all_columbidae_presence = read_csv('bigquery_export__columbidae_jetz_urban_locations.csv')
+head(all_columbidae_presence)
+```
+
+# Trait Data
+```{yaml metadata avonet_birdlife}
+models:
+  - name: avonet_birdlife
+    description: Functional traits taken from Avonet (Tobias et al. 2022) which includes core morphologic measurements, along with habitat preference
+    columns:
+      - name: species_name
+        description: The birdlife species name
+      - name: beak_length
+        description: measured from tip to skull along the culmen
+      - name: beak_width
+        description: 
+      - name: beak_depth
+        description:
+      - name: tail_length
+        description:
+      - name: wing_length
+        description: carpal joint to wingtip measured on the unflattened wing
+      - name: tarsus_length
+        description:
+      - name: habitat
+        description: habitat preference; one of: forest, grassland, human modified, rock, shrubland, woodland, desert
+      - name: habitat_density
+        description: habitat density preference (1 open to 3 dense)
+      - name: trophic_niche
+        description: frugivore, granivore, omnivore
+      - name: primary_lifestyle
+        description: generalist, insessorial, terrestrial
+      - name: range_size
+        description: extracted range size (km2) from Birdlife
+      - name: mass
+        description: body mass (grams)
+```
+
+```{r read avonet_birdlife}
+avonet_birdlife_input_tmp = read_csv('avonet_birdlife.csv')
+avonet_birdlife = avonet_birdlife_input_tmp[,c('Species1', 'Beak.Length_Culmen', 'Beak.Width', 'Beak.Depth', 'Tail.Length', 'Wing.Length', 'Tarsus.Length', 'Habitat', 'Habitat.Density', 'Trophic.Niche', 'Primary.Lifestyle', 'Range.Size', 'Mass')]
+names(avonet_birdlife) = c('species_name', 'beak_length', 'beak_width', 'beak_depth', 'tail_length', 'wing_length', 'tarsus_length', 'habitat', 'habitat_density', 'trophic_niche', 'primary_lifestyle', 'range_size', 'mass')
+head(avonet_birdlife)
+```
+
+## Mapping trait data to JETZ taxonomy
+```{yaml metadata birdlife_to_jetz_mapping}
+models:
+  - name: birdlife_to_jetz_mapping
+    description: Mapping from birdlife to jetz taxonomies
+    columns:
+      - name: species_name
+        description: The birdlife species name
+      - name: jetz_scientific_name
+        description: The Jetz species name
+```
+
+```{r read birdlife_to_jetz_mapping}
+birdlife_to_jetz_mapping = read_csv('bigquery_export__columbidae_taxonomic_mapping.csv')
+head(birdlife_to_jetz_mapping)
+```
+
+Drop species in taxonomy mapping that are not in our communities - to avoid worrying about species not in our datasets
+```{r clean birdlife_to_jetz_mapping}
+paste("Species not in dataset", nrow(birdlife_to_jetz_mapping[!birdlife_to_jetz_mapping$jetz_scientific_name %in% selected_columbidae_communities$jetz_scientific_name,]))
+paste("Total mapped species", nrow(birdlife_to_jetz_mapping))
+
+birdlife_to_jetz_mapping = birdlife_to_jetz_mapping[birdlife_to_jetz_mapping$jetz_scientific_name %in% all_columbidae_presence$jetz_scientific_name,]
+
+paste("Remaining species after removal", nrow(birdlife_to_jetz_mapping))
+```
+
+Check that we have AVONET data for all species - expect empty set
+```{r}
+birdlife_to_jetz_mapping[!birdlife_to_jetz_mapping$species_name %in% avonet_birdlife$species_name,]
+```
+
+Check that we have mapping entry for all community species - expect empty set
+```{r}
+selected_columbidae_communities[!selected_columbidae_communities$jetz_scientific_name %in% birdlife_to_jetz_mapping$jetz_scientific_name,]
+```
+
+When we map, how many duplicates do we have, and how dissimilar are they?
+```{r}
+avonet_birdlife_mapped_to_jetz_tmp = left_join(birdlife_to_jetz_mapping, avonet_birdlife)
+duplicated_jetz_species_in_avonet = avonet_birdlife_mapped_to_jetz_tmp$jetz_scientific_name[duplicated(avonet_birdlife_mapped_to_jetz_tmp$jetz_scientific_name)]
+avonet_birdlife_mapped_to_jetz_tmp[avonet_birdlife_mapped_to_jetz_tmp$jetz_scientific_name %in% duplicated_jetz_species_in_avonet,] %>% arrange(jetz_scientific_name)
+```
+
+De-duplicate avonet morphology using mean
+```{r create avonet_jetz}
+avonet_jetz = avonet_birdlife_mapped_to_jetz_tmp %>% group_by(jetz_scientific_name) %>% summarize(
+  beak_length = mean(beak_length),
+  beak_width = mean(beak_width),
+  beak_depth = mean(beak_depth),
+  tail_length = mean(tail_length),
+  wing_length = mean(wing_length),
+  tarsus_length = mean(tarsus_length),
+  trophic_niche = first(trophic_niche),
+  habitat = first(habitat),
+  habitat_density = first(habitat_density),
+  primary_lifestyle = first(primary_lifestyle),
+  range_size = sum(range_size),
+  mass = mean(mass)
+)
+head(avonet_jetz)
+```
+
+Check duplicates
+```{r}
+avonet_jetz[avonet_jetz$jetz_scientific_name %in% duplicated_jetz_species_in_avonet,]
+```
+
+## Evolutionary Age of Pigeons
+Phylogenetic maximum clade tree based on a set of trees from Jetz et al. (2012) using the Hacket et al. (2008) backbone.
+Trim tree to just species within our urban communities
+```{r}
+all_avian_species_tree <- read.tree("./phylogeny__stage2_hackett_mcc_no_neg.tre")
+columbidae_tree <- ladderize(drop.tip(all_avian_species_tree, setdiff(all_avian_species_tree$tip.label, selected_columbidae_communities$jetz_scientific_name)))
+```
+
+Find the length of the final branch for each pigeon in the tree
+```{r}
+terminal_branch_length = columbidae_tree$edge.length[columbidae_tree$edge[, 2] %in% 1:Ntip(columbidae_tree)]
+tips <- columbidae_tree$edge[columbidae_tree$edge[, 2] %in%  1:Ntip(columbidae_tree), 2]
+names(terminal_branch_length) = columbidae_tree$tip.label[tips]
+
+columbidae_branch_lengths = as.data.frame(terminal_branch_length)
+columbidae_branch_lengths$jetz_scientific_name = rownames(columbidae_branch_lengths)
+rownames(columbidae_branch_lengths) = NULL
+head(columbidae_branch_lengths)
+```
+
+# Build analysis dataset
+```{r}
+columbidae_presence_tmp = right_join(all_columbidae_presence, avonet_jetz)
+columbidae_presence_tmp = right_join(columbidae_presence_tmp, columbidae_branch_lengths)
+columbidae_presence = columbidae_presence_tmp[,c('present_in_city',  'season', 'origin', 'trophic_niche', 'habitat', 'habitat_density', 'primary_lifestyle', 'terminal_branch_length')]
+head(columbidae_presence)
+```
+# Analysis
+
+## Season
+
+```{r}
+table(columbidae_presence$present_in_city, columbidae_presence$season)
+```
+
+```{r}
+chisq_season = chisq.test(table(columbidae_presence$present_in_city, columbidae_presence$season))
+chisq_season
+```
+
+```{r}
+round(chisq_season$residuals, 2)
+```
+
+```{r}
+corrplot(chisq_season$residuals, is.cor = FALSE)
+```
+
+## Origin
+
+```{r}
+table(columbidae_presence$present_in_city, columbidae_presence$origin)
+```
+
+```{r}
+chisq_origin = chisq.test(table(columbidae_presence$present_in_city, columbidae_presence$origin))
+chisq_origin
+```
+
+```{r}
+round(chisq_origin$residuals, 2)
+```
+
+```{r}
+corrplot(chisq_origin$residuals, is.cor = FALSE)
+```
+## Habitat
+
+```{r}
+table(columbidae_presence$present_in_city, columbidae_presence$habitat)
+```
+
+```{r}
+chisq_habitat = chisq.test(table(columbidae_presence$present_in_city, columbidae_presence$habitat))
+chisq_habitat
+```
+
+```{r}
+round(chisq_habitat$residuals, 2)
+```
+
+```{r}
+corrplot(chisq_habitat$residuals, is.cor = FALSE)
+```
+
+## Habitat Density
+
+```{r}
+table(columbidae_presence$present_in_city, columbidae_presence$habitat_density)
+```
+
+```{r}
+chisq_habitat_density = chisq.test(table(columbidae_presence$present_in_city, columbidae_presence$habitat_density))
+chisq_habitat_density
+```
+
+```{r}
+round(chisq_habitat_density$residuals, 2)
+```
+
+```{r}
+corrplot(chisq_habitat_density$residuals, is.cor = FALSE)
+```
+
+## Trophic Guild
+
+```{r}
+table(columbidae_presence$present_in_city, columbidae_presence$trophic_niche)
+```
+
+```{r}
+chisq_trophic = chisq.test(table(columbidae_presence$present_in_city, columbidae_presence$trophic_niche))
+chisq_trophic
+```
+
+```{r}
+round(chisq_trophic$residuals, 2)
+```
+
+```{r}
+corrplot(chisq_trophic$residuals, is.cor = FALSE)
+```
+
+## Primary Lifestyle
+
+```{r}
+table(columbidae_presence$present_in_city, columbidae_presence$primary_lifestyle)
+```
+
+```{r}
+chisq_primary_lifestyle = chisq.test(table(columbidae_presence$present_in_city, columbidae_presence$primary_lifestyle))
+chisq_primary_lifestyle
+```
+
+```{r}
+round(chisq_primary_lifestyle$residuals, 2)
+```
+
+```{r}
+corrplot(chisq_primary_lifestyle$residuals, is.cor = FALSE)
+```
+## Evolutionary Age of Species
+```{r}
+print('Mean evolutionary age for species in cities')
+mean(columbidae_presence$terminal_branch_length[columbidae_presence$present_in_city])
+print('Mean evolutionary age for species NOT in cities')
+mean(columbidae_presence$terminal_branch_length[!columbidae_presence$present_in_city])
+```
+```{r}
+wilcox.test(columbidae_presence$terminal_branch_length[columbidae_presence$present_in_city], columbidae_presence$terminal_branch_length[!columbidae_presence$present_in_city])
+```
+```{r}
+ggplot(columbidae_presence, aes(x = present_in_city, y = terminal_branch_length)) + 
+  geom_boxplot() +
+  xlab('Species present in city?') + ylab('Evolutionary Age (branch length)')
+```
