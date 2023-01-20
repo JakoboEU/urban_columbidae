@@ -701,12 +701,12 @@ head(urban_resident_only_species_community_result)
 ```
 
 ```{r}
-urban_all_species_community_result = read_csv('./community_assembly_all_species_result.csv')
+urban_all_species_community_result = read_csv('./community_all_species_assembly_result.csv')
 urban_all_species_community_result
 ```
 
 ```{r}
-urban_resident_only_species_community_result = read_csv('./community_resident_species_assembly_result.csv')
+urban_resident_only_species_community_result = read_csv('./community_assembly_resident_species_result.csv')
 urban_resident_only_species_community_result
 ```
 
