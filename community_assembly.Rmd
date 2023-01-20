@@ -74,6 +74,7 @@ models:
 all_columbidae_communities = read_csv('bigquery_export__columbidae_jetz_urban_locations.csv')
 head(all_columbidae_communities)
 ```
+
 # Site Selection
 Our site metrics all compare species within communities, therefore we must have more than one species in each urban community for our analysis.
 Our null model requires us to create a range of dissimilar communities with the same richness as the actual urban community using species from the regional pool, therefore we must have less than the number of species in our regional pool in our urban pool.
@@ -84,6 +85,7 @@ Here we exclude then two sets of urban communities that are interesting in their
 urban_communities_tmp = all_columbidae_communities %>% group_by(city_id, city_name) %>% summarise(regional_pool_size = n(), urban_pool_size = sum(present_in_city))
 head(urban_communities_tmp)
 ```
+
 Communities with 1 or less pigeon species
 ```{r}
 urban_communities_tmp[urban_communities_tmp$urban_pool_size < 2,]
@@ -114,12 +116,52 @@ selected_urban_communities = urban_communities_tmp[urban_communities_tmp$urban_p
 nrow(selected_urban_communities)
 head(selected_urban_communities)
 ```
+
 And therefore
 ```{r}
 selected_columbidae_communities = all_columbidae_communities[all_columbidae_communities$city_id %in% selected_urban_communities$city_id,]
 head(selected_columbidae_communities)
 ```
+## Create a second set containing only Resident species
+We have shown that non-resident species are less likely to be present in urban communities; however, this could be temporal sampling bias that means non-resident species are less likely to appear on at least 5% of all checklists. Therefore we should validate our findings against a second dataset that contains only resident species.
 
+```{r}
+all_resident_columbidae_communities = all_columbidae_communities[all_columbidae_communities$season == 'Resident',]
+head(all_resident_columbidae_communities)
+```
+
+```{r}
+resident_urban_communities_tmp = all_resident_columbidae_communities %>% group_by(city_id, city_name) %>% summarise(regional_pool_size = n(), urban_pool_size = sum(present_in_city))
+head(resident_urban_communities_tmp)
+```
+
+```{yaml metadata selected_resident_only_urban_communities}
+models:
+  - name: selected_resident_only_urban_communities
+    description: Sites that we will analyse that have more than 1 species, and less species than the entire regional pool based on species being within their Residential range (and not just Breeding, Migration, or non-Breeding range).
+    columns:
+      - name: city_id
+        description: Vector ID from GHSL Data Package 2019 (Pesaresi et al. 2019)
+      - name: city_name
+        description: City name from Vector from GHSL Data Package 2019 (Pesaresi et al. 2019)
+      - name: regional_pool_size
+        description: the number of columbidae species in the city regional pool, e.g. number of species where the city vector overlaps the birdlife distribution vector
+      - name: urban_pool_size
+        description: the number of columbidae species that occur inside the city, e.g. the number of columbidae species that appear on at least 5% of all valid checklists within the city vector.
+```
+
+Selected sites:
+```{r create selected_resident_only_urban_communities}
+selected_resident_only_urban_communities = resident_urban_communities_tmp[resident_urban_communities_tmp$urban_pool_size > 1 & resident_urban_communities_tmp$urban_pool_size != resident_urban_communities_tmp$regional_pool_size,]
+nrow(selected_resident_only_urban_communities)
+head(selected_resident_only_urban_communities)
+```
+
+And therefore
+```{r}
+selected_resident_columbidae_communities = all_resident_columbidae_communities[all_resident_columbidae_communities$city_id %in% selected_resident_only_urban_communities$city_id,]
+head(selected_resident_only_urban_communities)
+```
 # Trait Data
 ```{yaml metadata avonet_birdlife}
 models:
@@ -160,6 +202,7 @@ avonet_birdlife = avonet_birdlife_input_tmp[,c('Species1', 'Beak.Length_Culmen',
 names(avonet_birdlife) = c('species_name', 'beak_length', 'beak_width', 'beak_depth', 'tail_length', 'wing_length', 'tarsus_length', 'habitat', 'habitat_density', 'trophic_niche', 'primary_lifestyle', 'range_size', 'mass')
 head(avonet_birdlife)
 ```
+
 ## Mapping trait data to JETZ taxonomy
 ```{yaml metadata birdlife_to_jetz_mapping}
 models:
@@ -176,6 +219,7 @@ models:
 birdlife_to_jetz_mapping = read_csv('bigquery_export__columbidae_taxonomic_mapping.csv')
 head(birdlife_to_jetz_mapping)
 ```
+
 Drop species in taxonomy mapping that are not in our communities - to avoid worrying about species not in our datasets
 ```{r clean birdlife_to_jetz_mapping}
 paste("Species not in dataset", nrow(birdlife_to_jetz_mapping[!birdlife_to_jetz_mapping$jetz_scientific_name %in% selected_columbidae_communities$jetz_scientific_name,]))
@@ -202,6 +246,7 @@ avonet_birdlife_mapped_to_jetz_tmp = left_join(birdlife_to_jetz_mapping, avonet_
 duplicated_jetz_species_in_avonet = avonet_birdlife_mapped_to_jetz_tmp$jetz_scientific_name[duplicated(avonet_birdlife_mapped_to_jetz_tmp$jetz_scientific_name)]
 avonet_birdlife_mapped_to_jetz_tmp[avonet_birdlife_mapped_to_jetz_tmp$jetz_scientific_name %in% duplicated_jetz_species_in_avonet,] %>% arrange(jetz_scientific_name)
 ```
+
 De-duplicate avonet morphology using mean
 ```{r create avonet_jetz}
 avonet_jetz = avonet_birdlife_mapped_to_jetz_tmp %>% group_by(jetz_scientific_name) %>% summarize(
@@ -220,6 +265,7 @@ avonet_jetz = avonet_birdlife_mapped_to_jetz_tmp %>% group_by(jetz_scientific_na
 )
 head(avonet_jetz)
 ```
+
 Check duplicates
 ```{r}
 avonet_jetz[avonet_jetz$jetz_scientific_name %in% duplicated_jetz_species_in_avonet,]
@@ -268,6 +314,14 @@ species_in_cities = pivot_wider(selected_columbidae_communities[selected_columbi
 species_in_cities = tibble::column_to_rownames(species_in_cities, var='city_id')
 species_in_cities = species_in_cities[,-1]
 species_in_cities
+```
+
+and for resident only species
+```{r create resident_species_in_cities}
+resident_species_in_cities = pivot_wider(selected_resident_columbidae_communities[selected_resident_columbidae_communities$present_in_city,c('jetz_scientific_name', 'present_in_city', 'city_id')], names_from = jetz_scientific_name, values_from = "present_in_city", values_fill = list(present_in_city = F))
+resident_species_in_cities = tibble::column_to_rownames(resident_species_in_cities, var='city_id')
+resident_species_in_cities = resident_species_in_cities[,-1]
+resident_species_in_cities
 ```
 
 ## Read in phylogeny
@@ -348,6 +402,7 @@ head(urban_community_fd_result)
 urban_community_fd_mass_result = get_fd_for_traits(c('locomotory_trait'), species_in_cities)
 head(urban_community_fd_mass_result)
 ```
+
 ## Trait Variance
 ### FRic - Convex Hull of all traits
 Using fundiversity package https://cran.r-project.org/web/packages/fundiversity/index.html
@@ -399,6 +454,7 @@ single_trait_variance = function(trait, communities) {
 
 single_trait_variance('mass', species_in_cities)
 ```
+
 ## SDNDr
 Standard deviation of distances between neighbouring species along a single trait axis, divided by the trait range of the community.
 
@@ -414,6 +470,7 @@ diff(sorted_loco_traits_in_1291)
 print('SDNDr:')
 sd(diff(sorted_loco_traits_in_1291)) / (max(sorted_loco_traits_in_1291) - min(sorted_loco_traits_in_1291))
 ```
+
 Turn into a function:
 ```{r SDNDr}
 SDNDr = function(trait, communities) {
@@ -468,6 +525,11 @@ urban_community_values = get_community_metrics(species_in_cities)
 urban_community_values
 ```
 
+```{r create urban_resident_only_community_values}
+urban_resident_only_community_values = get_community_metrics(resident_species_in_cities)
+urban_resident_only_community_values
+```
+
 # Calculate the null models
 Our null model is every possible community of species from the regional pool with the same richness as the urban pool
 
@@ -490,8 +552,7 @@ selected_urban_communities$urban_pool_size[selected_urban_communities$city_id ==
 
 Function to build every possible community
 ```{r create_null_model_communities}
-create_null_model_communities = function(city_id) {
-  regional_species = all_columbidae_communities$jetz_scientific_name[all_columbidae_communities$city_id == city_id]
+create_null_model_communities = function(city_id, regional_species) {
   regional_richness = length(regional_species)
   urban_richness = selected_urban_communities$urban_pool_size[selected_urban_communities$city_id == city_id]
   
@@ -504,7 +565,7 @@ create_null_model_communities = function(city_id) {
   null_model_sites
 }
 
-create_null_model_communities(test_city_id)
+create_null_model_communities(test_city_id, all_columbidae_communities$jetz_scientific_name[all_columbidae_communities$city_id == test_city_id])
 ```
 
 What were the results for the actual urban community in Manchester?
@@ -514,14 +575,14 @@ urban_community_values[urban_community_values$site == test_city_id,]
 
 Test creating community metrics for our null model
 ```{r}
-test_null_models = create_null_model_communities(test_city_id)
+test_null_models = create_null_model_communities(test_city_id, all_columbidae_communities$jetz_scientific_name[all_columbidae_communities$city_id == test_city_id])
 
 test_null_model_community_values = get_community_metrics(test_null_models)
 test_null_model_community_values
 ```
 
 ```{r}
-get_community_metrics(create_null_model_communities(test_city_id2))
+get_community_metrics(create_null_model_communities(test_city_id2, all_columbidae_communities$jetz_scientific_name[all_columbidae_communities$city_id == test_city_id2]))
 ```
 
 # Compare Urban Communities to regional null models
@@ -589,8 +650,8 @@ all_metrics_to_test
 ```
 
 ```{r create_null_model_test_values}
-create_null_model_test_values = function(city_id) {
-  null_models = create_null_model_communities(city_id)
+create_null_model_test_values = function(city_id, regional_species) {
+  null_models = create_null_model_communities(city_id, regional_species)
   null_model_community_values = get_community_metrics(null_models)
   
   actual_values = urban_community_values[urban_community_values$site == city_id,]
@@ -604,34 +665,55 @@ create_null_model_test_values = function(city_id) {
   result
 }
 
-create_null_model_test_values(test_city_id)
+create_null_model_test_values(test_city_id, all_columbidae_communities$jetz_scientific_name[all_columbidae_communities$city_id == test_city_id])
 ```
 
 ```{r}
-create_null_model_test_values(test_city_id2)
+create_null_model_test_values(test_city_id2, all_columbidae_communities$jetz_scientific_name[all_columbidae_communities$city_id == test_city_id2])
 ```
 
-```{r create urban_community_result, eval = FALSE}
-urban_community_result = data.frame()
+```{r create urban_all_species_community_result}
+urban_all_species_community_result = data.frame()
 
 for (city_id in selected_urban_communities$city_id) {
-  urban_community_result = rbind(urban_community_result, create_null_model_test_values(city_id))
+  city_null_models_all_species = create_null_model_test_values(city_id, all_columbidae_communities$jetz_scientific_name[all_columbidae_communities$city_id == city_id])
+  
+  urban_all_species_community_result = rbind(urban_all_species_community_result, city_null_models_all_species)
 }
 
-urban_community_result = right_join(urban_community_result, selected_urban_communities)
-write_csv(urban_community_result, './community_assembly_result.csv')
-head(urban_community_result)
+urban_all_species_community_result = right_join(urban_all_species_community_result, selected_urban_communities)
+write_csv(urban_all_species_community_result, './community_all_species_assembly_result.csv')
+head(urban_all_species_community_result)
+```
+
+```{r create urban_resident_only_species_community_result}
+urban_resident_only_species_community_result = data.frame()
+
+for (city_id in selected_resident_only_urban_communities$city_id) {
+  city_null_models_resident_species = create_null_model_test_values(city_id, all_resident_columbidae_communities$jetz_scientific_name[all_resident_columbidae_communities$city_id == city_id])
+  
+  urban_resident_only_species_community_result = rbind(urban_resident_only_species_community_result, city_null_models_resident_species)
+}
+
+urban_resident_only_species_community_result = right_join(urban_resident_only_species_community_result, selected_urban_communities)
+write_csv(urban_resident_only_species_community_result, './community_assembly_resident_species_result.csv')
+head(urban_resident_only_species_community_result)
 ```
 
 ```{r}
-urban_community_result = read_csv('./community_assembly_result.csv')
-urban_community_result
+urban_all_species_community_result = read_csv('./community_assembly_all_species_result.csv')
+urban_all_species_community_result
+```
+
+```{r}
+urban_resident_only_species_community_result = read_csv('./community_resident_species_assembly_result.csv')
+urban_resident_only_species_community_result
 ```
 
 # Analysis
 Total number of cities in analysis
 ```{r}
-nrow(urban_community_result)
+nrow(urban_all_species_community_result)
 ```
 
 ## Analysis of all traits across entire community
@@ -666,9 +748,9 @@ geom_normalised_histogram = function(name, gg, test_result, mean) {
 ```{r}
 std_mntd_analysis_plot = geom_standardised_histogram(
   'MNTD', 
-  ggplot(urban_community_result, aes(mntd_standardised)), 
-  wilcox.test(urban_community_result$mntd_standardised, mu = 0), 
-  mean(urban_community_result$mntd_standardised)
+  ggplot(urban_all_species_community_result, aes(mntd_standardised)), 
+  wilcox.test(urban_all_species_community_result$mntd_standardised, mu = 0), 
+  mean(urban_all_species_community_result$mntd_standardised)
 )
 std_mntd_analysis_plot
 ```
@@ -676,9 +758,9 @@ std_mntd_analysis_plot
 ```{r}
 norm_mntd_analysis_plot = geom_normalised_histogram(
   'MNTD', 
-  ggplot(urban_community_result, aes(mntd_normalised)), 
-  wilcox.test(urban_community_result$mntd_normalised, mu = 0.5), 
-  mean(urban_community_result$mntd_normalised)
+  ggplot(urban_all_species_community_result, aes(mntd_normalised)), 
+  wilcox.test(urban_all_species_community_result$mntd_normalised, mu = 0.5), 
+  mean(urban_all_species_community_result$mntd_normalised)
 )
 norm_mntd_analysis_plot
 ```
@@ -689,9 +771,9 @@ Mean pairwise phylogenetic distances between co-occurring species and is most se
 ```{r}
 std_mpd_analysis_plot = geom_standardised_histogram(
   'MPD', 
-  ggplot(urban_community_result, aes(mpd_standardised)), 
-  wilcox.test(urban_community_result$mpd_standardised, mu = 0), 
-  mean(urban_community_result$mpd_standardised)
+  ggplot(urban_all_species_community_result, aes(mpd_standardised)), 
+  wilcox.test(urban_all_species_community_result$mpd_standardised, mu = 0), 
+  mean(urban_all_species_community_result$mpd_standardised)
 )
 std_mpd_analysis_plot
 ```
@@ -699,9 +781,9 @@ std_mpd_analysis_plot
 ```{r}
 norm_mpd_analysis_plot = geom_normalised_histogram(
   'MNTD', 
-  ggplot(urban_community_result, aes(mpd_normalised)), 
-  wilcox.test(urban_community_result$mpd_normalised, mu = 0.5), 
-  mean(urban_community_result$mpd_normalised)
+  ggplot(urban_all_species_community_result, aes(mpd_normalised)), 
+  wilcox.test(urban_all_species_community_result$mpd_normalised, mu = 0.5), 
+  mean(urban_all_species_community_result$mpd_normalised)
 )
 norm_mpd_analysis_plot
 ```
@@ -712,9 +794,9 @@ Test normalised value
 ```{r}
 std_fd_analysis_plot = geom_standardised_histogram(
   'FD', 
-  ggplot(urban_community_result, aes(fd_standardised)), 
-  wilcox.test(urban_community_result$fd_standardised, mu = 0), 
-  mean(urban_community_result$fd_standardised)
+  ggplot(urban_all_species_community_result, aes(fd_standardised)), 
+  wilcox.test(urban_all_species_community_result$fd_standardised, mu = 0), 
+  mean(urban_all_species_community_result$fd_standardised)
 )
 std_fd_analysis_plot
 ```
@@ -722,9 +804,9 @@ std_fd_analysis_plot
 ```{r}
 norm_fd_analysis_plot = geom_normalised_histogram(
   'FD', 
-  ggplot(urban_community_result, aes(fd_normalised)), 
-  wilcox.test(urban_community_result$fd_normalised, mu = 0.5), 
-  mean(urban_community_result$fd_normalised)
+  ggplot(urban_all_species_community_result, aes(fd_normalised)), 
+  wilcox.test(urban_all_species_community_result$fd_normalised, mu = 0.5), 
+  mean(urban_all_species_community_result$fd_normalised)
 )
 norm_fd_analysis_plot
 ```
@@ -734,9 +816,9 @@ Number of cities that we could calculate FRic for, need 4 or more species (as re
 ```{r}
 std_fric_analysis_plot = geom_standardised_histogram(
   'FRic', 
-  ggplot(urban_community_result, aes(FRic_standardised)), 
-  wilcox.test(urban_community_result$FRic_standardised, mu = 0), 
-  mean(urban_community_result$FRic_standardised, na.rm = T)
+  ggplot(urban_all_species_community_result, aes(FRic_standardised)), 
+  wilcox.test(urban_all_species_community_result$FRic_standardised, mu = 0), 
+  mean(urban_all_species_community_result$FRic_standardised, na.rm = T)
 )
 std_fric_analysis_plot
 ```
@@ -744,9 +826,9 @@ std_fric_analysis_plot
 ```{r}
 norm_fric_analysis_plot = geom_normalised_histogram(
   'FRic', 
-  ggplot(urban_community_result, aes(FRic_normalised)), 
-  wilcox.test(urban_community_result$FRic_normalised, mu = 0.5), 
-  mean(urban_community_result$FRic_normalised, na.rm = T)
+  ggplot(urban_all_species_community_result, aes(FRic_normalised)), 
+  wilcox.test(urban_all_species_community_result$FRic_normalised, mu = 0.5), 
+  mean(urban_all_species_community_result$FRic_normalised, na.rm = T)
 )
 norm_fric_analysis_plot
 ```
@@ -755,7 +837,7 @@ norm_fric_analysis_plot
 
 Number of cities we can calculate SDNDr for - require at least 3 species
 ```{r}
-nrow(urban_community_result[!is.na(urban_community_result$mass_sdndr_actual),])
+nrow(urban_all_species_community_result[!is.na(urban_all_species_community_result$mass_sdndr_actual),])
 ```
 
 ### Locomotory Trait
@@ -764,9 +846,9 @@ nrow(urban_community_result[!is.na(urban_community_result$mass_sdndr_actual),])
 ```{r}
 std_loco_trait_fd_analysis_plot = geom_standardised_histogram(
   'Locomotory Trait - FD', 
-  ggplot(urban_community_result, aes(locomotory_trait_fd_standardised)), 
-  wilcox.test(urban_community_result$locomotory_trait_fd_standardised, mu = 0), 
-  mean(urban_community_result$locomotory_trait_fd_standardised, na.rm = T)
+  ggplot(urban_all_species_community_result, aes(locomotory_trait_fd_standardised)), 
+  wilcox.test(urban_all_species_community_result$locomotory_trait_fd_standardised, mu = 0), 
+  mean(urban_all_species_community_result$locomotory_trait_fd_standardised, na.rm = T)
 )
 std_loco_trait_fd_analysis_plot
 ```
@@ -774,9 +856,9 @@ std_loco_trait_fd_analysis_plot
 ```{r}
 norm_loco_trait_fd_analysis_plot = geom_normalised_histogram(
   'Locomotory Trait - FD', 
-  ggplot(urban_community_result, aes(locomotory_trait_fd_normalised)), 
-  wilcox.test(urban_community_result$locomotory_trait_fd_normalised, mu = 0.5), 
-  mean(urban_community_result$locomotory_trait_fd_normalised, na.rm = T)
+  ggplot(urban_all_species_community_result, aes(locomotory_trait_fd_normalised)), 
+  wilcox.test(urban_all_species_community_result$locomotory_trait_fd_normalised, mu = 0.5), 
+  mean(urban_all_species_community_result$locomotory_trait_fd_normalised, na.rm = T)
 )
 norm_loco_trait_fd_analysis_plot
 ```
@@ -785,9 +867,9 @@ norm_loco_trait_fd_analysis_plot
 ```{r}
 std_loco_trait_var_analysis_plot = geom_standardised_histogram(
   'Locomotory Trait - VAR', 
-  ggplot(urban_community_result, aes(locomotory_trait_var_standardised)), 
-  wilcox.test(urban_community_result$locomotory_trait_var_standardised, mu = 0), 
-  mean(urban_community_result$locomotory_trait_var_standardised, na.rm = T)
+  ggplot(urban_all_species_community_result, aes(locomotory_trait_var_standardised)), 
+  wilcox.test(urban_all_species_community_result$locomotory_trait_var_standardised, mu = 0), 
+  mean(urban_all_species_community_result$locomotory_trait_var_standardised, na.rm = T)
 )
 std_loco_trait_var_analysis_plot
 ```
@@ -795,9 +877,9 @@ std_loco_trait_var_analysis_plot
 ```{r}
 norm_loco_trait_var_analysis_plot = geom_normalised_histogram(
   'Locomotory Trait - VAR', 
-  ggplot(urban_community_result, aes(locomotory_trait_var_normalised)), 
-  wilcox.test(urban_community_result$locomotory_trait_var_normalised, mu = 0.5), 
-  mean(urban_community_result$locomotory_trait_var_normalised, na.rm = T)
+  ggplot(urban_all_species_community_result, aes(locomotory_trait_var_normalised)), 
+  wilcox.test(urban_all_species_community_result$locomotory_trait_var_normalised, mu = 0.5), 
+  mean(urban_all_species_community_result$locomotory_trait_var_normalised, na.rm = T)
 )
 norm_loco_trait_var_analysis_plot
 ```
@@ -806,9 +888,9 @@ norm_loco_trait_var_analysis_plot
 ```{r}
 std_loco_trait_sdndr_analysis_plot = geom_standardised_histogram(
   'Locomotory Trait - SDNDr', 
-  ggplot(urban_community_result, aes(locomotory_trait_sdndr_standardised)), 
-  wilcox.test(urban_community_result$locomotory_trait_sdndr_standardised, mu = 0), 
-  mean(urban_community_result$locomotory_trait_sdndr_standardised, na.rm = T)
+  ggplot(urban_all_species_community_result, aes(locomotory_trait_sdndr_standardised)), 
+  wilcox.test(urban_all_species_community_result$locomotory_trait_sdndr_standardised, mu = 0), 
+  mean(urban_all_species_community_result$locomotory_trait_sdndr_standardised, na.rm = T)
 )
 std_loco_trait_sdndr_analysis_plot
 ```
@@ -816,9 +898,9 @@ std_loco_trait_sdndr_analysis_plot
 ```{r}
 norm_loco_trait_sdndr_analysis_plot = geom_normalised_histogram(
   'Locomotory Trait - SDNDr', 
-  ggplot(urban_community_result, aes(locomotory_trait_sdndr_normalised)), 
-  wilcox.test(urban_community_result$locomotory_trait_sdndr_normalised, mu = 0.5), 
-  mean(urban_community_result$locomotory_trait_sdndr_normalised, na.rm = T)
+  ggplot(urban_all_species_community_result, aes(locomotory_trait_sdndr_normalised)), 
+  wilcox.test(urban_all_species_community_result$locomotory_trait_sdndr_normalised, mu = 0.5), 
+  mean(urban_all_species_community_result$locomotory_trait_sdndr_normalised, na.rm = T)
 )
 norm_loco_trait_sdndr_analysis_plot
 ```
@@ -830,9 +912,9 @@ norm_loco_trait_sdndr_analysis_plot
 ```{r}
 std_trophic_trait_fd_analysis_plot = geom_standardised_histogram(
   'Trophic Trait - FD', 
-  ggplot(urban_community_result, aes(trophic_trait_fd_standardised)), 
-  wilcox.test(urban_community_result$trophic_trait_fd_standardised, mu = 0), 
-  mean(urban_community_result$trophic_trait_fd_standardised, na.rm = T)
+  ggplot(urban_all_species_community_result, aes(trophic_trait_fd_standardised)), 
+  wilcox.test(urban_all_species_community_result$trophic_trait_fd_standardised, mu = 0), 
+  mean(urban_all_species_community_result$trophic_trait_fd_standardised, na.rm = T)
 )
 std_trophic_trait_fd_analysis_plot
 ```
@@ -840,9 +922,9 @@ std_trophic_trait_fd_analysis_plot
 ```{r}
 norm_trophic_trait_fd_analysis_plot = geom_normalised_histogram(
   'Trophic Trait - FD', 
-  ggplot(urban_community_result, aes(trophic_trait_fd_normalised)), 
-  wilcox.test(urban_community_result$trophic_trait_fd_normalised, mu = 0.5), 
-  mean(urban_community_result$trophic_trait_fd_normalised, na.rm = T)
+  ggplot(urban_all_species_community_result, aes(trophic_trait_fd_normalised)), 
+  wilcox.test(urban_all_species_community_result$trophic_trait_fd_normalised, mu = 0.5), 
+  mean(urban_all_species_community_result$trophic_trait_fd_normalised, na.rm = T)
 )
 norm_trophic_trait_fd_analysis_plot
 ```
@@ -852,9 +934,9 @@ norm_trophic_trait_fd_analysis_plot
 ```{r}
 std_trophic_trait_var_analysis_plot = geom_standardised_histogram(
   'Trophic Trait - VAR', 
-  ggplot(urban_community_result, aes(trophic_trait_var_standardised)), 
-  wilcox.test(urban_community_result$trophic_trait_var_standardised, mu = 0), 
-  mean(urban_community_result$trophic_trait_var_standardised, na.rm = T)
+  ggplot(urban_all_species_community_result, aes(trophic_trait_var_standardised)), 
+  wilcox.test(urban_all_species_community_result$trophic_trait_var_standardised, mu = 0), 
+  mean(urban_all_species_community_result$trophic_trait_var_standardised, na.rm = T)
 )
 std_trophic_trait_var_analysis_plot
 ```
@@ -862,9 +944,9 @@ std_trophic_trait_var_analysis_plot
 ```{r}
 norm_trophic_trait_var_analysis_plot = geom_normalised_histogram(
   'Trophic Trait - VAR', 
-  ggplot(urban_community_result, aes(trophic_trait_var_normalised)), 
-  wilcox.test(urban_community_result$trophic_trait_var_normalised, mu = 0.5), 
-  mean(urban_community_result$trophic_trait_var_normalised, na.rm = T)
+  ggplot(urban_all_species_community_result, aes(trophic_trait_var_normalised)), 
+  wilcox.test(urban_all_species_community_result$trophic_trait_var_normalised, mu = 0.5), 
+  mean(urban_all_species_community_result$trophic_trait_var_normalised, na.rm = T)
 )
 norm_trophic_trait_var_analysis_plot
 ```
@@ -874,9 +956,9 @@ norm_trophic_trait_var_analysis_plot
 ```{r}
 std_trophic_trait_sdndr_analysis_plot = geom_standardised_histogram(
   'Trophic Trait - SDNDr', 
-  ggplot(urban_community_result, aes(trophic_trait_sdndr_standardised)), 
-  wilcox.test(urban_community_result$trophic_trait_sdndr_standardised, mu = 0), 
-  mean(urban_community_result$trophic_trait_sdndr_standardised, na.rm = T)
+  ggplot(urban_all_species_community_result, aes(trophic_trait_sdndr_standardised)), 
+  wilcox.test(urban_all_species_community_result$trophic_trait_sdndr_standardised, mu = 0), 
+  mean(urban_all_species_community_result$trophic_trait_sdndr_standardised, na.rm = T)
 )
 std_trophic_trait_sdndr_analysis_plot
 ```
@@ -884,9 +966,9 @@ std_trophic_trait_sdndr_analysis_plot
 ```{r}
 norm_trophic_trait_sdndr_analysis_plot = geom_normalised_histogram(
   'Trophic Trait - SDNDr', 
-  ggplot(urban_community_result, aes(trophic_trait_sdndr_normalised)), 
-  wilcox.test(urban_community_result$trophic_trait_sdndr_normalised, mu = 0.5), 
-  mean(urban_community_result$trophic_trait_sdndr_normalised, na.rm = T)
+  ggplot(urban_all_species_community_result, aes(trophic_trait_sdndr_normalised)), 
+  wilcox.test(urban_all_species_community_result$trophic_trait_sdndr_normalised, mu = 0.5), 
+  mean(urban_all_species_community_result$trophic_trait_sdndr_normalised, na.rm = T)
 )
 norm_trophic_trait_sdndr_analysis_plot
 ```
@@ -898,9 +980,9 @@ norm_trophic_trait_sdndr_analysis_plot
 ```{r}
 std_mass_fd_analysis_plot = geom_standardised_histogram(
   'Mass - FD', 
-  ggplot(urban_community_result, aes(mass_fd_standardised)), 
-  wilcox.test(urban_community_result$mass_fd_standardised, mu = 0), 
-  mean(urban_community_result$mass_fd_standardised, na.rm = T)
+  ggplot(urban_all_species_community_result, aes(mass_fd_standardised)), 
+  wilcox.test(urban_all_species_community_result$mass_fd_standardised, mu = 0), 
+  mean(urban_all_species_community_result$mass_fd_standardised, na.rm = T)
 )
 std_mass_fd_analysis_plot
 ```
@@ -908,9 +990,9 @@ std_mass_fd_analysis_plot
 ```{r}
 norm_mass_fd_analysis_plot = geom_normalised_histogram(
   'Mass - FD', 
-  ggplot(urban_community_result, aes(mass_fd_normalised)), 
-  wilcox.test(urban_community_result$mass_fd_normalised, mu = 0.5), 
-  mean(urban_community_result$mass_fd_normalised, na.rm = T)
+  ggplot(urban_all_species_community_result, aes(mass_fd_normalised)), 
+  wilcox.test(urban_all_species_community_result$mass_fd_normalised, mu = 0.5), 
+  mean(urban_all_species_community_result$mass_fd_normalised, na.rm = T)
 )
 norm_mass_fd_analysis_plot
 ```
@@ -920,9 +1002,9 @@ norm_mass_fd_analysis_plot
 ```{r}
 std_mass_var_analysis_plot = geom_standardised_histogram(
   'Mass - VAR', 
-  ggplot(urban_community_result, aes(mass_var_standardised)), 
-  wilcox.test(urban_community_result$mass_var_standardised, mu = 0), 
-  mean(urban_community_result$mass_var_standardised, na.rm = T)
+  ggplot(urban_all_species_community_result, aes(mass_var_standardised)), 
+  wilcox.test(urban_all_species_community_result$mass_var_standardised, mu = 0), 
+  mean(urban_all_species_community_result$mass_var_standardised, na.rm = T)
 )
 std_mass_var_analysis_plot
 ```
@@ -930,9 +1012,9 @@ std_mass_var_analysis_plot
 ```{r}
 norm_mass_var_analysis_plot = geom_normalised_histogram(
   'Mass - VAR', 
-  ggplot(urban_community_result, aes(mass_var_normalised)), 
-  wilcox.test(urban_community_result$mass_var_normalised, mu = 0.5), 
-  mean(urban_community_result$mass_var_normalised, na.rm = T)
+  ggplot(urban_all_species_community_result, aes(mass_var_normalised)), 
+  wilcox.test(urban_all_species_community_result$mass_var_normalised, mu = 0.5), 
+  mean(urban_all_species_community_result$mass_var_normalised, na.rm = T)
 )
 norm_mass_var_analysis_plot
 ```
@@ -942,9 +1024,9 @@ norm_mass_var_analysis_plot
 ```{r}
 std_mass_sdndr_analysis_plot = geom_standardised_histogram(
   'Mass - SDNDr', 
-  ggplot(urban_community_result, aes(mass_sdndr_standardised)), 
-  wilcox.test(urban_community_result$mass_sdndr_standardised, mu = 0), 
-  mean(urban_community_result$mass_sdndr_standardised, na.rm = T)
+  ggplot(urban_all_species_community_result, aes(mass_sdndr_standardised)), 
+  wilcox.test(urban_all_species_community_result$mass_sdndr_standardised, mu = 0), 
+  mean(urban_all_species_community_result$mass_sdndr_standardised, na.rm = T)
 )
 std_mass_sdndr_analysis_plot
 ```
@@ -952,9 +1034,9 @@ std_mass_sdndr_analysis_plot
 ```{r}
 norm_mass_sdndr_analysis_plot = geom_normalised_histogram(
   'Mass - SDNDr', 
-  ggplot(urban_community_result, aes(mass_sdndr_normalised)), 
-  wilcox.test(urban_community_result$mass_sdndr_normalised, mu = 0.5), 
-  mean(urban_community_result$mass_sdndr_normalised, na.rm = T)
+  ggplot(urban_all_species_community_result, aes(mass_sdndr_normalised)), 
+  wilcox.test(urban_all_species_community_result$mass_sdndr_normalised, mu = 0.5), 
+  mean(urban_all_species_community_result$mass_sdndr_normalised, na.rm = T)
 )
 norm_mass_sdndr_analysis_plot
 ```
@@ -977,6 +1059,7 @@ We can check the normalised response for FD against urban community size to see 
 ```{r}
 ggplot(urban_community_result, aes(y = fd_normalised, x = as.factor(urban_pool_size))) + geom_boxplot()
 ```
+
 ```{r}
 jpeg('./figures/community_assembly_community.jpg', width = 1200, height = 800)
 ggarrange(norm_mntd_analysis_plot, norm_mpd_analysis_plot, norm_fric_analysis_plot, norm_fd_analysis_plot, ncol = 2, nrow = 2)
