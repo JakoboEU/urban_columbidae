@@ -706,41 +706,6 @@ create_null_model_test_values(
   urban_resident_only_community_values[urban_resident_only_community_values$site == test_city_id2,]
 )
 ```
-`
-```{r}
-all_columbidae_communities[all_columbidae_communities$city_id == test_city_id2,]
-
-create_null_model_communities(
-  test_city_id2, 
-  selected_urban_communities$urban_pool_size[selected_urban_communities$city_id == test_city_id2],
-  all_resident_columbidae_communities$jetz_scientific_name[all_resident_columbidae_communities$city_id == test_city_id2]
-)
-
-get_community_metrics(
-  create_null_model_communities(
-    test_city_id2, 
-    selected_urban_communities$urban_pool_size[selected_urban_communities$city_id == test_city_id2],
-    all_resident_columbidae_communities$jetz_scientific_name[all_resident_columbidae_communities$city_id == test_city_id2]
-  )
-)
-```
-```{r}
-all_resident_columbidae_communities[all_resident_columbidae_communities$city_id == test_city_id2,]
-
-create_null_model_communities(
-  test_city_id2, 
-  selected_resident_only_urban_communities$urban_pool_size[selected_resident_only_urban_communities$city_id == test_city_id2],
-  all_resident_columbidae_communities$jetz_scientific_name[all_resident_columbidae_communities$city_id == test_city_id2]
-)
-
-get_community_metrics(
-  create_null_model_communities(
-    test_city_id2, 
-    selected_resident_only_urban_communities$urban_pool_size[selected_resident_only_urban_communities$city_id == test_city_id2],
-    all_resident_columbidae_communities$jetz_scientific_name[all_resident_columbidae_communities$city_id == test_city_id2]
-  )
-)
-```
 
 
 ```{r create urban_all_species_community_result}
@@ -1420,3 +1385,197 @@ wilcox.test(urban_all_species_community_result$mntd_normalised ~ as.factor(urban
 ggplot(urban_all_species_community_result, aes(y = mntd_normalised, x = as.factor(number_of_urban_introduced_species))) + geom_boxplot()
 ```
 
+## Calculate maximum possible diversity held by urban community if no Introduced species
+
+Cities with introduced species
+```{r}
+city_ids_with_introduced_species = all_columbidae_communities$city_id[all_columbidae_communities$origin == 'Introduced' & all_columbidae_communities$present_in_city]
+length(city_ids_with_introduced_species)
+```
+
+Cities for analysis
+```{r}
+selected_urban_communties_with_introduced_species = selected_urban_communities[selected_urban_communities$city_id %in% city_ids_with_introduced_species,]
+head(selected_urban_communties_with_introduced_species)
+```
+
+Create all possible communities for city with same richness but no introduced species, and fetch community assembly metrics for these communities
+```{r}
+create_null_model_communities(
+  test_city_id, 
+  selected_urban_communities$urban_pool_size[selected_urban_communities$city_id == test_city_id],
+  all_columbidae_communities$jetz_scientific_name[all_columbidae_communities$city_id == test_city_id & all_columbidae_communities$origin != 'Introduced']
+)
+
+get_community_metrics(
+  create_null_model_communities(
+    test_city_id, 
+    selected_urban_communities$urban_pool_size[selected_urban_communities$city_id == test_city_id],
+    all_columbidae_communities$jetz_scientific_name[all_columbidae_communities$city_id == test_city_id & all_columbidae_communities$origin != 'Introduced']
+  )
+)
+```
+
+Create a function to build a comparison result for comparing min/max possible values with no introduced species to actual community value
+```{r}
+compare_actual_result_to_no_introduced = function(metric, possible_community_metrics_with_no_introduced, actual_community_metrics_result) {
+  max_no_introduced_value = max(possible_community_metrics_with_no_introduced[,c(metric)])
+  min_no_introduced_value = min(possible_community_metrics_with_no_introduced[,c(metric)])
+  
+  col_name = function(postscript) {
+    paste(metric, postscript, sep = '_')
+  }
+  
+  actual_value_normalised = actual_community_metrics_result[,c(col_name('normalised'))]
+  actual_value = actual_community_metrics_result[,c(col_name('actual'))]
+  actual_value_min = actual_community_metrics_result[,c(col_name('min'))]
+  actual_value_max = actual_community_metrics_result[,c(col_name('max'))]
+  
+  result = data.frame(
+    max_possible_value_with_no_introduced_normalised = normalise(max_no_introduced_value, actual_value_min, actual_value_max),
+    min_possible_value_with_no_introduced_normalised = normalise(min_no_introduced_value, actual_value_min, actual_value_max),
+    actual_value_normalised = actual_value_normalised,
+    max_possible_value_with_no_introduced = max_no_introduced_value,
+    min_possible_value_with_no_introduced = min_no_introduced_value,
+    actual_value = actual_value
+  )
+  
+  colnames(result) = c(col_name('max_possible_value_with_no_introduced_normalised'), 
+                       col_name('min_possible_value_with_no_introduced_normalised'),
+                       col_name('actual_value_normalised'), 
+                       col_name('max_possible_value_with_no_introduced'), 
+                       col_name('min_possible_value_with_no_introduced'), 
+                       col_name('actual_value'))
+  result
+}
+
+test_possible_community_values_with_no_introduced = get_community_metrics(
+  create_null_model_communities(
+    test_city_id, 
+    selected_urban_communities$urban_pool_size[selected_urban_communities$city_id == test_city_id],
+    all_columbidae_communities$jetz_scientific_name[all_columbidae_communities$city_id == test_city_id & all_columbidae_communities$origin != 'Introduced']
+  )
+)
+  
+compare_actual_result_to_no_introduced(
+  'fd', 
+  test_possible_community_values_with_no_introduced, 
+  urban_all_species_community_result[urban_all_species_community_result$city_id == test_city_id,]
+)
+```
+
+Build a function to create values for all possible urban communities with no introduced species, and then compare to actual community values.
+```{r}
+compare_all_metrics_actual_result_to_no_introduced = function(city_id, urban_richness, regional_species, actual_urban_species_community_result) {
+  possible_community_values_with_no_introduced_species = get_community_metrics(
+    create_null_model_communities(
+      city_id, 
+      selected_urban_communities$urban_pool_size[selected_urban_communities$city_id == city_id],
+      all_columbidae_communities$jetz_scientific_name[all_columbidae_communities$city_id == city_id & all_columbidae_communities$origin != 'Introduced']
+    )
+  )
+  
+  result = data.frame(city_id = city_id)
+  
+  for(metric in all_metrics_to_test) {
+    result = cbind(result,
+                   compare_actual_result_to_no_introduced(metric, possible_community_values_with_no_introduced_species, actual_urban_species_community_result))
+  }
+  
+  result
+}
+
+compare_all_metrics_actual_result_to_no_introduced(
+  test_city_id, 
+  selected_urban_communities$urban_pool_size[selected_urban_communities$city_id == test_city_id],
+  all_columbidae_communities$jetz_scientific_name[all_columbidae_communities$city_id == test_city_id & all_columbidae_communities$origin != 'Introduced'],
+  urban_all_species_community_result[urban_all_species_community_result$city_id == test_city_id,]
+)
+```
+
+Create result for each city in this analysis
+```{r}
+urban_no_introduced_species_community_result = data.frame()
+
+for(no_introduced_loop_city_id in selected_urban_communties_with_introduced_species$city_id) {
+  print(no_introduced_loop_city_id)
+  regional_species = all_columbidae_communities$jetz_scientific_name[all_columbidae_communities$city_id == no_introduced_loop_city_id & all_columbidae_communities$origin != 'Introduced']
+  
+  # We need at least 2 regional species (once introduced removed) to complete analysis
+  if (length(regional_species) > 1) {
+    urban_no_introduced_species_community_result = rbind(urban_no_introduced_species_community_result,
+      compare_all_metrics_actual_result_to_no_introduced(
+        no_introduced_loop_city_id, 
+        selected_urban_communities$urban_pool_size[selected_urban_communities$city_id == no_introduced_loop_city_id],
+        regional_species,
+        urban_all_species_community_result[urban_all_species_community_result$city_id == no_introduced_loop_city_id,]
+      )
+    )
+  }
+}
+
+write_csv(urban_no_introduced_species_community_result, './community_assembly_no_introduced_species_result.csv')
+head(urban_no_introduced_species_community_result)
+```
+
+```{r}
+urban_no_introduced_species_community_result = read_csv('./community_assembly_no_introduced_species_result.csv')
+urban_no_introduced_species_community_result
+```
+
+```{r}
+urban_no_introduced_species_community_result[urban_no_introduced_species_community_result$mntd_max_possible_value_with_no_introduced_normalised < 0,]
+```
+
+## Compare the possible values with no introduced species to the actual value
+
+### MNTD
+```{r}
+compare_actual_to_no_introduced = function(metric, no_introduced_values, actual_values, city_ids) {
+  comparison_df = rbind(
+    data.frame(value = no_introduced_values, type = 'No introduced species', id = city_ids),
+    data.frame(value = actual_values, type = 'Actual', id = city_ids)
+  )
+  
+  wilcox_test_mntd = wilcox.test(no_introduced_values, actual_values, paired = T)
+  
+  ggplot(comparison_df, aes(x = type, y = value)) + 
+    geom_boxplot() + 
+    geom_line(aes(group = id), size = 0.1) +  
+    xlab('Urban Community') + 
+    ylab(paste('Normalised', metric)) + 
+    labs(subtitle = paste("(V = ", wilcox_test_mntd$statistic, ", p-value", fmt_p_value(wilcox_test_mntd), ")"))
+}
+
+compare_actual_to_no_introduced('MNTD', 
+  urban_no_introduced_species_community_result$mntd_max_possible_value_with_no_introduced_normalised,
+  urban_no_introduced_species_community_result$mntd_actual_value_normalised,
+  urban_no_introduced_species_community_result$city_id
+)
+```
+
+### MPD
+```{r}
+compare_actual_to_no_introduced('MPD', 
+  urban_no_introduced_species_community_result$mpd_max_possible_value_with_no_introduced_normalised,
+  urban_no_introduced_species_community_result$mpd_actual_value_normalised,
+  urban_no_introduced_species_community_result$city_id
+)
+```
+### FD
+```{r}
+compare_actual_to_no_introduced('FD', 
+  urban_no_introduced_species_community_result$fd_max_possible_value_with_no_introduced_normalised,
+  urban_no_introduced_species_community_result$fd_actual_value_normalised,
+  urban_no_introduced_species_community_result$city_id
+)
+```
+
+### FRic
+```{r}
+compare_actual_to_no_introduced('FRic', 
+  urban_no_introduced_species_community_result$FRic_max_possible_value_with_no_introduced_normalised,
+  urban_no_introduced_species_community_result$FRic_actual_value_normalised,
+  urban_no_introduced_species_community_result$city_id
+)
+```
