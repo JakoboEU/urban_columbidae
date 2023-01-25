@@ -27,7 +27,7 @@ library(ggpubr)
 ## Recommended community metrics (Trisos et al. 2014)
 - Functional diversity of all traits (Petchey and Gaston 2002)
 - Convex Hull Volume (CHV) of all traits (a multivariate measure of the range of community values) (Cornwell et al. 2006)
-- Mean taxon distance (MPD)  is mean pairwise phylogenetic distances between co-occurring species and is most sensitive to tree-wide patterns of phylogenetic clustering and evenness.
+- Mean taxon distance (MTD)  is mean pairwise phylogenetic distances between co-occurring species and is most sensitive to tree-wide patterns of phylogenetic clustering and evenness.
 - Mean nearest taxon distance (MNTD) is mean pairwise phylogenetic distances separating each species from its closest co-occurring relative and is most sensitive to phylogenetic clustering or evenness at the tips of phylogeny.
 - FD of each trait individually 
 - Variance of each trait within community previously used to measure trait clustering
@@ -126,6 +126,16 @@ And therefore
 selected_columbidae_communities = all_columbidae_communities[all_columbidae_communities$city_id %in% selected_urban_communities$city_id,]
 head(selected_columbidae_communities)
 ```
+Total number of species across regional pools:
+```{r}
+length(unique(selected_columbidae_communities$jetz_scientific_name))
+```
+
+Total number of species across cities:
+```{r}
+length(unique(selected_columbidae_communities$jetz_scientific_name[selected_columbidae_communities$present_in_city]))
+```
+
 ## Create a second set containing only Resident species
 We have shown that non-resident species are less likely to be present in urban communities; however, this could be temporal sampling bias that means non-resident species are less likely to appear on at least 5% of all checklists. Therefore we should validate our findings against a second dataset that contains only resident species.
 
@@ -351,16 +361,16 @@ get_mntd_for_communities = function(communities, phydist_urban_columbidae = coph
 get_mntd_for_communities(species_in_cities)
 ```
 
-## MPD
+## MTD
 Using picante package https://cran.r-project.org/web/packages/picante/index.html
 Citation above.
-```{r get_mpd_for_communities}
-get_mpd_for_communities = function(communities, phydist_urban_columbidae = cophenetic(columbidae_tree)) {
-  urban_community_mpd_result = mpd(as.matrix(communities), phydist_urban_columbidae)
-  data.frame(site = rownames(communities), mpd = urban_community_mpd_result)
+```{r get_mtd_for_communities}
+get_mtd_for_communities = function(communities, phydist_urban_columbidae = cophenetic(columbidae_tree)) {
+  urban_community_mtd_result = mpd(as.matrix(communities), phydist_urban_columbidae)
+  data.frame(site = rownames(communities), mtd = urban_community_mtd_result)
 }
 
-get_mpd_for_communities(species_in_cities)
+get_mtd_for_communities(species_in_cities)
 ```
 
 ## FD - Petchey and Gaston
@@ -498,11 +508,11 @@ SDNDr('locomotory_trait', species_in_cities)
 get_community_metrics = function(communities, included_traits = analysis_all_traits) {
 
   mntd_result = get_mntd_for_communities(communities)
-  mpd_result = get_mpd_for_communities(communities)
+  mtd_result = get_mtd_for_communities(communities)
   fd_all_traits = get_fd_for_traits(included_traits, communities)
   convex_hull = get_convex_hull(included_traits, communities)
   
-  result = right_join(right_join(mntd_result, mpd_result), right_join(fd_all_traits, convex_hull))
+  result = right_join(right_join(mntd_result, mtd_result), right_join(fd_all_traits, convex_hull))
   
   for (trait in included_traits) {
     col_name = function(value) {
@@ -724,7 +734,7 @@ for (loop_all_city_id in selected_urban_communities$city_id) {
 
 urban_all_species_community_result = right_join(urban_all_species_community_result, selected_urban_communities)
 
-write_csv(urban_all_species_community_result, './community_all_species_assembly_result.csv')
+write_csv(urban_all_species_community_result, './community_assembly_all_species_result.csv')
 head(urban_all_species_community_result)
 ```
 
@@ -749,7 +759,7 @@ head(urban_resident_only_species_community_result)
 ```
 
 ```{r}
-urban_all_species_community_result = read_csv('./community_all_species_assembly_result.csv')
+urban_all_species_community_result = read_csv('./community_assembly_all_species_result.csv')
 urban_all_species_community_result
 ```
 
@@ -833,43 +843,43 @@ norm_mntd_analysis_plot_ro = geom_normalised_histogram(
 norm_mntd_analysis_plot_ro
 ```
 
-### MPD
+### MTD
 Mean pairwise phylogenetic distances between co-occurring species and is most sensitive to tree-wide patterns of phylogenetic clustering and evenness.
 
 #### All species
 Standardised 
 ```{r}
-std_mpd_analysis_plot = geom_standardised_histogram(
-  'MPD', 
-  ggplot(urban_all_species_community_result, aes(mpd_standardised)), 
-  wilcox.test(urban_all_species_community_result$mpd_standardised, mu = 0), 
-  mean(urban_all_species_community_result$mpd_standardised)
+std_mtd_analysis_plot = geom_standardised_histogram(
+  'MTD', 
+  ggplot(urban_all_species_community_result, aes(mtd_standardised)), 
+  wilcox.test(urban_all_species_community_result$mtd_standardised, mu = 0), 
+  mean(urban_all_species_community_result$mtd_standardised)
 )
-std_mpd_analysis_plot
+std_mtd_analysis_plot
 ```
 
 Normalised
 ```{r}
-norm_mpd_analysis_plot = geom_normalised_histogram(
-  'MPD', 
-  ggplot(urban_all_species_community_result, aes(mpd_normalised)), 
-  wilcox.test(urban_all_species_community_result$mpd_normalised, mu = 0.5), 
-  mean(urban_all_species_community_result$mpd_normalised)
+norm_mtd_analysis_plot = geom_normalised_histogram(
+  'MTD', 
+  ggplot(urban_all_species_community_result, aes(mtd_normalised)), 
+  wilcox.test(urban_all_species_community_result$mtd_normalised, mu = 0.5), 
+  mean(urban_all_species_community_result$mtd_normalised)
 )
-norm_mpd_analysis_plot
+norm_mtd_analysis_plot
 ```
 
 
 #### Resident only species
 Normalised
 ```{r}
-norm_mpd_analysis_plot_ro = geom_normalised_histogram(
-  'MPD', 
-  ggplot(urban_resident_only_species_community_result, aes(mpd_normalised)), 
-  wilcox.test(urban_resident_only_species_community_result$mpd_normalised, mu = 0.5), 
-  mean(urban_resident_only_species_community_result$mpd_normalised)
+norm_mtd_analysis_plot_ro = geom_normalised_histogram(
+  'MTD', 
+  ggplot(urban_resident_only_species_community_result, aes(mtd_normalised)), 
+  wilcox.test(urban_resident_only_species_community_result$mtd_normalised, mu = 0.5), 
+  mean(urban_resident_only_species_community_result$mtd_normalised)
 )
-norm_mpd_analysis_plot_ro
+norm_mtd_analysis_plot_ro
 ```
 
 ### All Traits FD
@@ -1300,13 +1310,14 @@ norm_mass_sdndr_analysis_plot_ro
 
 Standardised
 ```{r, fig.height=3, fig.width=3}
-ggarrange(std_mntd_analysis_plot, std_mpd_analysis_plot, std_fric_analysis_plot, std_fd_analysis_plot, ncol = 2, nrow = 2)
+ggarrange(std_mntd_analysis_plot, std_mtd_analysis_plot, std_fric_analysis_plot, std_fd_analysis_plot, ncol = 2, nrow = 2)
 ```
 
 Normalised
 ```{r, fig.height=3, fig.width=3}
-ggarrange(norm_mntd_analysis_plot, norm_mpd_analysis_plot, norm_fric_analysis_plot, norm_fd_analysis_plot, ncol = 2, nrow = 2)
+ggarrange(norm_mntd_analysis_plot, norm_mtd_analysis_plot, norm_fric_analysis_plot, norm_fd_analysis_plot, ncol = 2, nrow = 2)
 ```
+
 Strong evidence for competitive exclusion shaping urban communities, three of the four metrics are significantly higher than would be expected by random.  The only metric that is not higher than expected nor significant is FRic. Could this be because FRic only includes urban communities with 3 or more species?
 
 We can check the normalised response for FD against urban community size to see if there is any evidence of larger communities being less likely to be shaped by competitive exclusion. This shows that larger pools do have a much lower mean for normalised FD response and therefore the FRic result could be down to only larger pools being included.  More species could well be present when more habitat is available in the city, and thus there is sufficient habitat to help species avoid getting involved in competitive interactions.
@@ -1317,13 +1328,13 @@ ggplot(urban_all_species_community_result, aes(y = fd_normalised, x = as.factor(
 
 ```{r}
 jpeg('./figures/community_assembly_community.jpg', width = 1200, height = 800)
-ggarrange(norm_mntd_analysis_plot, norm_mpd_analysis_plot, norm_fric_analysis_plot, norm_fd_analysis_plot, ncol = 2, nrow = 2)
+ggarrange(norm_mntd_analysis_plot, norm_mtd_analysis_plot, norm_fric_analysis_plot, norm_fd_analysis_plot, ncol = 2, nrow = 2)
 dev.off()
 ```
 
 Normalised - resident only species
 ```{r, fig.height=3, fig.width=3}
-ggarrange(norm_mntd_analysis_plot_ro, norm_mpd_analysis_plot_ro, norm_fric_analysis_plot_ro, norm_fd_analysis_plot_ro, ncol = 2, nrow = 2)
+ggarrange(norm_mntd_analysis_plot_ro, norm_mtd_analysis_plot_ro, norm_fric_analysis_plot_ro, norm_fd_analysis_plot_ro, ncol = 2, nrow = 2)
 ```
 
 ### Single Traits
@@ -1344,6 +1355,7 @@ ggarrange(
   norm_mass_fd_analysis_plot, norm_mass_var_analysis_plot, norm_mass_sdndr_analysis_plot,
   ncol = 3, nrow = 3)
 ```
+
 Higher than expected values for the locomotory trait FD and mass FD, along with lower than expected values for the locomotory trait SDNDr and mass SDNDr give some evidence that both these traits are selected under competitive exclusion.  VAR in both cases gives the opposite view, this is the single trait version of FRic.
 While the trophic trait has a higher than expected FD, its SDNDr value is fairly close to the mean and therefore this trait may not be selected under competitive exclusion.
 Also, Trisos et al. (2014) discourage the use of multi-pattern metrics such as variance and range, which are sensitive to both clustering and over-dispersion, in single-pattern, one-tailed hypothesis tests.
@@ -1554,11 +1566,11 @@ compare_actual_to_no_introduced('MNTD',
 )
 ```
 
-### MPD
+### MTD
 ```{r}
-compare_actual_to_no_introduced('MPD', 
-  urban_no_introduced_species_community_result$mpd_max_possible_value_with_no_introduced_normalised,
-  urban_no_introduced_species_community_result$mpd_actual_value_normalised,
+compare_actual_to_no_introduced('MTD', 
+  urban_no_introduced_species_community_result$mtd_max_possible_value_with_no_introduced_normalised,
+  urban_no_introduced_species_community_result$mtd_actual_value_normalised,
   urban_no_introduced_species_community_result$city_id
 )
 ```

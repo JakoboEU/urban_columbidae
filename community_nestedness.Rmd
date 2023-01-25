@@ -23,9 +23,9 @@ temp <- nestedtemp(species_city_presence)
 temp
 ```
 
-```{r}
-plot(temp, xlab = "Species", ylab="Sites",main="Extinction probability")
-plot(temp, kind="incidence",xlab = "Species", ylab="Sites",main="Presence-absence")
+```{r, fig.height = 6, fig.width=8}
+plot(temp, xlab = "Species", ylab="Sites",main="Extinction probability", names= TRUE)
+plot(temp, kind="incidence",xlab = "Species", ylab="Sites",main="Presence-absence", names= TRUE)
 ```
 
 ```{r}

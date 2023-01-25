@@ -103,7 +103,7 @@ head(birdlife_to_jetz_mapping)
 
 Drop species in taxonomy mapping that are not in our communities - to avoid worrying about species not in our datasets
 ```{r clean birdlife_to_jetz_mapping}
-paste("Species not in dataset", nrow(birdlife_to_jetz_mapping[!birdlife_to_jetz_mapping$jetz_scientific_name %in% selected_columbidae_communities$jetz_scientific_name,]))
+paste("Species not in dataset", nrow(birdlife_to_jetz_mapping[!birdlife_to_jetz_mapping$jetz_scientific_name %in% all_columbidae_presence$jetz_scientific_name,]))
 paste("Total mapped species", nrow(birdlife_to_jetz_mapping))
 
 birdlife_to_jetz_mapping = birdlife_to_jetz_mapping[birdlife_to_jetz_mapping$jetz_scientific_name %in% all_columbidae_presence$jetz_scientific_name,]
@@ -118,7 +118,7 @@ birdlife_to_jetz_mapping[!birdlife_to_jetz_mapping$species_name %in% avonet_bird
 
 Check that we have mapping entry for all community species - expect empty set
 ```{r}
-selected_columbidae_communities[!selected_columbidae_communities$jetz_scientific_name %in% birdlife_to_jetz_mapping$jetz_scientific_name,]
+all_columbidae_presence[!all_columbidae_presence$jetz_scientific_name %in% birdlife_to_jetz_mapping$jetz_scientific_name,]
 ```
 
 When we map, how many duplicates do we have, and how dissimilar are they?
@@ -151,13 +151,17 @@ Check duplicates
 ```{r}
 avonet_jetz[avonet_jetz$jetz_scientific_name %in% duplicated_jetz_species_in_avonet,]
 ```
+Total species in analysis
+```{r}
+length(unique(all_columbidae_presence$jetz_scientific_name))
+```
 
 ## Evolutionary Age of Pigeons
 Phylogenetic maximum clade tree based on a set of trees from Jetz et al. (2012) using the Hacket et al. (2008) backbone.
 Trim tree to just species within our urban communities
 ```{r}
 all_avian_species_tree <- read.tree("./phylogeny__stage2_hackett_mcc_no_neg.tre")
-columbidae_tree <- ladderize(drop.tip(all_avian_species_tree, setdiff(all_avian_species_tree$tip.label, selected_columbidae_communities$jetz_scientific_name)))
+columbidae_tree <- ladderize(drop.tip(all_avian_species_tree, setdiff(all_avian_species_tree$tip.label, all_columbidae_presence$jetz_scientific_name)))
 ```
 
 Find the length of the final branch for each pigeon in the tree
@@ -181,6 +185,7 @@ head(columbidae_presence)
 ```
 # Presence Analysis
 This analysis is sensitive to response of species that occur in a large number of regional pools particularly urban exploiters (that occur in most cities) or urban avoiders (that appear in few cities) - the presence/absense of these species with have a larger impact on this result that other species.
+
 
 ## Season
 
@@ -319,10 +324,9 @@ For analysis not dependent on whether species in range
 columbidae_urban_tolerance_tmp = all_columbidae_presence %>% group_by(jetz_scientific_name) %>% summarise(regional_pools = n(), urban_pools = sum(present_in_city), urban_tolerance = sum(present_in_city) / n())
 columbidae_urban_tolerance_tmp = right_join(columbidae_urban_tolerance_tmp, avonet_jetz)
 columbidae_urban_tolerance_tmp = right_join(columbidae_urban_tolerance_tmp, columbidae_branch_lengths)
-columbidae_tolerance = columbidae_urban_tolerance_tmp[,c('urban_tolerance',  'trophic_niche', 'habitat', 'habitat_density', 'primary_lifestyle', 'terminal_branch_length')]
+columbidae_tolerance = columbidae_urban_tolerance_tmp[,c('jetz_scientific_name', 'urban_tolerance',  'regional_pools', 'urban_pools', 'urban_tolerance',  'trophic_niche', 'habitat', 'habitat_density', 'primary_lifestyle', 'terminal_branch_length')]
 head(columbidae_tolerance)
 ```
-
 
 ## Season
 For analysis of season
@@ -348,12 +352,29 @@ For analysis of origin
 columbidae_urban_tolerance_origin_tmp = all_columbidae_presence %>% group_by(jetz_scientific_name, origin) %>% summarise(regional_pools = n(), urban_pools = sum(present_in_city), urban_tolerance = sum(present_in_city) / n())
 columbidae_urban_tolerance_origin_tmp = right_join(columbidae_urban_tolerance_origin_tmp, avonet_jetz)
 columbidae_urban_tolerance_origin_tmp = right_join(columbidae_urban_tolerance_origin_tmp, columbidae_branch_lengths)
-columbidae_urban_tolerance_origin = columbidae_urban_tolerance_origin_tmp[,c('urban_tolerance',  'origin')]
+columbidae_urban_tolerance_origin = columbidae_urban_tolerance_origin_tmp[,c('jetz_scientific_name', 'urban_tolerance',  'regional_pools', 'urban_pools', 'origin')]
 head(columbidae_urban_tolerance_origin)
+```
+
+Introduced species
+```{r}
+columbidae_urban_tolerance_origin[columbidae_urban_tolerance_origin$origin == 'Introduced',]
+```
+Which have an overall status
+```{r}
+introduced_species_names = columbidae_urban_tolerance_origin$jetz_scientific_name[columbidae_urban_tolerance_origin$origin == 'Introduced']
+columbidae_tolerance[columbidae_tolerance$jetz_scientific_name %in% introduced_species_names,]
 ```
 
 ```{r}
 wilcox.test(columbidae_urban_tolerance_origin$urban_tolerance ~ columbidae_urban_tolerance_origin$origin)
+```
+
+```{r}
+print("Mean tolerance of native species")
+mean(columbidae_urban_tolerance_origin$urban_tolerance[columbidae_urban_tolerance_origin$origin == 'Native'])
+print("Mean tolernace of introduced species")
+mean(columbidae_urban_tolerance_origin$urban_tolerance[columbidae_urban_tolerance_origin$origin != 'Native'])
 ```
 
 ## Habitat
