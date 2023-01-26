@@ -1397,11 +1397,17 @@ wilcox.test(urban_all_species_community_result$mntd_normalised ~ as.factor(urban
 ggplot(urban_all_species_community_result, aes(y = mntd_normalised, x = as.factor(number_of_urban_introduced_species))) + geom_boxplot()
 ```
 
-## Calculate maximum possible diversity held by urban community if no Introduced species
+## Calculate maximum possible diversity held by urban community if no Feral Pigeon
 
-Cities with introduced species
+All communities without Feral Pigeon
 ```{r}
-city_ids_with_introduced_species = all_columbidae_communities$city_id[all_columbidae_communities$origin == 'Introduced' & all_columbidae_communities$present_in_city]
+all_columbidae_communities_no_feral_pig = all_columbidae_communities[all_columbidae_communities$jetz_scientific_name != 'Columba_livia',]
+head(all_columbidae_communities_no_feral_pig)
+```
+
+Cities with Columba Livia as an introduced species
+```{r}
+city_ids_with_introduced_species = unique(all_columbidae_communities$city_id[all_columbidae_communities$jetz_scientific_name == 'Columba_livia' & all_columbidae_communities$origin == 'Introduced' & all_columbidae_communities$present_in_city])
 length(city_ids_with_introduced_species)
 ```
 
@@ -1416,14 +1422,14 @@ Create all possible communities for city with same richness but no introduced sp
 create_null_model_communities(
   test_city_id, 
   selected_urban_communities$urban_pool_size[selected_urban_communities$city_id == test_city_id],
-  all_columbidae_communities$jetz_scientific_name[all_columbidae_communities$city_id == test_city_id & all_columbidae_communities$origin != 'Introduced']
+  all_columbidae_communities_no_feral_pig$jetz_scientific_name[all_columbidae_communities_no_feral_pig$city_id == test_city_id]
 )
 
 get_community_metrics(
   create_null_model_communities(
     test_city_id, 
     selected_urban_communities$urban_pool_size[selected_urban_communities$city_id == test_city_id],
-    all_columbidae_communities$jetz_scientific_name[all_columbidae_communities$city_id == test_city_id & all_columbidae_communities$origin != 'Introduced']
+    all_columbidae_communities_no_feral_pig$jetz_scientific_name[all_columbidae_communities_no_feral_pig$city_id == test_city_id]
   )
 )
 ```
@@ -1483,7 +1489,7 @@ compare_all_metrics_actual_result_to_no_introduced = function(city_id, urban_ric
     create_null_model_communities(
       city_id, 
       selected_urban_communities$urban_pool_size[selected_urban_communities$city_id == city_id],
-      all_columbidae_communities$jetz_scientific_name[all_columbidae_communities$city_id == city_id & all_columbidae_communities$origin != 'Introduced']
+      all_columbidae_communities_no_feral_pig$jetz_scientific_name[all_columbidae_communities_no_feral_pig$city_id == city_id]
     )
   )
   
@@ -1500,7 +1506,7 @@ compare_all_metrics_actual_result_to_no_introduced = function(city_id, urban_ric
 compare_all_metrics_actual_result_to_no_introduced(
   test_city_id, 
   selected_urban_communities$urban_pool_size[selected_urban_communities$city_id == test_city_id],
-  all_columbidae_communities$jetz_scientific_name[all_columbidae_communities$city_id == test_city_id & all_columbidae_communities$origin != 'Introduced'],
+  all_columbidae_communities_no_feral_pig$jetz_scientific_name[all_columbidae_communities_no_feral_pig$city_id == test_city_id],
   urban_all_species_community_result[urban_all_species_community_result$city_id == test_city_id,]
 )
 ```
@@ -1511,7 +1517,7 @@ urban_no_introduced_species_community_result = data.frame()
 
 for(no_introduced_loop_city_id in selected_urban_communties_with_introduced_species$city_id) {
   print(no_introduced_loop_city_id)
-  regional_species = all_columbidae_communities$jetz_scientific_name[all_columbidae_communities$city_id == no_introduced_loop_city_id & all_columbidae_communities$origin != 'Introduced']
+  regional_species = all_columbidae_communities_no_feral_pig$jetz_scientific_name[all_columbidae_communities_no_feral_pig$city_id == no_introduced_loop_city_id ]
   
   # We need at least 2 regional species (once introduced removed) to complete analysis
   if (length(regional_species) > 1) {
