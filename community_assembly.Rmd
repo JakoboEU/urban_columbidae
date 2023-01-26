@@ -16,6 +16,8 @@ library(abdiv)
 library(vegan)
 library(fundiversity)
 library(ggpubr)
+library(gridExtra)
+library(grid)
 ```
 
 # Introduction
@@ -1325,10 +1327,49 @@ We can check the normalised response for FD against urban community size to see 
 ```{r}
 ggplot(urban_all_species_community_result, aes(y = fd_normalised, x = as.factor(urban_pool_size))) + geom_boxplot()
 ```
+```{r, fig.height=3, fig.width=3}
+blank <- grid.rect(gp=gpar(col="white"))
+
+point_plot = function(points_aes) {
+  ggplot(urban_all_species_community_result, points_aes) + 
+    geom_point(size = 0.5, aes(color = as.factor(urban_pool_size))) + 
+    scale_x_continuous(position = 'top') +
+    guides(color=guide_legend(title="Urban richness", nrow=1)) +
+    theme_bw()
+}
+
+ggarrange(
+  point_plot(aes(x = fd_normalised, y = mntd_normalised)) + ylab("MNTD") + xlab("FD"),
+  point_plot(aes(x = FRic_normalised, y = mntd_normalised)) + rremove("ylab") + xlab("FRic"),
+  point_plot(aes(x = mtd_normalised, y = mntd_normalised)) + rremove("ylab") + xlab("MTD"),
+  point_plot(aes(x = fd_normalised, y = mtd_normalised)) + ylab("MTD") + rremove("xlab"),
+  point_plot(aes(x = FRic_normalised, y = mtd_normalised)) + rremove("ylab") + rremove("xlab"),
+  blank,
+  point_plot(aes(x = fd_normalised, y = FRic_normalised)) + ylab("FRic") + rremove("xlab"),
+  blank,
+  blank
+  , ncol = 3, nrow = 3, common.legend = T, legend = "bottom")
+```
 
 ```{r}
 jpeg('./figures/community_assembly_community.jpg', width = 1200, height = 800)
-ggarrange(norm_mntd_analysis_plot, norm_mtd_analysis_plot, norm_fric_analysis_plot, norm_fd_analysis_plot, ncol = 2, nrow = 2)
+ggarrange(norm_mntd_analysis_plot + theme_bw(), norm_mtd_analysis_plot + theme_bw(), norm_fric_analysis_plot + theme_bw(), norm_fd_analysis_plot + theme_bw(), ncol = 2, nrow = 2)
+dev.off()
+```
+
+```{r}
+jpeg('./figures/community_assembly_community_compared.jpg', width = 1200, height = 800)
+ggarrange(
+  point_plot(aes(x = fd_normalised, y = mntd_normalised)) + ylab("MNTD") + xlab("FD"),
+  point_plot(aes(x = FRic_normalised, y = mntd_normalised)) + rremove("ylab") + xlab("FRic"),
+  point_plot(aes(x = mtd_normalised, y = mntd_normalised)) + rremove("ylab") + xlab("MTD"),
+  point_plot(aes(x = fd_normalised, y = mtd_normalised)) + ylab("MTD") + rremove("xlab"),
+  point_plot(aes(x = FRic_normalised, y = mtd_normalised)) + rremove("ylab") + rremove("xlab"),
+  blank,
+  point_plot(aes(x = fd_normalised, y = FRic_normalised)) + ylab("FRic") + rremove("xlab"),
+  blank,
+  blank
+  , ncol = 3, nrow = 3, common.legend = T, legend = "bottom")
 dev.off()
 ```
 
@@ -1363,11 +1404,34 @@ Also, Trisos et al. (2014) discourage the use of multi-pattern metrics such as v
 ```{r}
 jpeg('./figures/community_assembly_single_traits.jpg', width = 1200, height = 800)
 ggarrange(
-  norm_loco_trait_fd_analysis_plot, norm_loco_trait_var_analysis_plot, norm_loco_trait_sdndr_analysis_plot,
-  norm_trophic_trait_fd_analysis_plot, norm_trophic_trait_var_analysis_plot, norm_trophic_trait_sdndr_analysis_plot,
-  norm_mass_fd_analysis_plot, norm_mass_var_analysis_plot, norm_mass_sdndr_analysis_plot,
+  norm_loco_trait_fd_analysis_plot + theme_bw(), norm_loco_trait_var_analysis_plot + theme_bw(), norm_loco_trait_sdndr_analysis_plot + theme_bw(),
+  norm_trophic_trait_fd_analysis_plot + theme_bw(), norm_trophic_trait_var_analysis_plot + theme_bw(), norm_trophic_trait_sdndr_analysis_plot + theme_bw(),
+  norm_mass_fd_analysis_plot + theme_bw(), norm_mass_var_analysis_plot + theme_bw(), norm_mass_sdndr_analysis_plot + theme_bw(),
   ncol = 3, nrow = 3)
 dev.off()
+```
+
+Locomotory metrics compared
+```{r}
+ggarrange(
+  point_plot(aes(x = locomotory_trait_var_normalised, y = locomotory_trait_fd_normalised)) + ylab("FD") + xlab("VAR"),
+  point_plot(aes(x = locomotory_trait_sdndr_normalised, y = locomotory_trait_fd_normalised)) + rremove("ylab") + xlab("SDNDr"),
+  ncol = 2, nrow = 1, common.legend = T, legend = "bottom")
+```
+Trophic metrics compared
+```{r}
+ggarrange(
+  point_plot(aes(x = trophic_trait_var_normalised, y = trophic_trait_fd_normalised)) + ylab("FD") + xlab("VAR"),
+  point_plot(aes(x = trophic_trait_sdndr_normalised, y = trophic_trait_fd_normalised)) + rremove("ylab") + xlab("SDNDr"),
+  ncol = 2, nrow = 1, common.legend = T, legend = "bottom")
+```
+
+Mass metrics compared
+```{r}
+ggarrange(
+  point_plot(aes(x = mass_var_normalised, y = mass_fd_normalised)) + ylab("FD") + xlab("VAR"),
+  point_plot(aes(x = mass_sdndr_normalised, y = mass_fd_normalised)) + rremove("ylab") + xlab("SDNDr"),
+  ncol = 2, nrow = 1, common.legend = T, legend = "bottom")
 ```
 
 Normalised - resident only species
