@@ -740,7 +740,7 @@ write_csv(urban_all_species_community_result, './community_assembly_all_species_
 head(urban_all_species_community_result)
 ```
 
-```{r create urban_resident_only_species_community_result}
+```{r create urban_resident_only_species_community_result, eval = FALSE}
 urban_resident_only_species_community_result = data.frame()
 
 for (loop_resident_city_id in selected_resident_only_urban_communities$city_id) {
@@ -1576,7 +1576,7 @@ compare_all_metrics_actual_result_to_no_introduced(
 ```
 
 Create result for each city in this analysis
-```{r}
+```{r, eval = FALSE}
 urban_no_introduced_species_community_result = data.frame()
 
 for(no_introduced_loop_city_id in selected_urban_communties_with_introduced_species$city_id) {
