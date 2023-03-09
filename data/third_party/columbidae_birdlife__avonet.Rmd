@@ -1,0 +1,78 @@
+---
+title: "Analysis for converting avonet from birdlife to jetz taoxnomy"
+output: html_notebook
+---
+
+```{r setup, message = F, warning = false}
+library(dplyr)
+library(purrr)
+library(tidyverse)
+library(tidyr)
+```
+
+```{r read avonet_birdlife}
+avonet_birdlife_input_tmp = read_csv('columbidae_birdlife__avonet.csv')
+avonet_birdlife = avonet_birdlife_input_tmp[,c('Species1', 'Beak.Length_Culmen', 'Beak.Width', 'Beak.Depth', 'Tail.Length', 'Wing.Length', 'Tarsus.Length', 'Habitat', 'Habitat.Density', 'Trophic.Niche', 'Primary.Lifestyle', 'Range.Size', 'Mass')]
+names(avonet_birdlife) = c('species_name', 'beak_length', 'beak_width', 'beak_depth', 'tail_length', 'wing_length', 'tarsus_length', 'habitat', 'habitat_density', 'trophic_niche', 'primary_lifestyle', 'range_size', 'mass')
+head(avonet_birdlife)
+```
+
+## Mapping trait data to JETZ taxonomy
+
+```{r read birdlife_to_jetz_mapping}
+birdlife_to_jetz_mapping = read_csv('../bigquery/columbidae_birdlife_to_jetz__taxonomic_mapping.csv')
+head(birdlife_to_jetz_mapping)
+```
+
+Drop species in taxonomy mapping that are not in our communities - to avoid worrying about species not in our datasets
+```{r clean birdlife_to_jetz_mapping}
+all_columbidae_communities = read_csv('../bigquery/columbidae_jetz__urban_locations.csv')
+
+paste("Species not in dataset", nrow(birdlife_to_jetz_mapping[!birdlife_to_jetz_mapping$jetz_scientific_name %in% all_columbidae_communities$jetz_scientific_name,]))
+paste("Total mapped species", nrow(birdlife_to_jetz_mapping))
+
+birdlife_to_jetz_mapping = birdlife_to_jetz_mapping[birdlife_to_jetz_mapping$jetz_scientific_name %in% all_columbidae_communities$jetz_scientific_name,]
+
+paste("Remaining species after removal", nrow(birdlife_to_jetz_mapping))
+```
+
+Check that we have AVONET data for all species - expect empty set
+```{r}
+birdlife_to_jetz_mapping[!birdlife_to_jetz_mapping$species_name %in% avonet_birdlife$species_name,]
+```
+
+Check that we have mapping entry for all community species - expect empty set
+```{r}
+all_columbidae_communities[!all_columbidae_communities$jetz_scientific_name %in% birdlife_to_jetz_mapping$jetz_scientific_name,]
+```
+
+When we map, how many duplicates do we have, and how dissimilar are they?
+```{r}
+avonet_birdlife_mapped_to_jetz_tmp = left_join(birdlife_to_jetz_mapping, avonet_birdlife)
+duplicated_jetz_species_in_avonet = avonet_birdlife_mapped_to_jetz_tmp$jetz_scientific_name[duplicated(avonet_birdlife_mapped_to_jetz_tmp$jetz_scientific_name)]
+avonet_birdlife_mapped_to_jetz_tmp[avonet_birdlife_mapped_to_jetz_tmp$jetz_scientific_name %in% duplicated_jetz_species_in_avonet,] %>% arrange(jetz_scientific_name)
+```
+
+De-duplicate avonet morphology using mean
+```{r create avonet_jetz}
+avonet_jetz = avonet_birdlife_mapped_to_jetz_tmp %>% group_by(jetz_scientific_name) %>% summarize(
+  beak_length = mean(beak_length),
+  beak_width = mean(beak_width),
+  beak_depth = mean(beak_depth),
+  tail_length = mean(tail_length),
+  wing_length = mean(wing_length),
+  tarsus_length = mean(tarsus_length),
+  trophic_niche = first(trophic_niche),
+  habitat = first(habitat),
+  habitat_density = first(habitat_density),
+  primary_lifestyle = first(primary_lifestyle),
+  range_size = sum(range_size),
+  mass = mean(mass)
+)
+head(avonet_jetz)
+```
+
+Check duplicates
+```{r}
+avonet_jetz[avonet_jetz$jetz_scientific_name %in% duplicated_jetz_species_in_avonet,]
+```

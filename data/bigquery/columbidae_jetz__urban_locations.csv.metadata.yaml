@@ -1,0 +1,20 @@
+models:
+  - name: all_columbidae_communities
+    description: Regional and urban communities for all cities with a population of at least 250,000 from GHSL Data Package 2019 (Pesaresi et al. 2019), which contain at leasts 167 eBird checklists, and have at least one Columbidae species within their regional pools.
+    columns:
+      - name: city_id
+        description: Vector ID from GHSL Data Package 2019 (Pesaresi et al. 2019)
+      - name: city_name
+        description: City name from Vector from GHSL Data Package 2019 (Pesaresi et al. 2019)
+      - name: jetz_scientific_name
+        description: The mapped name of each species whose distribution from BirdLife International’s species distribution maps (BirdLife International and Handbook of the Birds of the World 2020), overlaps with the city vector from GHSL Data Package 2019 (Pesaresi et al. 2019). Species mapped from eBird and Birdlife to JETZ taxonomy using birdlife alternative names and Avibase (Lepage 2011).
+      - name: present_in_city
+        description: True if the species is present on at least 5% of all valid checklists within the city
+      - name: season_code 
+        description: season code from BirdLife International and Handbook of the Birds of the World 2020
+      - name: season
+        description: Textual description of Birdlife's season code
+      - name: origin_code 
+        description: origin code from BirdLife International and Handbook of the Birds of the World 2020
+      - name: origin
+        description: Textual description of Birdlife's origin code

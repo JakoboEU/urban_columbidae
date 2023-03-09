@@ -1,0 +1,167 @@
+---
+title: "Cooccurance of Columbidae (based on worldwide records) and resulting urban tolerance"
+output: html_notebook
+---
+
+```{r setup}
+library(dplyr)
+library(tidyverse)
+library(picante)
+```
+
+Load data for our columbidae species present in all localities of the world
+```{r}
+all_occurance = read_csv('../../data/bigquery/columbidae_birdlife__worldwide_ebird_records.csv')
+```
+```{r}
+head(all_occurance)
+```
+```{r}
+mapping = read_csv('../../data/bigquery/columbidae_birdlife_to_jetz__taxonomic_mapping.csv')
+```
+
+```{r}
+all_occurance_jetz_pt1 = left_join(all_occurance, mapping, by = c("scientific_name" = "species_name"))
+all_occurance_jetz = all_occurance_jetz_pt1 %>% group_by(locality_id, jetz_scientific_name) %>% summarise()
+all_occurance_jetz
+```
+
+And then join to self using locality ID, which gives us all cooccuring species across the world, with urban tolerance.
+```{r}
+all_occurance_jetz2 = all_occurance_jetz
+names(all_occurance_jetz2) = c('locality_id', 'jetz_scientific_name2')
+cooccurance = right_join(all_occurance_jetz, all_occurance_jetz2)
+cooccurance = cooccurance[cooccurance$jetz_scientific_name != cooccurance$jetz_scientific_name2,]
+```
+
+```{r}
+head(cooccurance)
+```
+
+Remove locality so we end up with cooccuring species, along with number of patches recorded as cooccuring.
+```{r}
+cooccurance_details = cooccurance %>% group_by(jetz_scientific_name, jetz_scientific_name2) %>% summarise(recorded_patches = n())
+cooccurance_details
+```
+
+Load in our regional pools
+```{r}
+regional_pools = read_csv('../../data/bigquery/columbidae_jetz__urban_locations.csv')
+regional_pools = regional_pools[,c('jetz_scientific_name', 'city_id', 'present_in_city')]
+head(regional_pools)
+```
+
+Generate all cooccuring species in regional pools
+```{r}
+regional_pools2 = regional_pools
+names(regional_pools2) = c('jetz_scientific_name2', 'city_id', 'present_in_city2')
+regional_cooccurance = right_join(regional_pools, regional_pools2)
+regional_cooccurance = regional_cooccurance[regional_cooccurance$jetz_scientific_name != regional_cooccurance$jetz_scientific_name2,]
+head(regional_cooccurance)
+```
+
+```{r}
+regional_cooccurance_pairs = regional_cooccurance %>% group_by(jetz_scientific_name, jetz_scientific_name2) %>% summarise(number_of_pools = n(), present_count = sum(present_in_city), present_count2 = sum(present_in_city2), both_present = sum(present_in_city & present_in_city2))
+regional_cooccurance_pairs
+```
+
+Finally we can create all valid pairs of species that could be living in the same patches from our regional pools.
+Here we also drop all species where neither pair is present in the city
+```{r}
+regional_patch_cooccurance = right_join(regional_cooccurance_pairs, cooccurance_details)
+regional_patch_cooccurance = regional_patch_cooccurance[!is.na(regional_patch_cooccurance$number_of_pools),]
+regional_patch_cooccurance = regional_patch_cooccurance[regional_patch_cooccurance$present_count >= regional_patch_cooccurance$present_count2,]
+regional_patch_cooccurance = regional_patch_cooccurance[regional_patch_cooccurance$present_count > 0,]
+regional_patch_cooccurance
+```
+
+
+In most of the records above, the number of times they are both present is the same that the number of times only the least dominant is presence.
+The exceptions are:
+```{r}
+regional_patch_cooccurance[regional_patch_cooccurance$present_count2 != regional_patch_cooccurance$both_present,]
+```
+
+Problem records we have where they have the same tolerance (67 pairs of species):
+```{r}
+regional_patch_cooccurance[regional_patch_cooccurance$present_count == regional_patch_cooccurance$present_count2,]
+```
+
+Drop duplicate co-occuring pairs by creating a unique key from the two species names (should remove 67 rows)
+```{r}
+regional_patch_cooccurance = regional_patch_cooccurance %>% rowwise() %>%
+  mutate(key = paste0(sort(c(jetz_scientific_name, jetz_scientific_name2)), collapse = '|'))
+
+regional_patch_cooccurance = regional_patch_cooccurance[!duplicated(regional_patch_cooccurance$key),]
+
+regional_patch_cooccurance
+```
+
+Work out MNTD between each species pair:
+```{r}
+tree <- read.tree("../../data/third_party/phylogeny_jetz__stage2_hackett_mcc_no_neg.tre")
+```
+
+```{r}
+all_species = unique(c(regional_patch_cooccurance$jetz_scientific_name, regional_patch_cooccurance$jetz_scientific_name2))
+tree_pruned_to_columbidae <- ladderize(drop.tip(tree, setdiff(tree$tip.label, all_species)))
+```
+
+```{r}
+phydist <- cophenetic(tree_pruned_to_columbidae)
+```
+
+
+```{r}
+regional_patch_cooccurance$mntd = NA
+
+for(row_i in 1:nrow(regional_patch_cooccurance)) {
+  community = data.frame(species1 = c(T, T), species2 = c(T, T))
+  names(community) = list(as.character(regional_patch_cooccurance[[row_i,c('jetz_scientific_name')]]), as.character(regional_patch_cooccurance[[row_i,c('jetz_scientific_name2')]]))
+  rownames(community) = c('1', '2')
+
+  mntd.community.result <- ses.mntd(as.matrix(community), phydist, null.model="taxa.labels", abundance.weighted=FALSE, runs=99)
+  
+  regional_patch_cooccurance[row_i,]$mntd = mntd.community.result[1,]$mntd.obs
+}
+
+regional_patch_cooccurance
+```
+
+Calculate a status which indicates whether species are in the city together:
+```{r}
+regional_patch_cooccurance$cooccurance_status = 'Occasional'
+regional_patch_cooccurance$cooccurance_status[regional_patch_cooccurance$present_count2 == 0] = 'Never'
+regional_patch_cooccurance$cooccurance_status[regional_patch_cooccurance$present_count == regional_patch_cooccurance$present_count2] = 'Always'
+
+regional_patch_cooccurance
+```
+
+```{r}
+ggplot(regional_patch_cooccurance, aes(x = cooccurance_status, y = mntd)) + geom_boxplot()
+```
+
+```{r}
+shapiro.test(regional_patch_cooccurance$mntd) 
+shapiro.test(log(regional_patch_cooccurance$mntd))
+shapiro.test(sqrt(regional_patch_cooccurance$mntd))
+```
+
+```{r}
+nrow(regional_patch_cooccurance)
+mean(regional_patch_cooccurance$mntd)
+```
+
+```{r}
+regional_patch_cooccurance %>% group_by(cooccurance_status) %>% summarise(mean = mean(mntd), sd = sd(mntd), min = min(mntd), max = max(mntd), total = n())
+```
+
+
+```{r}
+t.test(regional_patch_cooccurance$mntd[regional_patch_cooccurance$cooccurance_status == 'Never'], regional_patch_cooccurance$mntd[regional_patch_cooccurance$cooccurance_status == 'Always'])
+```
+
+```{r}
+kruskal.test(cooccurance_status ~ mntd, data = regional_patch_cooccurance)
+```
+

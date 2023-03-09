@@ -1,0 +1,323 @@
+---
+title: "Urban Trait Predictors for Pigeons"
+output: html_notebook
+---
+
+```{r setup, message = F, warning = false}
+library(dplyr)
+library(purrr)
+library(tidyverse)
+library(tidyr)
+
+library(corrplot)
+library(phytools)
+```
+
+
+## Read in data exported from bigquery
+```{r read all_columbidae_presence}
+all_columbidae_presence = read_csv('../../data/bigquery/columbidae_jetz__urban_locations.csv')
+head(all_columbidae_presence)
+```
+
+# Trait Data
+
+De-duplicate avonet morphology using mean
+```{r create avonet_jetz}
+source("../../data/third_party/columbidae_jetz__avonet.R")
+avonet_jetz = avonet_in_jetz_taxonomy()
+head(avonet_jetz)
+```
+
+## Evolutionary Age of Pigeons
+Phylogenetic maximum clade tree based on a set of trees from Jetz et al. (2012) using the Hacket et al. (2008) backbone.
+Trim tree to just species within our urban communities
+```{r}
+all_avian_species_tree <- read.tree("../../data/third_party/phylogeny_jetz__stage2_hackett_mcc_no_neg.tre")
+columbidae_tree <- ladderize(drop.tip(all_avian_species_tree, setdiff(all_avian_species_tree$tip.label, all_columbidae_presence$jetz_scientific_name)))
+```
+
+Find the length of the final branch for each pigeon in the tree
+```{r}
+terminal_branch_length = columbidae_tree$edge.length[columbidae_tree$edge[, 2] %in% 1:Ntip(columbidae_tree)]
+tips <- columbidae_tree$edge[columbidae_tree$edge[, 2] %in%  1:Ntip(columbidae_tree), 2]
+names(terminal_branch_length) = columbidae_tree$tip.label[tips]
+
+columbidae_branch_lengths = as.data.frame(terminal_branch_length)
+columbidae_branch_lengths$jetz_scientific_name = rownames(columbidae_branch_lengths)
+rownames(columbidae_branch_lengths) = NULL
+head(columbidae_branch_lengths)
+```
+
+# Build analysis dataset
+```{r}
+columbidae_presence_tmp = right_join(all_columbidae_presence, avonet_jetz)
+columbidae_presence_tmp = right_join(columbidae_presence_tmp, columbidae_branch_lengths)
+columbidae_presence = columbidae_presence_tmp[,c('present_in_city',  'season', 'origin', 'trophic_niche', 'habitat', 'habitat_density', 'primary_lifestyle', 'terminal_branch_length')]
+head(columbidae_presence)
+```
+# Presence Analysis
+This analysis is sensitive to response of species that occur in a large number of regional pools particularly urban exploiters (that occur in most cities) or urban avoiders (that appear in few cities) - the presence/absense of these species with have a larger impact on this result that other species.
+
+
+## Season
+
+```{r}
+table(columbidae_presence$present_in_city, columbidae_presence$season)
+```
+
+```{r}
+chisq_season = chisq.test(table(columbidae_presence$present_in_city, columbidae_presence$season))
+chisq_season
+```
+
+```{r}
+round(chisq_season$residuals, 2)
+```
+
+```{r}
+corrplot(chisq_season$residuals, is.cor = FALSE)
+```
+
+## Origin
+
+```{r}
+table(columbidae_presence$present_in_city, columbidae_presence$origin)
+```
+
+```{r}
+chisq_origin = chisq.test(table(columbidae_presence$present_in_city, columbidae_presence$origin))
+chisq_origin
+```
+
+```{r}
+round(chisq_origin$residuals, 2)
+```
+
+```{r}
+corrplot(chisq_origin$residuals, is.cor = FALSE)
+```
+## Habitat
+
+```{r}
+table(columbidae_presence$present_in_city, columbidae_presence$habitat)
+```
+
+```{r}
+chisq_habitat = chisq.test(table(columbidae_presence$present_in_city, columbidae_presence$habitat))
+chisq_habitat
+```
+
+```{r}
+round(chisq_habitat$residuals, 2)
+```
+
+```{r}
+corrplot(chisq_habitat$residuals, is.cor = FALSE)
+```
+
+## Habitat Density
+
+```{r}
+table(columbidae_presence$present_in_city, columbidae_presence$habitat_density)
+```
+
+```{r}
+chisq_habitat_density = chisq.test(table(columbidae_presence$present_in_city, columbidae_presence$habitat_density))
+chisq_habitat_density
+```
+
+```{r}
+round(chisq_habitat_density$residuals, 2)
+```
+
+```{r}
+corrplot(chisq_habitat_density$residuals, is.cor = FALSE)
+```
+
+## Trophic Guild
+
+```{r}
+table(columbidae_presence$present_in_city, columbidae_presence$trophic_niche)
+```
+
+```{r}
+chisq_trophic = chisq.test(table(columbidae_presence$present_in_city, columbidae_presence$trophic_niche))
+chisq_trophic
+```
+
+```{r}
+round(chisq_trophic$residuals, 2)
+```
+
+```{r}
+corrplot(chisq_trophic$residuals, is.cor = FALSE)
+```
+
+## Primary Lifestyle
+
+```{r}
+table(columbidae_presence$present_in_city, columbidae_presence$primary_lifestyle)
+```
+
+```{r}
+chisq_primary_lifestyle = chisq.test(table(columbidae_presence$present_in_city, columbidae_presence$primary_lifestyle))
+chisq_primary_lifestyle
+```
+
+```{r}
+round(chisq_primary_lifestyle$residuals, 2)
+```
+
+```{r}
+corrplot(chisq_primary_lifestyle$residuals, is.cor = FALSE)
+```
+## Evolutionary Age of Species
+```{r}
+print('Mean evolutionary age for species in cities')
+mean(columbidae_presence$terminal_branch_length[columbidae_presence$present_in_city])
+print('Mean evolutionary age for species NOT in cities')
+mean(columbidae_presence$terminal_branch_length[!columbidae_presence$present_in_city])
+```
+```{r}
+wilcox.test(columbidae_presence$terminal_branch_length[columbidae_presence$present_in_city], columbidae_presence$terminal_branch_length[!columbidae_presence$present_in_city])
+```
+```{r}
+ggplot(columbidae_presence, aes(x = present_in_city, y = terminal_branch_length)) + 
+  geom_boxplot() +
+  xlab('Species present in city?') + ylab('Evolutionary Age (branch length)')
+```
+# Urban Tolerance Analysis
+This analysis is sensitive to response of species that occur in a small number of regional pools and are urban adapters, e.g. may occur in cities but are not either prevalent or totally absent. e.g. a species in only 1 regional pool can only have a tolerance of 0 or 1, and a species in only 2 regional pools can only have a tolerance of 0 (0/2), 0.5 (1/2), or 1 (2/2).
+
+
+## Data sets
+For analysis not dependent on whether species in range
+```{r}
+columbidae_urban_tolerance_tmp = all_columbidae_presence %>% group_by(jetz_scientific_name) %>% summarise(regional_pools = n(), urban_pools = sum(present_in_city), urban_tolerance = sum(present_in_city) / n())
+columbidae_urban_tolerance_tmp = right_join(columbidae_urban_tolerance_tmp, avonet_jetz)
+columbidae_urban_tolerance_tmp = right_join(columbidae_urban_tolerance_tmp, columbidae_branch_lengths)
+columbidae_tolerance = columbidae_urban_tolerance_tmp[,c('jetz_scientific_name', 'urban_tolerance',  'regional_pools', 'urban_pools', 'trophic_niche', 'habitat', 'habitat_density', 'primary_lifestyle', 'terminal_branch_length')]
+head(columbidae_tolerance)
+```
+
+## Season
+For analysis of season
+```{r}
+columbidae_urban_tolerance_seasonal_tmp = all_columbidae_presence %>% group_by(jetz_scientific_name, season) %>% summarise(regional_pools = n(), urban_pools = sum(present_in_city), urban_tolerance = sum(present_in_city) / n())
+columbidae_urban_tolerance_seasonal_tmp = right_join(columbidae_urban_tolerance_seasonal_tmp, avonet_jetz)
+columbidae_urban_tolerance_seasonal_tmp = right_join(columbidae_urban_tolerance_seasonal_tmp, columbidae_branch_lengths)
+columbidae_urban_tolerance_seasonal = columbidae_urban_tolerance_seasonal_tmp[,c('urban_tolerance',  'season')]
+head(columbidae_urban_tolerance_seasonal)
+```
+
+```{r}
+kruskal.test(columbidae_urban_tolerance_seasonal$urban_tolerance ~ columbidae_urban_tolerance_seasonal$season)
+```
+
+```{r}
+pairwise.wilcox.test(columbidae_urban_tolerance_seasonal$urban_tolerance, columbidae_urban_tolerance_seasonal$season)
+```
+
+## Origin
+For analysis of origin
+```{r}
+columbidae_urban_tolerance_origin_tmp = all_columbidae_presence %>% group_by(jetz_scientific_name, origin) %>% summarise(regional_pools = n(), urban_pools = sum(present_in_city), urban_tolerance = sum(present_in_city) / n())
+columbidae_urban_tolerance_origin_tmp = right_join(columbidae_urban_tolerance_origin_tmp, avonet_jetz)
+columbidae_urban_tolerance_origin_tmp = right_join(columbidae_urban_tolerance_origin_tmp, columbidae_branch_lengths)
+columbidae_urban_tolerance_origin = columbidae_urban_tolerance_origin_tmp[,c('jetz_scientific_name', 'urban_tolerance',  'regional_pools', 'urban_pools', 'origin')]
+head(columbidae_urban_tolerance_origin)
+```
+
+Introduced species
+```{r}
+columbidae_urban_tolerance_origin[columbidae_urban_tolerance_origin$origin == 'Introduced',]
+```
+Which have an overall status
+```{r}
+introduced_species_names = columbidae_urban_tolerance_origin$jetz_scientific_name[columbidae_urban_tolerance_origin$origin == 'Introduced']
+columbidae_tolerance[columbidae_tolerance$jetz_scientific_name %in% introduced_species_names,]
+```
+
+```{r}
+wilcox.test(columbidae_urban_tolerance_origin$urban_tolerance ~ columbidae_urban_tolerance_origin$origin)
+```
+
+```{r}
+print("Mean tolerance of native species")
+mean(columbidae_urban_tolerance_origin$urban_tolerance[columbidae_urban_tolerance_origin$origin == 'Native'])
+print("Mean tolernace of introduced species")
+mean(columbidae_urban_tolerance_origin$urban_tolerance[columbidae_urban_tolerance_origin$origin != 'Native'])
+```
+
+## Habitat
+
+```{r}
+kruskal.test(columbidae_tolerance$urban_tolerance ~ columbidae_tolerance$habitat)
+```
+
+```{r, warning = F}
+pairwise.wilcox.test(columbidae_tolerance$urban_tolerance, columbidae_tolerance$habitat)
+```
+
+```{r}
+ggplot(data = columbidae_tolerance, aes(x = habitat, y = urban_tolerance)) + geom_boxplot()
+```
+
+## Habitat Density
+
+```{r}
+kruskal.test(columbidae_tolerance$urban_tolerance ~ columbidae_tolerance$habitat_density)
+```
+
+```{r}
+pairwise.wilcox.test(columbidae_tolerance$urban_tolerance, columbidae_tolerance$habitat_density)
+```
+
+```{r}
+ggplot(columbidae_tolerance, aes(x = as.factor(habitat_density), y = urban_tolerance)) + geom_boxplot()
+```
+
+
+## Trophic Guild
+
+```{r}
+kruskal.test(columbidae_tolerance$urban_tolerance ~ columbidae_tolerance$trophic_niche)
+```
+
+```{r}
+pairwise.wilcox.test(columbidae_tolerance$urban_tolerance, columbidae_tolerance$trophic_niche)
+```
+
+```{r}
+ggplot(columbidae_tolerance, aes(x = trophic_niche, y = urban_tolerance)) + geom_boxplot()
+```
+
+
+## Primary Lifestyle
+
+```{r}
+kruskal.test(columbidae_tolerance$urban_tolerance ~ columbidae_tolerance$primary_lifestyle)
+```
+
+```{r}
+pairwise.wilcox.test(columbidae_tolerance$urban_tolerance, columbidae_tolerance$primary_lifestyle)
+```
+
+```{r}
+ggplot(columbidae_tolerance, aes(x = primary_lifestyle, y = urban_tolerance)) + geom_boxplot()
+```
+
+
+## Evolutionary Age of Species
+
+```{r}
+summary(glm(data = columbidae_tolerance, formula = urban_tolerance ~ terminal_branch_length, family = "gaussian"))
+```
+
+```{r}
+ggplot(columbidae_tolerance, aes(x = terminal_branch_length, y = urban_tolerance)) + 
+  geom_point() +
+  geom_smooth(formula = "y ~ x", method="glm", se=F) +
+  ylab('Urban Tolerance') + xlab('Evolutionary Age (branch length)') + ylim(c(0, 1))
+```

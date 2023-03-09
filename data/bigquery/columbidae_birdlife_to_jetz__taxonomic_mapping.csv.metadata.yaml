@@ -1,0 +1,9 @@
+models:
+  - name: birdlife_to_jetz_mapping
+    description: Mapping from birdlife to jetz taxonomies
+    columns:
+      - name: species_name
+        description: The birdlife species name
+      - name: jetz_scientific_name
+        description: The Jetz species name
+

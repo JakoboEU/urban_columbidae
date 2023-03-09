@@ -1,0 +1,30 @@
+models:
+  - name: avonet_birdlife
+    description: Functional traits taken from Avonet (Tobias et al. 2022) which includes core morphologic measurements, along with habitat preference
+    columns:
+      - name: species_name
+        description: The birdlife species name
+      - name: beak_length
+        description: measured from tip to skull along the culmen
+      - name: beak_width
+        description: 
+      - name: beak_depth
+        description:
+      - name: tail_length
+        description:
+      - name: wing_length
+        description: carpal joint to wingtip measured on the unflattened wing
+      - name: tarsus_length
+        description:
+      - name: habitat
+        description: habitat preference; one of: forest, grassland, human modified, rock, shrubland, woodland, desert
+      - name: habitat_density
+        description: habitat density preference (1 open to 3 dense)
+      - name: trophic_niche
+        description: frugivore, granivore, omnivore
+      - name: primary_lifestyle
+        description: generalist, insessorial, terrestrial
+      - name: range_size
+        description: extracted range size (km2) from Birdlife
+      - name: mass
+        description: body mass (grams)
