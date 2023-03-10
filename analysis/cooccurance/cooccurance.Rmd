@@ -11,7 +11,7 @@ library(picante)
 
 Load data for our columbidae species present in all localities of the world
 ```{r}
-all_occurance = read_csv('../../data/bigquery/columbidae_birdlife__worldwide_ebird_records.csv')
+all_occurance = read_csv(gzfile('../../data/bigquery/columbidae_birdlife__worldwide_ebird_records.csv.gz'))
 ```
 ```{r}
 head(all_occurance)

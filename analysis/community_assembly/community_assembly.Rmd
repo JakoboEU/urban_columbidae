@@ -627,6 +627,7 @@ head(urban_all_species_community_result)
 
 ```{r create urban_resident_only_species_community_result, eval = FALSE}
 RESIDENT_SPECIES_RESULT__CACHE_FILE = './cache/community_assembly_resident_species_result.csv'
+urban_resident_only_species_community_result = NULL
 
 if (!file.exists(RESIDENT_SPECIES_RESULT__CACHE_FILE)) {
   urban_resident_only_species_community_result = data.frame()
