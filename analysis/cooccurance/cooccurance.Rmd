@@ -165,3 +165,38 @@ t.test(regional_patch_cooccurance$mntd[regional_patch_cooccurance$cooccurance_st
 kruskal.test(cooccurance_status ~ mntd, data = regional_patch_cooccurance)
 ```
 
+```{r}
+library(GGally)
+```
+
+```{r}
+regional_patch_cooccurance
+```
+
+```{r}
+regional_patch_cooccurance$number_of_pools_sqrt = as.integer(sqrt(regional_patch_cooccurance$number_of_pools))
+regional_patch_cooccurance$cooccurance_ratio = regional_patch_cooccurance$both_present / regional_patch_cooccurance$number_of_pools
+
+cooccurance_ratio_color_ramp <- colorRampPalette(c("red", "blue"))
+cooccurance_ratio_palette = cooccurance_ratio_color_ramp(11)
+
+get_ratio_colour = function(ratio) {
+  cooccurance_ratio_palette[round(ratio * 10)]
+}
+
+color.gradient <- function(x, colors=c("red","yellow", "green"), colsteps=100) {
+  return( colorRampPalette(colors) (colsteps) [ findInterval(x, seq(min(x),max(x), length.out=colsteps)) ] )
+}
+
+regional_patch_cooccurance$cooccurance_ratio_colour = color.gradient(regional_patch_cooccurance$cooccurance_ratio)
+```
+
+```{r}
+ggnet2(regional_patch_cooccurance, label = T, edge.size = "number_of_pools_sqrt", edge.color = "cooccurance_ratio_colour", legend.position = "bottom")
+```
+
+```{r}
+jpeg("figures/worldwide_cooccurance.jpg", width=5112, height=5112)
+ggnet2(regional_patch_cooccurance, label = T, edge.size = "number_of_pools_sqrt", edge.color = "cooccurance_ratio_colour")
+dev.off()
+```

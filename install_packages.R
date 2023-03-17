@@ -12,3 +12,8 @@ install.packages("fundiversity")
 install.packages("ggpubr")
 install.packages("gridExtra")
 install.packages("grid")
+
+install.packages("GGally")
+install.packages('network')
+install.packages('sna')
+install.packages('scales')
