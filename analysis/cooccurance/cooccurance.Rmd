@@ -165,6 +165,9 @@ t.test(regional_patch_cooccurance$mntd[regional_patch_cooccurance$cooccurance_st
 kruskal.test(cooccurance_status ~ mntd, data = regional_patch_cooccurance)
 ```
 
+# Map Co-occurance using a network plot
+
+## All co-occurance
 ```{r}
 library(GGally)
 ```
@@ -200,3 +203,22 @@ jpeg("figures/worldwide_cooccurance.jpg", width=5112, height=5112)
 ggnet2(regional_patch_cooccurance, label = T, edge.size = "number_of_pools_sqrt", edge.color = "cooccurance_ratio_colour")
 dev.off()
 ```
+
+## Cooccurrance by realm
+
+```{r}
+head(regional_pools)
+```
+
+```{r}
+cities_to_realms = read_csv('../../data/earth_engine/cities_to_realms.csv')
+names(cities_to_realms) = c('city_id', 'realm')
+head(cities_to_realms)
+```
+
+```{r}
+city_presence_to_realm = left_join(cities_to_realms, regional_pools)
+city_presence_to_realm = city_presence_to_realm[!is.na(city_presence_to_realm$jetz_scientific_name),]
+city_presence_to_realm
+```
+
