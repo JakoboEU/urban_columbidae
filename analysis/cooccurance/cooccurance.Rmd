@@ -217,8 +217,61 @@ head(cities_to_realms)
 ```
 
 ```{r}
-city_presence_to_realm = left_join(cities_to_realms, regional_pools)
-city_presence_to_realm = city_presence_to_realm[!is.na(city_presence_to_realm$jetz_scientific_name),]
-city_presence_to_realm
+regional_pools_by_realm = left_join(cities_to_realms, regional_pools)
+regional_pools_by_realm = regional_pools_by_realm[!is.na(regional_pools_by_realm$jetz_scientific_name),]
+regional_pools_by_realm
 ```
+
+```{r}
+regional_pools_by_realm2 = regional_pools_by_realm
+names(regional_pools_by_realm2) = c('city_id', 'realm', 'jetz_scientific_name2', 'present_in_city2')
+urban_cooccurance_by_realm = right_join(regional_pools_by_realm, regional_pools_by_realm2)
+urban_cooccurance_by_realm = urban_cooccurance_by_realm[urban_cooccurance_by_realm$jetz_scientific_name != urban_cooccurance_by_realm$jetz_scientific_name2,]
+head(urban_cooccurance_by_realm)
+```
+Restrict down to pairs of species that do occur
+```{r}
+possible_cooccurrance_by_realm = urban_cooccurance_by_realm %>% group_by(realm, jetz_scientific_name, jetz_scientific_name2) %>% summarise(total_regional_pools = n(), both_present = sum(present_in_city & present_in_city2))
+
+cooccurrance_by_realm = right_join(cooccurance_details, possible_cooccurrance_by_realm)
+```
+
+Add additional columns for plot
+```{r}
+cooccurrance_by_realm$number_of_pools_sqrt = as.integer(sqrt(cooccurrance_by_realm$total_regional_pools))
+cooccurrance_by_realm$cooccurance_ratio = cooccurrance_by_realm$both_present / cooccurrance_by_realm$total_regional_pools
+
+cooccurrance_by_realm$cooccurance_ratio_colour = color.gradient(cooccurrance_by_realm$cooccurance_ratio)
+
+head(cooccurrance_by_realm)
+```
+
+```{r}
+unique(cooccurrance_by_realm$realm)
+```
+
+```{r}
+ggnet2(cooccurrance_by_realm[cooccurrance_by_realm$realm == 'Palearctic',], label = T, edge.size = "number_of_pools_sqrt", edge.color = "cooccurance_ratio_colour", legend.position = "bottom")
+```
+```{r}
+ggnet2(cooccurrance_by_realm[cooccurrance_by_realm$realm == 'Australasia',], label = T, edge.size = "number_of_pools_sqrt", edge.color = "cooccurance_ratio_colour", legend.position = "bottom")
+```
+
+```{r}
+ggnet2(cooccurrance_by_realm[cooccurrance_by_realm$realm == 'Indomalayan',], label = T, edge.size = "number_of_pools_sqrt", edge.color = "cooccurance_ratio_colour", legend.position = "bottom")
+```
+
+```{r}
+ggnet2(cooccurrance_by_realm[cooccurrance_by_realm$realm == 'Afrotropic',], label = T, edge.size = "number_of_pools_sqrt", edge.color = "cooccurance_ratio_colour", legend.position = "bottom")
+```
+
+```{r}
+ggnet2(cooccurrance_by_realm[cooccurrance_by_realm$realm == 'Nearctic',], label = T, edge.size = "number_of_pools_sqrt", edge.color = "cooccurance_ratio_colour", legend.position = "bottom")
+```
+
+```{r}
+ggnet2(cooccurrance_by_realm[cooccurrance_by_realm$realm == 'Neotropic',], label = T, edge.size = "number_of_pools_sqrt", edge.color = "cooccurance_ratio_colour", legend.position = "bottom")
+```
+
+
 
