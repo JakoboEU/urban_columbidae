@@ -7,6 +7,7 @@ output: html_notebook
 library(dplyr)
 library(tidyverse)
 library(picante)
+library(network)
 ```
 
 Load data for our columbidae species present in all localities of the world
@@ -48,7 +49,7 @@ Load in our regional pools
 ```{r}
 regional_pools = read_csv('../../data/bigquery/columbidae_jetz__urban_locations.csv')
 regional_pools = regional_pools[,c('jetz_scientific_name', 'city_id', 'present_in_city')]
-head(regional_pools)
+regional_pools
 ```
 
 Generate all cooccuring species in regional pools
@@ -194,14 +195,10 @@ color.gradient <- function(x, colors=c("red","yellow", "green"), colsteps=100) {
 regional_patch_cooccurance$cooccurance_ratio_colour = color.gradient(regional_patch_cooccurance$cooccurance_ratio)
 ```
 
-```{r}
-ggnet2(regional_patch_cooccurance, label = T, edge.size = "number_of_pools_sqrt", edge.color = "cooccurance_ratio_colour", legend.position = "bottom")
-```
 
 ```{r}
-jpeg("figures/worldwide_cooccurance.jpg", width=5112, height=5112)
 ggnet2(regional_patch_cooccurance, label = T, edge.size = "number_of_pools_sqrt", edge.color = "cooccurance_ratio_colour")
-dev.off()
+ggsave("figures/worldwide_cooccurance.jpg", width=5112, height=5112, units = "px")
 ```
 
 ## Cooccurrance by realm
@@ -213,7 +210,10 @@ head(regional_pools)
 ```{r}
 cities_to_realms = read_csv('../../data/earth_engine/cities_to_realms.csv')
 names(cities_to_realms) = c('city_id', 'realm')
-head(cities_to_realms)
+cities_to_realms[order(cities_to_realms$realm),]
+```
+```{r}
+cities_to_realms[cities_to_realms$city_id == 4355,]
 ```
 
 ```{r}
@@ -223,27 +223,45 @@ regional_pools_by_realm
 ```
 
 ```{r}
+regional_pools_by_realm_summary = regional_pools_by_realm %>% group_by(realm, jetz_scientific_name) %>% summarise(species_presence_total_pools = n(), species_presence_total_urban = sum(present_in_city))
+regional_pools_by_realm_summary
+```
+
+```{r}
 regional_pools_by_realm2 = regional_pools_by_realm
 names(regional_pools_by_realm2) = c('city_id', 'realm', 'jetz_scientific_name2', 'present_in_city2')
 urban_cooccurance_by_realm = right_join(regional_pools_by_realm, regional_pools_by_realm2)
 urban_cooccurance_by_realm = urban_cooccurance_by_realm[urban_cooccurance_by_realm$jetz_scientific_name != urban_cooccurance_by_realm$jetz_scientific_name2,]
 head(urban_cooccurance_by_realm)
 ```
+
 Restrict down to pairs of species that do occur
 ```{r}
-possible_cooccurrance_by_realm = urban_cooccurance_by_realm %>% group_by(realm, jetz_scientific_name, jetz_scientific_name2) %>% summarise(total_regional_pools = n(), both_present = sum(present_in_city & present_in_city2))
+possible_cooccurrance_by_realm = urban_cooccurance_by_realm %>% group_by(realm, jetz_scientific_name, jetz_scientific_name2) %>% summarise(cooccurance_total_pools = n(), cooccurance_both_urban = sum(present_in_city & present_in_city2))
 
 cooccurrance_by_realm = right_join(cooccurance_details, possible_cooccurrance_by_realm)
+
+cooccurrance_by_realm
 ```
 
 Add additional columns for plot
 ```{r}
-cooccurrance_by_realm$number_of_pools_sqrt = as.integer(sqrt(cooccurrance_by_realm$total_regional_pools))
-cooccurrance_by_realm$cooccurance_ratio = cooccurrance_by_realm$both_present / cooccurrance_by_realm$total_regional_pools
-
+cooccurrance_by_realm$cooccurance_total_pools_sqrt = as.integer(sqrt(cooccurrance_by_realm$cooccurance_total_pools))
+cooccurrance_by_realm$cooccurance_ratio = cooccurrance_by_realm$cooccurance_both_urban / cooccurrance_by_realm$cooccurance_total_pools
 cooccurrance_by_realm$cooccurance_ratio_colour = color.gradient(cooccurrance_by_realm$cooccurance_ratio)
 
-head(cooccurrance_by_realm)
+cooccurrance_by_realm
+```
+
+Summary data for each species for nodes
+```{r}
+species_presence_by_realm = regional_pools_by_realm %>% group_by(jetz_scientific_name, realm) %>% summarise(
+  species_total_pools = n(), 
+  species_total_cities = sum(present_in_city),
+  species_urban_tolerance = sum(present_in_city) / n())
+
+species_presence_by_realm$urban_tolerance_colour = color.gradient(species_presence_by_realm$species_urban_tolerance)
+species_presence_by_realm
 ```
 
 ```{r}
@@ -251,27 +269,28 @@ unique(cooccurrance_by_realm$realm)
 ```
 
 ```{r}
-ggnet2(cooccurrance_by_realm[cooccurrance_by_realm$realm == 'Palearctic',], label = T, edge.size = "number_of_pools_sqrt", edge.color = "cooccurance_ratio_colour", legend.position = "bottom")
-```
-```{r}
-ggnet2(cooccurrance_by_realm[cooccurrance_by_realm$realm == 'Australasia',], label = T, edge.size = "number_of_pools_sqrt", edge.color = "cooccurance_ratio_colour", legend.position = "bottom")
+cooccurrance_paleartic = cooccurrance_by_realm[cooccurrance_by_realm$realm == 'Palearctic',]
+cooccurrance_paleartic
 ```
 
 ```{r}
-ggnet2(cooccurrance_by_realm[cooccurrance_by_realm$realm == 'Indomalayan',], label = T, edge.size = "number_of_pools_sqrt", edge.color = "cooccurance_ratio_colour", legend.position = "bottom")
+cooccurrance_paleartic_net = network(cooccurrance_paleartic)
+cooccurrance_paleartic_net
 ```
 
 ```{r}
-ggnet2(cooccurrance_by_realm[cooccurrance_by_realm$realm == 'Afrotropic',], label = T, edge.size = "number_of_pools_sqrt", edge.color = "cooccurance_ratio_colour", legend.position = "bottom")
+species_paleartic = data.frame(species_presence_by_realm[species_presence_by_realm$realm == 'Palearctic',])
+rownames(species_paleartic) = species_paleartic$jetz_scientific_name
+species_paleartic
 ```
 
 ```{r}
-ggnet2(cooccurrance_by_realm[cooccurrance_by_realm$realm == 'Nearctic',], label = T, edge.size = "number_of_pools_sqrt", edge.color = "cooccurance_ratio_colour", legend.position = "bottom")
+ggnet2(cooccurrance_paleartic_net, label = T, edge.size = "cooccurance_total_pools_sqrt", edge.color = "cooccurance_ratio_colour", node.color = species_paleartic[,c('urban_tolerance_colour')], node.size = species_paleartic[,c('species_total_pools')])
+
+ggsave("figures/paleartic_cooccurance.jpg", width=5112, height=5112, units = "px")
 ```
 
-```{r}
-ggnet2(cooccurrance_by_realm[cooccurrance_by_realm$realm == 'Neotropic',], label = T, edge.size = "number_of_pools_sqrt", edge.color = "cooccurance_ratio_colour", legend.position = "bottom")
-```
+
 
 
 
