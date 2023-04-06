@@ -38,6 +38,14 @@ cor(trophic_trait_pca$Ybar[,1], avonet_jetz$mass)
 ```
 
 ```{r}
+cor(trophic_trait_pca$Ybar[,2], avonet_jetz$mass)
+```
+
+```{r}
+cor(trophic_trait_pca$Ybar[,3], avonet_jetz$mass)
+```
+
+```{r}
 avonet_jetz$trophic_trait = trophic_trait_pca$Ybar[,1]
 ```
 
@@ -53,6 +61,14 @@ cor(locomotry_trait_pca$Ybar[,1], avonet_jetz$mass)
 ```
 
 ```{r}
+cor(locomotry_trait_pca$Ybar[,2], avonet_jetz$mass)
+```
+
+```{r}
+cor(locomotry_trait_pca$Ybar[,3], avonet_jetz$mass)
+```
+
+```{r}
 avonet_jetz$locomotory_trait = locomotry_trait_pca$Ybar[,1]
 ```
 
@@ -61,4 +77,40 @@ avonet_jetz
 ```
 ```{r}
 write_csv(avonet_jetz, '../../data/output/urban_traits__trait_axis.csv')
+```
+
+# How is trophic trait related to component parts?
+```{r}
+ggplot(avonet_jetz, aes(x = trophic_trait, y = beak_length)) + geom_point()
+```
+
+
+```{r}
+ggplot(avonet_jetz, aes(x = trophic_trait, y = beak_width)) + geom_point()
+```
+
+```{r}
+ggplot(avonet_jetz, aes(x = trophic_trait, y = beak_depth)) + geom_point()
+```
+
+```{r}
+ggplot(avonet_jetz, aes(x = trophic_trait, y = mass)) + geom_point()
+```
+
+# How is locomotory trait related to component parts?
+```{r}
+ggplot(avonet_jetz, aes(x = locomotory_trait, y = tail_length)) + geom_point()
+```
+
+
+```{r}
+ggplot(avonet_jetz, aes(x = locomotory_trait, y = wing_length)) + geom_point()
+```
+
+```{r}
+ggplot(avonet_jetz, aes(x = locomotory_trait, y = tarsus_length)) + geom_point()
+```
+
+```{r}
+ggplot(avonet_jetz, aes(x = locomotory_trait, y = mass)) + geom_point()
 ```

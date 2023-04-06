@@ -1,0 +1,138 @@
+---
+title: "Trait Spread in cities"
+output: html_notebook
+---
+
+
+Load in our regional pools
+```{r}
+regional_pools = read_csv('../../data/bigquery/columbidae_jetz__urban_locations.csv')
+regional_pools = regional_pools[,c('jetz_scientific_name', 'city_name', 'city_id', 'present_in_city')]
+regional_pools
+```
+
+Load in traits, created in ./urban_traits/trait_axis.Rmd
+```{r}
+avonet_jetz = read_csv('../../data/output/urban_traits__trait_axis.csv')
+avonet_jetz
+```
+
+Load in realms
+```{r}
+cities_to_realms = read_csv('../../data/earth_engine/cities_to_realms.csv')
+names(cities_to_realms) = c('city_id', 'realm')
+cities_to_realms[order(cities_to_realms$realm),]
+```
+
+
+```{r}
+regional_species = regional_pools[,c('jetz_scientific_name', 'city_id', 'city_name')]
+regional_species$record_type = 'Regional Pool'
+
+urban_species = regional_pools[regional_pools$present_in_city, c('jetz_scientific_name', 'city_id', 'city_name')]
+urban_species$record_type = 'Urban'
+
+species = rbind(regional_species, urban_species)
+species
+```
+```{r}
+species = left_join(species, cities_to_realms)
+species = left_join(species, avonet_jetz[,c('jetz_scientific_name', 'mass', 'trophic_trait', 'locomotory_trait')])
+species
+```
+
+# Explore range of masses between regional pools and cities
+
+```{r, fig.width=12}
+ggplot(species[species$realm == 'Palearctic',], aes(y = mass, x = city_name, color = record_type)) + 
+  geom_boxplot() + 
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1), legend.position="bottom")
+```
+
+```{r, fig.width=12}
+ggplot(species[species$realm == 'Nearctic',], aes(y = mass, x = city_name, color = record_type)) + 
+  geom_boxplot() + 
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1), legend.position="bottom")
+```
+
+```{r, fig.width=12}
+ggplot(species[species$realm == 'Afrotropic',], aes(y = mass, x = city_name, color = record_type)) + 
+  geom_boxplot() + 
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1), legend.position="bottom")
+```
+```{r, fig.width=12}
+ggplot(species[species$realm == 'Australasia',], aes(y = mass, x = city_name, color = record_type)) + 
+  geom_boxplot() + 
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1), legend.position="bottom")
+```
+
+```{r, fig.width=12}
+ggplot(species[species$realm == 'Indomalayan',], aes(y = mass, x = city_name, color = record_type)) + 
+  geom_boxplot() + 
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1), legend.position="bottom")
+```
+
+
+# Explore range of locomotory trait between regional pools and cities
+
+```{r, fig.width=12}
+ggplot(species[species$realm == 'Palearctic',], aes(y = locomotory_trait, x = city_name, color = record_type)) + 
+  geom_boxplot() + 
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1), legend.position="bottom")
+```
+
+```{r, fig.width=12}
+ggplot(species[species$realm == 'Nearctic',], aes(y = locomotory_trait, x = city_name, color = record_type)) + 
+  geom_boxplot() + 
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1), legend.position="bottom")
+```
+
+```{r, fig.width=12}
+ggplot(species[species$realm == 'Afrotropic',], aes(y = locomotory_trait, x = city_name, color = record_type)) + 
+  geom_boxplot() + 
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1), legend.position="bottom")
+```
+
+```{r, fig.width=12}
+ggplot(species[species$realm == 'Australasia',], aes(y = locomotory_trait, x = city_name, color = record_type)) + 
+  geom_boxplot() + 
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1), legend.position="bottom")
+```
+
+```{r, fig.width=12}
+ggplot(species[species$realm == 'Indomalayan',], aes(y = locomotory_trait, x = city_name, color = record_type)) + 
+  geom_boxplot() + 
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1), legend.position="bottom")
+```
+
+# Explore range of trophic trait between regional pools and cities
+
+```{r, fig.width=12}
+ggplot(species[species$realm == 'Palearctic',], aes(y = trophic_trait, x = city_name, color = record_type)) + 
+  geom_boxplot() + 
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1), legend.position="bottom")
+```
+
+```{r, fig.width=12}
+ggplot(species[species$realm == 'Nearctic',], aes(y = trophic_trait, x = city_name, color = record_type)) + 
+  geom_boxplot() + 
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1), legend.position="bottom")
+```
+
+```{r, fig.width=12}
+ggplot(species[species$realm == 'Afrotropic',], aes(y = trophic_trait, x = city_name, color = record_type)) + 
+  geom_boxplot() + 
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1), legend.position="bottom")
+```
+
+```{r, fig.width=12}
+ggplot(species[species$realm == 'Australasia',], aes(y = trophic_trait, x = city_name, color = record_type)) + 
+  geom_boxplot() + 
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1), legend.position="bottom")
+```
+
+```{r, fig.width=12}
+ggplot(species[species$realm == 'Indomalayan',], aes(y = trophic_trait, x = city_name, color = record_type)) + 
+  geom_boxplot() + 
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1), legend.position="bottom")
+```
