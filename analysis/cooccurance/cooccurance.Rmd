@@ -126,7 +126,15 @@ for(row_i in 1:nrow(regional_patch_cooccurance)) {
   regional_patch_cooccurance[row_i,]$mntd = mntd.community.result[1,]$mntd.obs
 }
 
+regional_patch_cooccurance$cooccurance_ratio = regional_patch_cooccurance$both_present / regional_patch_cooccurance$number_of_pools
 regional_patch_cooccurance
+```
+
+```{r}
+ggplot(regional_patch_cooccurance, aes(x = mntd, y = cooccurance_ratio)) + geom_point() + geom_smooth(method = "glm", linetype = 2)
+```
+```{r}
+ggplot(regional_patch_cooccurance[regional_patch_cooccurance$cooccurance_ratio > 0,], aes(x = mntd, y = cooccurance_ratio)) + geom_point() + geom_smooth(method = "glm", linetype = 2)
 ```
 
 Calculate a status which indicates whether species are in the city together:
@@ -153,10 +161,10 @@ nrow(regional_patch_cooccurance)
 mean(regional_patch_cooccurance$mntd)
 ```
 
+Is there a significant different in the mean MNTD between these groups?
 ```{r}
 regional_patch_cooccurance %>% group_by(cooccurance_status) %>% summarise(mean = mean(mntd), sd = sd(mntd), min = min(mntd), max = max(mntd), total = n())
 ```
-
 
 ```{r}
 t.test(regional_patch_cooccurance$mntd[regional_patch_cooccurance$cooccurance_status == 'Never'], regional_patch_cooccurance$mntd[regional_patch_cooccurance$cooccurance_status == 'Always'])
@@ -164,6 +172,35 @@ t.test(regional_patch_cooccurance$mntd[regional_patch_cooccurance$cooccurance_st
 
 ```{r}
 kruskal.test(cooccurance_status ~ mntd, data = regional_patch_cooccurance)
+```
+
+Not really!
+
+Compare mean MNTD between species that sometimes and never cooccur
+```{r}
+mean(regional_patch_cooccurance$mntd[regional_patch_cooccurance$cooccurance_ratio > 0])
+mean(regional_patch_cooccurance$mntd[regional_patch_cooccurance$cooccurance_ratio == 0])
+mean(regional_patch_cooccurance$mntd[regional_patch_cooccurance$cooccurance_ratio == 1])
+
+
+t.test(regional_patch_cooccurance$mntd[regional_patch_cooccurance$cooccurance_ratio > 0], regional_patch_cooccurance$mntd[regional_patch_cooccurance$cooccurance_ratio == 0])
+```
+Again, not significantly different
+
+Which species that are evolutionary close together, occur rarely?
+```{r}
+regional_patch_cooccurance[regional_patch_cooccurance$mntd < 20, c('jetz_scientific_name', 'jetz_scientific_name2', 'cooccurance_status', 'mntd')]
+```
+
+What if we exclude species that never occur in cities?  Are urban avoiders changing this result?
+```{r}
+urban_birds = unique(regional_pools$jetz_scientific_name[regional_pools$present_in_city == T])
+regional_patch_cooccurance_of_urban_birds = regional_patch_cooccurance[regional_patch_cooccurance$jetz_scientific_name %in% urban_birds & regional_patch_cooccurance$jetz_scientific_name2 %in% urban_birds,]
+
+ggplot(regional_patch_cooccurance_of_urban_birds, aes(x = mntd, y = cooccurance_ratio)) + geom_point() + geom_smooth(method = "glm", linetype = 2)
+```
+```{r}
+summary(glm(data = regional_patch_cooccurance_of_urban_birds, formula = cooccurance_ratio ~ mntd))
 ```
 
 # Map Co-occurance using a network plot
@@ -179,7 +216,6 @@ regional_patch_cooccurance
 
 ```{r}
 regional_patch_cooccurance$number_of_pools_sqrt = as.integer(sqrt(regional_patch_cooccurance$number_of_pools))
-regional_patch_cooccurance$cooccurance_ratio = regional_patch_cooccurance$both_present / regional_patch_cooccurance$number_of_pools
 
 cooccurance_ratio_color_ramp <- colorRampPalette(c("red", "blue"))
 cooccurance_ratio_palette = cooccurance_ratio_color_ramp(11)
@@ -212,6 +248,7 @@ cities_to_realms = read_csv('../../data/earth_engine/cities_to_realms.csv')
 names(cities_to_realms) = c('city_id', 'realm')
 cities_to_realms[order(cities_to_realms$realm),]
 ```
+
 ```{r}
 cities_to_realms[cities_to_realms$city_id == 4355,]
 ```
@@ -268,6 +305,7 @@ species_presence_by_realm
 unique(cooccurrance_by_realm$realm)
 ```
 
+### Palearctic
 ```{r}
 cooccurrance_paleartic = cooccurrance_by_realm[cooccurrance_by_realm$realm == 'Palearctic',]
 cooccurrance_paleartic
@@ -291,6 +329,120 @@ ggsave("figures/paleartic_cooccurance.jpg", width=5112, height=5112, units = "px
 ```
 
 
+### Australasia
+```{r}
+cooccurrance_australasia = cooccurrance_by_realm[cooccurrance_by_realm$realm == 'Australasia',]
+cooccurrance_australasia
+```
 
+```{r}
+cooccurrance_australasia_net = network(cooccurrance_australasia)
+cooccurrance_australasia_net
+```
+
+```{r}
+species_australasia = data.frame(species_presence_by_realm[species_presence_by_realm$realm == 'Australasia',])
+rownames(species_australasia) = species_australasia$jetz_scientific_name
+species_australasia
+```
+
+```{r}
+ggnet2(cooccurrance_australasia_net, label = T, edge.size = "cooccurance_total_pools_sqrt", edge.color = "cooccurance_ratio_colour", node.color = species_australasia[,c('urban_tolerance_colour')], node.size = species_australasia[,c('species_total_pools')])
+
+ggsave("figures/australasia_cooccurance.jpg", width=5112, height=5112, units = "px")
+```
+
+
+### Indomalayan
+```{r}
+cooccurrance_indomalayan = cooccurrance_by_realm[cooccurrance_by_realm$realm == 'Indomalayan',]
+cooccurrance_indomalayan
+```
+
+```{r}
+cooccurrance_indomalayan_net = network(cooccurrance_indomalayan)
+cooccurrance_indomalayan_net
+```
+
+```{r}
+species_indomalayan = data.frame(species_presence_by_realm[species_presence_by_realm$realm == 'Indomalayan',])
+rownames(species_indomalayan) = species_indomalayan$jetz_scientific_name
+species_indomalayan
+```
+
+```{r}
+ggnet2(cooccurrance_indomalayan_net, label = T, edge.size = "cooccurance_total_pools_sqrt", edge.color = "cooccurance_ratio_colour", node.color = species_indomalayan[,c('urban_tolerance_colour')], node.size = species_indomalayan[,c('species_total_pools')])
+
+ggsave("figures/indomalayan_cooccurance.jpg", width=5112, height=5112, units = "px")
+```
+
+### Neotropic
+```{r}
+cooccurrance_neotropic = cooccurrance_by_realm[cooccurrance_by_realm$realm == 'Neotropic',]
+cooccurrance_neotropic
+```
+
+```{r}
+cooccurrance_neotropic_net = network(cooccurrance_neotropic)
+cooccurrance_neotropic_net
+```
+
+```{r}
+species_neotropic = data.frame(species_presence_by_realm[species_presence_by_realm$realm == 'Neotropic',])
+rownames(species_neotropic) = species_neotropic$jetz_scientific_name
+species_neotropic
+```
+
+```{r}
+ggnet2(cooccurrance_neotropic_net, label = T, edge.size = "cooccurance_total_pools_sqrt", edge.color = "cooccurance_ratio_colour", node.color = species_neotropic[,c('urban_tolerance_colour')], node.size = species_neotropic[,c('species_total_pools')])
+
+ggsave("figures/neotropic_cooccurance.jpg", width=5112, height=5112, units = "px")
+```
+
+### Afrotropic
+```{r}
+cooccurrance_afrotropic = cooccurrance_by_realm[cooccurrance_by_realm$realm == 'Afrotropic',]
+cooccurrance_afrotropic
+```
+
+```{r}
+cooccurrance_afrotropic_net = network(cooccurrance_afrotropic)
+cooccurrance_afrotropic_net
+```
+
+```{r}
+species_afrotropic = data.frame(species_presence_by_realm[species_presence_by_realm$realm == 'Afrotropic',])
+rownames(species_afrotropic) = species_afrotropic$jetz_scientific_name
+species_afrotropic
+```
+
+```{r}
+ggnet2(cooccurrance_afrotropic_net, label = T, edge.size = "cooccurance_total_pools_sqrt", edge.color = "cooccurance_ratio_colour", node.color = species_afrotropic[,c('urban_tolerance_colour')], node.size = species_afrotropic[,c('species_total_pools')])
+
+ggsave("figures/afrotropic_cooccurance.jpg", width=5112, height=5112, units = "px")
+```
+
+### Nearctic
+```{r}
+cooccurrance_nearctic = cooccurrance_by_realm[cooccurrance_by_realm$realm == 'Nearctic',]
+cooccurrance_nearctic
+```
+
+```{r}
+cooccurrance_nearctic_net = network(cooccurrance_nearctic)
+cooccurrance_nearctic_net
+```
+
+```{r}
+species_nearctic = data.frame(species_presence_by_realm[species_presence_by_realm$realm == 'Nearctic',])
+rownames(species_nearctic) = species_nearctic$jetz_scientific_name
+species_nearctic
+```
+
+```{r}
+ggnet2(cooccurrance_nearctic_net, label = T, edge.size = "cooccurance_total_pools_sqrt", edge.color = "cooccurance_ratio_colour", node.color = species_nearctic[,c('urban_tolerance_colour')], node.size = species_nearctic[,c('species_total_pools')])
+
+ggsave("figures/nearctic_cooccurance.jpg", width=5112, height=5112, units = "px")
+```
 
 

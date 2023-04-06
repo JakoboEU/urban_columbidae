@@ -1,0 +1,64 @@
+---
+title: "Generate trait axis"
+output: html_notebook
+---
+
+```{r setup, message = F, warning = false}
+library(dplyr)
+library(purrr)
+library(tidyverse)
+library(tidyr)
+
+library(vegan)
+```
+
+# Trait Data
+```{r, warning=F}
+source("../../data/third_party/columbidae_jetz__avonet.R")
+avonet_jetz = avonet_in_jetz_taxonomy()
+head(avonet_jetz)
+```
+
+## Creating trait values
+
+### Trophic trait
+```{r}
+trophic_trait_pca = rda(avonet_jetz[,c('beak_length', 'beak_width', 'beak_depth')])
+summary(trophic_trait_pca)
+```
+
+Does the new trophic trait explain trophic niche?
+```{r}
+summary(glm(formula = niche ~ pc1, data = data.frame(niche = as.factor(avonet_jetz$trophic_niche), pc1 = trophic_trait_pca$Ybar[,1]), family = binomial))
+```
+
+Is PC1 correlated to mass?
+```{r}
+cor(trophic_trait_pca$Ybar[,1], avonet_jetz$mass)
+```
+
+```{r}
+avonet_jetz$trophic_trait = trophic_trait_pca$Ybar[,1]
+```
+
+### Locomotory trait
+```{r}
+locomotry_trait_pca = rda(avonet_jetz[,c('tarsus_length', 'wing_length', 'tail_length')])
+summary(locomotry_trait_pca)
+```
+
+Is PC1 correlated to mass?
+```{r}
+cor(locomotry_trait_pca$Ybar[,1], avonet_jetz$mass)
+```
+
+```{r}
+avonet_jetz$locomotory_trait = locomotry_trait_pca$Ybar[,1]
+```
+
+```{r}
+avonet_jetz
+```
+```{r}
+write_csv(avonet_jetz, '../../data/output/urban_traits__trait_axis.csv')
+```

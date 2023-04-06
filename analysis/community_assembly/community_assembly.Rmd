@@ -43,13 +43,15 @@ library(grid)
 ## Recommended null model (Milar et al. 2017)
 Many metrics sensitive to species richness. Urban communities are governed by the surrounding regional pool. For each urban community, we can generate all of the possible communities with the same species richness as the urban community with species from the regional pool.  The average of all possible communities gives us a null model.
 
+## Note
+Expensive to create datasets are stored in cache files under ./cache.  To completely run the analysis from scratch ensure all files are removed from this directory first.
+
 # Community data
 We used all cities with a population of 250,000 or more, and that have at least 167 complete checklists that are more than 5 and less than 240 minutes in length and cover no more than 10km. We then included any Columbidae species in the urban community that appeared on at least 5% of all of these checklists recorded within the city.
 
 This criteria comes from choosing all cities with at least 1000 checklists, and then testing 1000 times how many checklists are required to find all those species that appear on at least 5% of the total checklists. 269 cities were included in this test, and 167 was the maximum number of checklists required to find all min-5% species (which was in Auckland).
 
-## Read in data exported from bigquery
-
+## Read in community data exported from bigquery
 ```{r read all_columbidae_communities}
 all_columbidae_communities = read_csv('../../data/bigquery/columbidae_jetz__urban_locations.csv')
 head(all_columbidae_communities)
@@ -66,15 +68,34 @@ urban_communities_tmp = all_columbidae_communities %>% group_by(city_id, city_na
 head(urban_communities_tmp)
 ```
 
+## Cities that are excluded from remaining analysis
 Communities with 1 or less pigeon species
 ```{r}
 urban_communities_tmp[urban_communities_tmp$urban_pool_size < 2,]
 ```
-Communities with all regional species
+Cities with no pigeons
 ```{r}
-urban_communities_tmp[urban_communities_tmp$urban_pool_size == urban_communities_tmp$regional_pool_size,]
+paste(urban_communities_tmp$city_name[urban_communities_tmp$urban_pool_size == 0], collapse = ', ')
 ```
 
+Cities with a single pigeon but with more in regional pool
+```{r}
+paste(urban_communities_tmp$city_name[urban_communities_tmp$urban_pool_size == 1 & urban_communities_tmp$regional_pool_size > 1], collapse = ', ')
+```
+Cities with a single pigeon in city and regional pool
+```{r}
+paste(urban_communities_tmp$city_name[urban_communities_tmp$urban_pool_size == 1 & urban_communities_tmp$regional_pool_size == 1], collapse = ', ')
+```
+
+Cities with all species from regional pool where regional pool has more than 1 species
+```{r}
+urban_communities_tmp[urban_communities_tmp$urban_pool_size == urban_communities_tmp$regional_pool_size & urban_communities_tmp$regional_pool_size > 1,]
+```
+
+Cities that contain all regional species, when the number of regional species is greater than 1: 
+Culiacán (6 species), Chihuahua(3), Rabat (4), Plymouth (4), Edinburgh (4), Stockholm (3), and Christchurch (2)
+
+## Cities included in analysis
 Selected sites:
 ```
 models:
@@ -94,13 +115,13 @@ models:
       - name: number_of_urban_introduced_species
         description: the number of columbidae species present inside the city that are introduced, e.g. have origin 'Introduced' from the Birdlife distribution vector.
 ```
-```{r create selected_urban_communities}
+```{r}
 selected_urban_communities = urban_communities_tmp[urban_communities_tmp$urban_pool_size > 1 & urban_communities_tmp$urban_pool_size != urban_communities_tmp$regional_pool_size,]
 nrow(selected_urban_communities)
 head(selected_urban_communities)
 ```
 
-And therefore
+And therefore our selected communities are:
 ```{r}
 selected_columbidae_communities = all_columbidae_communities[all_columbidae_communities$city_id %in% selected_urban_communities$city_id,]
 head(selected_columbidae_communities)
@@ -129,7 +150,7 @@ resident_urban_communities_tmp = all_resident_columbidae_communities %>% group_b
 head(resident_urban_communities_tmp)
 ```
 
-Selected sites:
+Selected sites with resident only species:
 ```
 models:
   - name: selected_resident_only_urban_communities
@@ -144,73 +165,35 @@ models:
       - name: urban_pool_size
         description: the number of columbidae species that occur inside the city, e.g. the number of columbidae species that appear on at least 5% of all valid checklists within the city vector.
 ```
-```{r create selected_resident_only_urban_communities}
+```{r}
 selected_resident_only_urban_communities = resident_urban_communities_tmp[resident_urban_communities_tmp$urban_pool_size > 1 & resident_urban_communities_tmp$urban_pool_size != resident_urban_communities_tmp$regional_pool_size,]
 nrow(selected_resident_only_urban_communities)
 head(selected_resident_only_urban_communities)
 ```
 
-And therefore
+And therefore resident species at our selected urban communties are:
 ```{r}
 selected_resident_columbidae_communities = all_resident_columbidae_communities[all_resident_columbidae_communities$city_id %in% selected_resident_only_urban_communities$city_id,]
 head(selected_resident_only_urban_communities)
 ```
 
 # Trait Data
-```{r, warning=F}
-source("../../data/third_party/columbidae_jetz__avonet.R")
-avonet_jetz = avonet_in_jetz_taxonomy()
-head(avonet_jetz)
-```
-
-## Creating trait values
-
-### Trophic trait
+Created in ./urban_traits/trait_axis.Rmd
 ```{r}
-trophic_trait_pca = rda(avonet_jetz[,c('beak_length', 'beak_width', 'beak_depth')])
-summary(trophic_trait_pca)
-```
-
-Does the new trophic trait explain trophic niche?
-```{r}
-summary(glm(formula = niche ~ pc1, data = data.frame(niche = as.factor(avonet_jetz$trophic_niche), pc1 = trophic_trait_pca$Ybar[,1]), family = binomial))
-```
-
-Is PC1 correlated to mass?
-```{r}
-cor(trophic_trait_pca$Ybar[,1], avonet_jetz$mass)
-```
-
-```{r}
-avonet_jetz$trophic_trait = trophic_trait_pca$Ybar[,1]
-```
-
-### Locomotory trait
-```{r}
-locomotry_trait_pca = rda(avonet_jetz[,c('tarsus_length', 'wing_length', 'tail_length')])
-summary(locomotry_trait_pca)
-```
-
-Is PC1 correlated to mass?
-```{r}
-cor(locomotry_trait_pca$Ybar[,1], avonet_jetz$mass)
-```
-
-```{r}
-avonet_jetz$locomotory_trait = locomotry_trait_pca$Ybar[,1]
+avonet_jetz = read_csv('../../data/output/urban_traits__trait_axis.csv')
 ```
 
 # Calculate city wide community values
 
 ## First build out matrix of all urban communities
-```{r create species_in_cities}
+```{r}
 species_in_cities = pivot_wider(selected_columbidae_communities[selected_columbidae_communities$present_in_city,c('jetz_scientific_name', 'present_in_city', 'city_id')], names_from = jetz_scientific_name, values_from = "present_in_city", values_fill = list(present_in_city = F))
 species_in_cities = tibble::column_to_rownames(species_in_cities, var='city_id')
 species_in_cities
 ```
 
 and for resident only species
-```{r create resident_species_in_cities}
+```{r}
 resident_species_in_cities = pivot_wider(selected_resident_columbidae_communities[selected_resident_columbidae_communities$present_in_city,c('jetz_scientific_name', 'present_in_city', 'city_id')], names_from = jetz_scientific_name, values_from = "present_in_city", values_fill = list(present_in_city = F))
 resident_species_in_cities = tibble::column_to_rownames(resident_species_in_cities, var='city_id')
 resident_species_in_cities
@@ -412,12 +395,12 @@ get_community_metrics = function(communities, included_traits = analysis_all_tra
 }
 ```
 
-```{r create urban_community_values}
+```{r}
 urban_community_values = get_community_metrics(species_in_cities)
 urban_community_values
 ```
 
-```{r create urban_resident_only_community_values}
+```{r}
 urban_resident_only_community_values = get_community_metrics(resident_species_in_cities)
 urban_resident_only_community_values
 ```
@@ -442,7 +425,7 @@ selected_urban_communities$urban_pool_size[selected_urban_communities$city_id ==
 ```
 
 Function to build every possible community
-```{r create_null_model_communities}
+```{r}
 create_null_model_communities = function(city_id, urban_richness, regional_species) {
   regional_richness = length(regional_species)
   
@@ -520,7 +503,7 @@ standardise(actual_value, mean(null_model_values), sd(null_model_values))
 ```
 
 Create function to test actual value against all possible null model values
-```{r compare_community_to_null_model}
+```{r}
 compare_community_to_null_model = function(metric_name, actual_metric_value, null_model_metric_values) {
   min_value = min(null_model_metric_values)
   max_value = max(null_model_metric_values)
@@ -549,13 +532,13 @@ compare_community_to_null_model(property, actual_value, null_model_values)
 ```
 
 The metrics we want to test:
-```{r create all_metrics_to_test}
+```{r}
 all_metrics_to_test = colnames(urban_community_values)[-1]
 all_metrics_to_test
 ```
 
 Compare the actual values to the null model values:
-```{r create_null_model_test_values}
+```{r}
 create_null_model_test_values = function(city_id, urban_richness, regional_species, actual_values) {
   null_models = create_null_model_communities(city_id, urban_richness, regional_species)
   null_model_community_values = get_community_metrics(null_models)
@@ -598,7 +581,7 @@ create_null_model_test_values(
 ```
 
 
-```{r create urban_all_species_community_result}
+```{r}
 ALL_SPECIES_RESULT__CACHE_FILE = './cache/community_assembly_all_species_result.csv'
 
 if(!file.exists(ALL_SPECIES_RESULT__CACHE_FILE)) {
@@ -625,7 +608,7 @@ if(!file.exists(ALL_SPECIES_RESULT__CACHE_FILE)) {
 head(urban_all_species_community_result)
 ```
 
-```{r create urban_resident_only_species_community_result, eval = FALSE}
+```{r}
 RESIDENT_SPECIES_RESULT__CACHE_FILE = './cache/community_assembly_resident_species_result.csv'
 urban_resident_only_species_community_result = NULL
 
