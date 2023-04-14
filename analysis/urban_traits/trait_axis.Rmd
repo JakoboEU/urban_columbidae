@@ -10,6 +10,7 @@ library(tidyverse)
 library(tidyr)
 
 library(vegan)
+library(multcomp)
 ```
 
 # Trait Data
@@ -26,10 +27,58 @@ head(avonet_jetz)
 trophic_trait_pca = rda(avonet_jetz[,c('beak_length', 'beak_width', 'beak_depth')])
 summary(trophic_trait_pca)
 ```
-
-Does the new trophic trait explain trophic niche?
 ```{r}
-summary(glm(formula = niche ~ pc1, data = data.frame(niche = as.factor(avonet_jetz$trophic_niche), pc1 = trophic_trait_pca$Ybar[,1]), family = binomial))
+pc_values = rbind(data.frame(trophic_niche = avonet_jetz$trophic_niche, pc = trophic_trait_pca$Ybar[,1], axis = '1'),
+                  rbind(
+                      data.frame(trophic_niche = avonet_jetz$trophic_niche, pc = trophic_trait_pca$Ybar[,2], axis = '2'),
+                      data.frame(trophic_niche = avonet_jetz$trophic_niche, pc = trophic_trait_pca$Ybar[,3], axis = '3')
+                    )
+                )
+pc_values$trophic_niche = as.factor(pc_values$trophic_niche)
+head(pc_values)
+```
+
+How does PC1 explain trophic niche?
+```{r}
+trophic_pc1_aov = aov(pc ~ trophic_niche,
+  data = pc_values[pc_values$axis == '1',]
+)
+
+summary(trophic_pc1_aov)
+
+summary(glht(trophic_pc1_aov,
+  linfct = mcp(trophic_niche = "Tukey")
+))
+```
+
+How does PC2 explain trophic niche?
+```{r}
+trophic_pc1_aov = aov(pc ~ trophic_niche,
+  data = pc_values[pc_values$axis == '2',]
+)
+
+summary(trophic_pc1_aov)
+
+summary(glht(trophic_pc1_aov,
+  linfct = mcp(trophic_niche = "Tukey")
+))
+```
+
+How does PC3 explain trophic niche?
+```{r}
+trophic_pc1_aov = aov(pc ~ trophic_niche,
+  data = pc_values[pc_values$axis == '3',]
+)
+
+summary(trophic_pc1_aov)
+
+summary(glht(trophic_pc1_aov,
+  linfct = mcp(trophic_niche = "Tukey")
+))
+```
+
+```{r}
+ggplot(pc_values, aes(x = trophic_niche, y = pc, color = axis)) + geom_boxplot()
 ```
 
 Is PC1 correlated to mass?
@@ -37,14 +86,34 @@ Is PC1 correlated to mass?
 cor(trophic_trait_pca$Ybar[,1], avonet_jetz$mass)
 ```
 
+Is PC2 correlated to mass?
 ```{r}
 cor(trophic_trait_pca$Ybar[,2], avonet_jetz$mass)
 ```
 
+Is PC3 correlated to mass?
 ```{r}
 cor(trophic_trait_pca$Ybar[,3], avonet_jetz$mass)
 ```
 
+```{r}
+pc_values_wider = data.frame(trophic_niche = avonet_jetz$trophic_niche, pc1 = trophic_trait_pca$Ybar[,1], pc2 = trophic_trait_pca$Ybar[,2], pc3 = trophic_trait_pca$Ybar[,3])
+head(pc_values_wider)
+```
+
+```{r}
+ggarrange(ncol = 2, nrow = 2, common.legend = T,
+          ggplot(pc_values_wider, aes(y = pc1, x = pc2, color = trophic_niche)) + geom_point(),
+          ggplot(pc_values_wider, aes(y = pc1, x = pc3, color = trophic_niche)) + geom_point(),
+          ggplot(pc_values_wider, aes(y = pc3, x = pc2, color = trophic_niche)) + geom_point()
+)
+```
+
+Choose which PC we want to represent our trophic trait:
+ * For all three PCs Omnivore is in the middle and goes across both Frugivore and Granivore.
+ * PC1 has the biggest difference between Frugivore and Granivore.
+ * High PC1 is Frugivore-ish
+ * Low PC1 is Granivore-ish.
 ```{r}
 avonet_jetz$trophic_trait = trophic_trait_pca$Ybar[,1]
 ```
@@ -60,26 +129,82 @@ Is PC1 correlated to mass?
 cor(locomotry_trait_pca$Ybar[,1], avonet_jetz$mass)
 ```
 
+Is PC2 correlated to mass?
 ```{r}
 cor(locomotry_trait_pca$Ybar[,2], avonet_jetz$mass)
 ```
 
+Is PC3 correlated to mass?
 ```{r}
 cor(locomotry_trait_pca$Ybar[,3], avonet_jetz$mass)
 ```
 
+#### How is the locomotory trait related to migration?
+Load in city data
+
+```{r}
+city_data = read_csv('../../data/bigquery/columbidae_jetz__urban_locations.csv')
+head(city_data)
+```
+```{r}
+species_by_migration = city_data %>% group_by(jetz_scientific_name) %>% summarise(
+  never_migratory = sum(season != 'Resident') == 0
+)
+head(species_by_migration)
+```
+
+```{r}
+species_locomotory_data = data.frame(jetz_scientific_name = avonet_jetz$jetz_scientific_name, pc1 = locomotry_trait_pca$Ybar[,1], pc2 = locomotry_trait_pca$Ybar[,2], pc3 = locomotry_trait_pca$Ybar[,3])
+species_locomotory_data = right_join(species_locomotory_data, species_by_migration)
+species_locomotory_data
+```
+How does PC1 explain migratory?
+```{r}
+locomotory_pc1_aov = aov(pc1 ~ never_migratory,
+  data = species_locomotory_data
+)
+
+summary(locomotory_pc1_aov)
+```
+How does PC2 explain migratory?
+```{r}
+locomotory_pc2_aov = aov(pc2 ~ never_migratory,
+  data = species_locomotory_data
+)
+
+summary(locomotory_pc2_aov)
+```
+How does PC3 explain migratory?
+```{r}
+locomotory_pc3_aov = aov(pc3 ~ never_migratory,
+  data = species_locomotory_data
+)
+
+summary(locomotory_pc3_aov)
+```
+
+```{r}
+ggplot(species_locomotory_data, aes(x = never_migratory, y = pc1)) + geom_boxplot()
+```
+
+#### Choose PC trait
+Which PC do we use for locomotory trait?
+* PC1 is the only axis that has a difference between migratory and non-migratory
+* Higher PC1 is for species that never migrate
 ```{r}
 avonet_jetz$locomotory_trait = locomotry_trait_pca$Ybar[,1]
 ```
 
+## Store our new traits for reuse
 ```{r}
 avonet_jetz
 ```
+
 ```{r}
 write_csv(avonet_jetz, '../../data/output/urban_traits__trait_axis.csv')
 ```
 
-# How is trophic trait related to component parts?
+## How is trophic trait related to component parts?
 ```{r}
 ggplot(avonet_jetz, aes(x = trophic_trait, y = beak_length)) + geom_point()
 ```
@@ -114,3 +239,5 @@ ggplot(avonet_jetz, aes(x = locomotory_trait, y = tarsus_length)) + geom_point()
 ```{r}
 ggplot(avonet_jetz, aes(x = locomotory_trait, y = mass)) + geom_point()
 ```
+
+
