@@ -118,6 +118,20 @@ Choose which PC we want to represent our trophic trait:
 avonet_jetz$trophic_trait = trophic_trait_pca$Ybar[,1]
 ```
 
+```{r}
+tt_means <- aggregate(pc1 ~  trophic_niche, pc_values_wider, mean)
+tt_mins <- aggregate(pc1 ~  trophic_niche, pc_values_wider, min)
+tt_maxs <- aggregate(pc1 ~  trophic_niche, pc_values_wider, max)
+ggplot(pc_values_wider, aes(x = trophic_niche, y = pc1)) + 
+  geom_boxplot() + 
+  ylab('Trophic Continuous Trait') + xlab('Trophic Classified Trait') +
+  geom_text(data = tt_means, aes(label = round(pc1, 3), y = pc1 + 0.08)) +
+  geom_text(data = tt_mins, aes(label = round(pc1, 3), y = pc1 - 0.08)) +
+  geom_text(data = tt_maxs, aes(label = round(pc1, 3), y = pc1 + 0.08)) +
+  labs(title = "Composed Trophic Trait", subtitle = "Anova (p < 0.001)")
+ggsave('./figures/trait_axis__som__trophic.jpg')
+```
+
 ### Locomotory trait
 ```{r}
 locomotry_trait_pca = rda(avonet_jetz[,c('tarsus_length', 'wing_length', 'tail_length')])
@@ -193,6 +207,20 @@ Which PC do we use for locomotory trait?
 * Higher PC1 is for species that never migrate
 ```{r}
 avonet_jetz$locomotory_trait = locomotry_trait_pca$Ybar[,1]
+```
+
+```{r}
+lt_means <- aggregate(pc1 ~  never_migratory, species_locomotory_data, mean)
+lt_mins <- aggregate(pc1 ~  never_migratory, species_locomotory_data, min)
+lt_maxs <- aggregate(pc1 ~  never_migratory, species_locomotory_data, max)
+ggplot(species_locomotory_data, aes(x = never_migratory, y = pc1)) + 
+  geom_boxplot() + 
+  ylab('Locomotory Continuous Trait') + xlab('Is never migratory?') +
+  geom_text(data = lt_means, aes(label = round(pc1, 3), y = pc1 + 0.1)) +
+  geom_text(data = lt_mins, aes(label = round(pc1, 3), y = pc1 - 0.08)) +
+  geom_text(data = lt_maxs, aes(label = round(pc1, 3), y = pc1 + 0.08)) +
+  labs(title = "Composed Locomotory Trait", subtitle = "Anova (p = 0.09)")
+ggsave('./figures/trait_axis__som__locomotory.jpg')
 ```
 
 ## Store our new traits for reuse
