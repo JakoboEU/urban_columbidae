@@ -254,8 +254,14 @@ cities_to_realms[cities_to_realms$city_id == 4355,]
 ```
 
 ```{r}
+cities_in_single_realm = cities_to_realms %>% group_by(city_id) %>% summarise(number_of_realms = n()) %>% filter(number_of_realms == 1)
+```
+
+# Here we exclude cities that appear in multiple realms, there are on the edge of a realm and may contains species from multiple realms. This complicates our graphs
+```{r}
 regional_pools_by_realm = left_join(cities_to_realms, regional_pools)
 regional_pools_by_realm = regional_pools_by_realm[!is.na(regional_pools_by_realm$jetz_scientific_name),]
+regional_pools_by_realm = regional_pools_by_realm[regional_pools_by_realm$city_id %in% cities_in_single_realm$city_id,]
 regional_pools_by_realm
 ```
 

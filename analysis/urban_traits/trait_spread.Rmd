@@ -27,7 +27,7 @@ cities_to_realms[order(cities_to_realms$realm),]
 
 ```{r}
 regional_species = regional_pools[,c('jetz_scientific_name', 'city_id', 'city_name')]
-regional_species$record_type = 'Regional Pool'
+regional_species$record_type = 'Regional'
 
 urban_species = regional_pools[regional_pools$present_in_city, c('jetz_scientific_name', 'city_id', 'city_name')]
 urban_species$record_type = 'Urban'
@@ -36,103 +36,96 @@ species = rbind(regional_species, urban_species)
 species
 ```
 ```{r}
+cities_in_single_realm = cities_to_realms %>% group_by(city_id) %>% summarise(number_of_realms = n()) %>% filter(number_of_realms == 1)
+```
+
+Here we exclude cities that appear in multiple realms, there are on the edge of a realm and may contains species from multiple realms. This complicates our graphs
+We also exclude Oceania which has only a single city
+```{r}
 species = left_join(species, cities_to_realms)
 species = left_join(species, avonet_jetz[,c('jetz_scientific_name', 'mass', 'trophic_trait', 'locomotory_trait')])
+species = species[species$city_id %in% cities_in_single_realm$city_id,]
+species = species[species$realm != 'Oceania',]
 species
 ```
 
 # Explore range of masses between regional pools and cities
 
-```{r, fig.width=12}
-ggplot(species[species$realm == 'Palearctic',], aes(y = mass, x = city_name, color = record_type)) + 
-  geom_boxplot() + 
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1), legend.position="bottom")
+```{r}
+test_mass_trait = function(realm_name) {
+  species_in_realm = species[species$realm == realm_name,]
+
+  wt = wilcox.test(species_in_realm$mass ~ species_in_realm$record_type)
+  
+  paste(realm_name, ' has statistical significance of ', wt$p.value,  ' (W=', wt$statistic, '), Urban mean ', mean(species_in_realm$mass[species_in_realm$record_type == 'Urban']), ', regional mean ', mean(species_in_realm$mass[species_in_realm$record_type == 'Regional']), sep = '')
+}
+
+test_mass_trait('Afrotropic')
+test_mass_trait('Australasia')
+test_mass_trait('Indomalayan')
+test_mass_trait('Nearctic')
+test_mass_trait('Neotropic')
+test_mass_trait('Palearctic')
 ```
 
 ```{r, fig.width=12}
-ggplot(species[species$realm == 'Nearctic',], aes(y = mass, x = city_name, color = record_type)) + 
+ggplot(species, aes(y = mass, x = realm, color = record_type)) + 
   geom_boxplot() + 
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1), legend.position="bottom")
-```
-
-```{r, fig.width=12}
-ggplot(species[species$realm == 'Afrotropic',], aes(y = mass, x = city_name, color = record_type)) + 
-  geom_boxplot() + 
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1), legend.position="bottom")
-```
-```{r, fig.width=12}
-ggplot(species[species$realm == 'Australasia',], aes(y = mass, x = city_name, color = record_type)) + 
-  geom_boxplot() + 
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1), legend.position="bottom")
-```
-
-```{r, fig.width=12}
-ggplot(species[species$realm == 'Indomalayan',], aes(y = mass, x = city_name, color = record_type)) + 
-  geom_boxplot() + 
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1), legend.position="bottom")
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1), legend.position="bottom") +
+  xlab('Realm') + ylab('Mass') + guides(color=guide_legend(title="Community"))
+ggsave('./figures/mass_trait_spread_by_realm.jpg')
 ```
 
 
 # Explore range of locomotory trait between regional pools and cities
+```{r}
+test_loco_trait = function(realm_name) {
+  species_in_realm = species[species$realm == realm_name,]
 
-```{r, fig.width=12}
-ggplot(species[species$realm == 'Palearctic',], aes(y = locomotory_trait, x = city_name, color = record_type)) + 
-  geom_boxplot() + 
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1), legend.position="bottom")
+  wt = wilcox.test(species_in_realm$locomotory_trait ~ species_in_realm$record_type)
+  
+  paste(realm_name, ' has statistical significance of ', wt$p.value,  ' (W=', wt$statistic, '), Urban mean ', mean(species_in_realm$locomotory_trait[species_in_realm$record_type == 'Urban']), ', regional mean ', mean(species_in_realm$locomotory_trait[species_in_realm$record_type == 'Regional']), sep = '')
+}
+
+test_loco_trait('Afrotropic')
+test_loco_trait('Australasia')
+test_loco_trait('Indomalayan')
+test_loco_trait('Nearctic')
+test_loco_trait('Neotropic')
+test_loco_trait('Palearctic')
 ```
 
 ```{r, fig.width=12}
-ggplot(species[species$realm == 'Nearctic',], aes(y = locomotory_trait, x = city_name, color = record_type)) + 
+ggplot(species, aes(y = locomotory_trait, x = realm, color = record_type)) + 
   geom_boxplot() + 
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1), legend.position="bottom")
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1), legend.position="bottom") +
+  xlab('Realm') + ylab('Locomotory (Migratory -> Non-migratory)') + guides(color=guide_legend(title="Community"))
+ggsave('./figures/locomotory_trait_spread_by_realm.jpg')
 ```
 
-```{r, fig.width=12}
-ggplot(species[species$realm == 'Afrotropic',], aes(y = locomotory_trait, x = city_name, color = record_type)) + 
-  geom_boxplot() + 
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1), legend.position="bottom")
-```
-
-```{r, fig.width=12}
-ggplot(species[species$realm == 'Australasia',], aes(y = locomotory_trait, x = city_name, color = record_type)) + 
-  geom_boxplot() + 
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1), legend.position="bottom")
-```
-
-```{r, fig.width=12}
-ggplot(species[species$realm == 'Indomalayan',], aes(y = locomotory_trait, x = city_name, color = record_type)) + 
-  geom_boxplot() + 
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1), legend.position="bottom")
-```
 
 # Explore range of trophic trait between regional pools and cities
+```{r}
+test_trophic_trait = function(realm_name) {
+  species_in_realm = species[species$realm == realm_name,]
 
-```{r, fig.width=12}
-ggplot(species[species$realm == 'Palearctic',], aes(y = trophic_trait, x = city_name, color = record_type)) + 
-  geom_boxplot() + 
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1), legend.position="bottom")
+  wt = wilcox.test(species_in_realm$trophic_trait ~ species_in_realm$record_type)
+  
+  paste(realm_name, ' has statistical significance of ', wt$p.value,  ' (W=', wt$statistic, '), Urban mean ', mean(species_in_realm$trophic_trait[species_in_realm$record_type == 'Urban']), ', regional mean ', mean(species_in_realm$trophic_trait[species_in_realm$record_type == 'Regional']), sep = '')
+}
+
+test_trophic_trait('Afrotropic')
+test_trophic_trait('Australasia')
+test_trophic_trait('Indomalayan')
+test_trophic_trait('Nearctic')
+test_trophic_trait('Neotropic')
+test_trophic_trait('Palearctic')
 ```
 
 ```{r, fig.width=12}
-ggplot(species[species$realm == 'Nearctic',], aes(y = trophic_trait, x = city_name, color = record_type)) + 
+ggplot(species, aes(y = trophic_trait, x = realm, color = record_type)) + 
   geom_boxplot() + 
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1), legend.position="bottom")
-```
-
-```{r, fig.width=12}
-ggplot(species[species$realm == 'Afrotropic',], aes(y = trophic_trait, x = city_name, color = record_type)) + 
-  geom_boxplot() + 
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1), legend.position="bottom")
-```
-
-```{r, fig.width=12}
-ggplot(species[species$realm == 'Australasia',], aes(y = trophic_trait, x = city_name, color = record_type)) + 
-  geom_boxplot() + 
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1), legend.position="bottom")
-```
-
-```{r, fig.width=12}
-ggplot(species[species$realm == 'Indomalayan',], aes(y = trophic_trait, x = city_name, color = record_type)) + 
-  geom_boxplot() + 
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1), legend.position="bottom")
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1), legend.position="bottom") +
+  xlab('Realm') + ylab('Trophic (Granivore -> Frugivore/Omnivore)') + guides(color=guide_legend(title="Community"))
+ggsave('./figures/trophic_trait_spread_by_realm.jpg')
 ```

@@ -109,7 +109,7 @@ ggarrange(ncol = 2, nrow = 2, common.legend = T,
 )
 ```
 
-Choose which PC we want to represent our trophic trait:
+### Choose which PC we want to represent our trophic trait:
  * For all three PCs Omnivore is in the middle and goes across both Frugivore and Granivore.
  * PC1 has the biggest difference between Frugivore and Granivore.
  * High PC1 is Frugivore-ish

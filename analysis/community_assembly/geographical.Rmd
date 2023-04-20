@@ -16,6 +16,7 @@ This file uses outputs from `community_assembly.Rmd`.
 
 ```{r}
 community_assembly_output = read_csv('./cache/community_assembly_all_species_result.csv')
+head(community_assembly_output)
 ```
 
 ```{r}
@@ -29,10 +30,12 @@ country_outlines <- read_sf('../../data/third_party/world_bank_country_outlines/
 world_cities <- st_transform(world_cities, crs = st_crs(country_outlines))
 ```
 
+## MNTD
 ```{r}
 ggplot() +  
   geom_sf(data = country_outlines, aes(geometry = geometry)) +
-  geom_sf(data = world_cities, aes(geometry = geometry, color = mntd_normalised), show.legend = "point") +
+  geom_sf(data = world_cities, aes(geometry = geometry, size = regional_pool_size)) +
+  geom_sf(data = world_cities, aes(geometry = geometry, color = mntd_normalised, size = urban_pool_size), show.legend = "point") +
   theme_bw() + theme(legend.position="bottom") + scale_colour_gradient2(
   low = "red",
   mid = "yellow",
@@ -43,4 +46,9 @@ ggplot() +
   guide = "colourbar",
   aesthetics = "colour"
 )
+ggsave('./figures/geographical_mntd.jpg', width = 3000, units = "px")
 ```
+
+
+
+
