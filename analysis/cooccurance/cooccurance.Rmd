@@ -10,7 +10,7 @@ library(picante)
 library(network)
 ```
 
-Load data for our columbidae species present in all localities of the world
+## Load data for our columbidae species present in all localities of the world
 ```{r}
 all_occurance = read_csv(gzfile('../../data/bigquery/columbidae_birdlife__worldwide_ebird_records.csv.gz'))
 ```
@@ -45,7 +45,7 @@ cooccurance_details = cooccurance %>% group_by(jetz_scientific_name, jetz_scient
 cooccurance_details
 ```
 
-Load in our regional pools
+## Load in our regional pools
 ```{r}
 regional_pools = read_csv('../../data/bigquery/columbidae_jetz__urban_locations.csv')
 regional_pools = regional_pools[,c('jetz_scientific_name', 'city_id', 'present_in_city')]
@@ -66,6 +66,7 @@ regional_cooccurance_pairs = regional_cooccurance %>% group_by(jetz_scientific_n
 regional_cooccurance_pairs
 ```
 
+## Create data set of all species that co-occur on eBird localties within our regional pools
 Finally we can create all valid pairs of species that could be living in the same patches from our regional pools.
 Here we also drop all species where neither pair is present in the city
 ```{r}
@@ -98,7 +99,7 @@ regional_patch_cooccurance = regional_patch_cooccurance[!duplicated(regional_pat
 regional_patch_cooccurance
 ```
 
-Work out MNTD between each species pair:
+## Work out MNTD between each species pair:
 ```{r}
 tree <- read.tree("../../data/third_party/phylogeny_jetz__stage2_hackett_mcc_no_neg.tre")
 ```
@@ -130,6 +131,7 @@ regional_patch_cooccurance$cooccurance_ratio = regional_patch_cooccurance$both_p
 regional_patch_cooccurance
 ```
 
+# Explore Co-occurance ~ Pair MNTD
 ```{r}
 ggplot(regional_patch_cooccurance, aes(x = mntd, y = cooccurance_ratio)) + geom_point() + geom_smooth(method = "glm", linetype = 2)
 ```
@@ -137,7 +139,7 @@ ggplot(regional_patch_cooccurance, aes(x = mntd, y = cooccurance_ratio)) + geom_
 ggplot(regional_patch_cooccurance[regional_patch_cooccurance$cooccurance_ratio > 0,], aes(x = mntd, y = cooccurance_ratio)) + geom_point() + geom_smooth(method = "glm", linetype = 2)
 ```
 
-Calculate a status which indicates whether species are in the city together:
+## Calculate a status which indicates whether species are in the city together:
 ```{r}
 regional_patch_cooccurance$cooccurance_status = 'Occasional'
 regional_patch_cooccurance$cooccurance_status[regional_patch_cooccurance$present_count2 == 0] = 'Never'
@@ -192,7 +194,7 @@ Which species that are evolutionary close together, occur rarely?
 regional_patch_cooccurance[regional_patch_cooccurance$mntd < 20, c('jetz_scientific_name', 'jetz_scientific_name2', 'cooccurance_status', 'mntd')]
 ```
 
-What if we exclude species that never occur in cities?  Are urban avoiders changing this result?
+## What if we exclude species that never occur in cities?  Are urban avoiders changing this result?
 ```{r}
 urban_birds = unique(regional_pools$jetz_scientific_name[regional_pools$present_in_city == T])
 regional_patch_cooccurance_of_urban_birds = regional_patch_cooccurance[regional_patch_cooccurance$jetz_scientific_name %in% urban_birds & regional_patch_cooccurance$jetz_scientific_name2 %in% urban_birds,]
@@ -201,6 +203,41 @@ ggplot(regional_patch_cooccurance_of_urban_birds, aes(x = mntd, y = cooccurance_
 ```
 ```{r}
 summary(glm(data = regional_patch_cooccurance_of_urban_birds, formula = cooccurance_ratio ~ mntd))
+```
+
+## What about if we just look at species with the same trophic niche
+Load in trophic niches
+```{r}
+avonet_jetz = read_csv('../../data/output/urban_traits__trait_axis.csv')
+trophic_niche = avonet_jetz[,c('jetz_scientific_name', 'trophic_niche')]
+head(trophic_niche)
+```
+```{r}
+regional_patch_cooccurance_of_urban_birds_by_trophic_trait = left_join(regional_patch_cooccurance, trophic_niche)
+names(trophic_niche) = c('jetz_scientific_name2', 'trophic_niche2')
+regional_patch_cooccurance_of_urban_birds_by_trophic_trait = left_join(regional_patch_cooccurance_of_urban_birds_by_trophic_trait, trophic_niche)
+
+regional_patch_cooccurance_of_urban_birds_by_trophic_trait = regional_patch_cooccurance_of_urban_birds_by_trophic_trait[regional_patch_cooccurance_of_urban_birds_by_trophic_trait$trophic_niche == regional_patch_cooccurance_of_urban_birds_by_trophic_trait$trophic_niche2,]
+regional_patch_cooccurance_of_urban_birds_by_trophic_trait
+```
+
+```{r}
+ggplot(regional_patch_cooccurance_of_urban_birds_by_trophic_trait, aes(x = mntd, y = cooccurance_ratio)) + geom_point() + geom_smooth(method = "glm", linetype = 2)
+```
+```{r}
+summary(glm(data = regional_patch_cooccurance_of_urban_birds_by_trophic_trait, formula = cooccurance_ratio ~ mntd))
+```
+
+```{r}
+ggplot(regional_patch_cooccurance_of_urban_birds_by_trophic_trait, aes(x = cooccurance_status, y = mntd)) + geom_boxplot()
+```
+
+```{r}
+regional_patch_cooccurance_of_urban_birds_by_trophic_trait %>% group_by(cooccurance_status) %>% summarise(mean = mean(mntd), sd = sd(mntd), min = min(mntd), max = max(mntd), total = n())
+```
+
+```{r}
+kruskal.test(cooccurance_status ~ mntd, data = regional_patch_cooccurance_of_urban_birds_by_trophic_trait)
 ```
 
 # Map Co-occurance using a network plot
