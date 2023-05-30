@@ -3,11 +3,16 @@ title: "Trait Spread in cities"
 output: html_notebook
 ---
 
+```{r setup}
+library(dplyr)
+library(tidyverse)
+library(picante)
+```
 
 Load in our regional pools
 ```{r}
 regional_pools = read_csv('../../data/bigquery/columbidae_jetz__urban_locations.csv')
-regional_pools = regional_pools[,c('jetz_scientific_name', 'city_name', 'city_id', 'present_in_city')]
+regional_pools = regional_pools[,c('jetz_scientific_name', 'city_name', 'city_id', 'present_in_city', 'origin')]
 regional_pools
 ```
 
@@ -26,10 +31,10 @@ cities_to_realms[order(cities_to_realms$realm),]
 
 
 ```{r}
-regional_species = regional_pools[,c('jetz_scientific_name', 'city_id', 'city_name')]
+regional_species = regional_pools[,c('jetz_scientific_name', 'city_id', 'city_name', 'origin')]
 regional_species$record_type = 'Regional'
 
-urban_species = regional_pools[regional_pools$present_in_city, c('jetz_scientific_name', 'city_id', 'city_name')]
+urban_species = regional_pools[regional_pools$present_in_city, c('jetz_scientific_name', 'city_id', 'city_name', 'origin')]
 urban_species$record_type = 'Urban'
 
 species = rbind(regional_species, urban_species)
@@ -128,4 +133,56 @@ ggplot(species, aes(y = trophic_trait, x = realm, color = record_type)) +
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1), legend.position="bottom") +
   xlab('Realm') + ylab('Trophic (Granivore -> Frugivore/Omnivore)') + guides(color=guide_legend(title="Community"))
 ggsave('./figures/trophic_trait_spread_by_realm.jpg')
+```
+
+## City by city plots with convex hulls around trait space
+
+```{r fig.width=10, fig.height=22}
+plot_trait_space = function(realm_to_plot) {
+  species_in_realm = species[species$realm == realm_to_plot,]
+  species_in_realm$city_label = paste(species_in_realm$city_name, ' (', species_in_realm$city_id , ')', sep='')
+
+  regional_hull <- species_in_realm %>% filter(record_type == 'Regional') %>% group_by(city_label) %>% slice(chull(trophic_trait, locomotory_trait))
+  urban_hull <- species_in_realm %>% filter(record_type == 'Urban') %>% group_by(city_label) %>% slice(chull(trophic_trait, locomotory_trait))
+
+  ggplot(data = species_in_realm, aes(x = trophic_trait, y = locomotory_trait)) +
+         geom_point(aes(color = origin)) +
+         facet_wrap( ~ city_label, ncol=6) + 
+         geom_polygon(data = regional_hull, alpha = 0.2, color = 'green') +
+         geom_polygon(data = urban_hull, alpha = 0.4, color = 'red') +
+         theme_bw() + scale_color_manual(values=c("blue", "black")) +
+         xlab('Trophic Trait (Granivore -> Frugivore)') + ylab('Locomotory Trait (Migratory -> Non-Migratory)') + theme(legend.position="bottom") +
+         labs(title = realm_to_plot)
+}
+
+plot_trait_space('Palearctic')
+ggsave('./figures/trait_space_palearctic.jpg')
+```
+
+```{r fig.width=10, fig.height=22}
+plot_trait_space('Afrotropic')
+ggsave('./figures/trait_space_afrotropic.jpg')
+```
+
+
+```{r fig.width=10, fig.height=22}
+plot_trait_space('Australasia')
+ggsave('./figures/trait_space_australasia.jpg')
+```
+
+
+```{r fig.width=10, fig.height=22}
+plot_trait_space('Indomalayan')
+ggsave('./figures/trait_space_indomalayan.jpg')
+```
+
+
+```{r fig.width=10, fig.height=22}
+plot_trait_space('Nearctic')
+ggsave('./figures/trait_space_nearctic.jpg')
+```
+
+```{r fig.width=10, fig.height=22}
+plot_trait_space('Neotropic')
+ggsave('./figures/trait_space_neotropic.jpg')
 ```
