@@ -150,7 +150,7 @@ plot_trait_space = function(realm_to_plot) {
          facet_wrap( ~ city_label, ncol=6) + 
          geom_polygon(data = regional_hull, alpha = 0.2, color = 'green') +
          geom_polygon(data = urban_hull, alpha = 0.4, color = 'red') +
-         theme_bw() + scale_color_manual(values=c("blue", "black")) +
+         theme_bw() + scale_color_manual(values=c("orange", "black")) +
          xlab('Trophic Trait (Granivore -> Frugivore)') + ylab('Locomotory Trait (Migratory -> Non-Migratory)') + theme(legend.position="bottom") +
          labs(title = realm_to_plot)
 }
