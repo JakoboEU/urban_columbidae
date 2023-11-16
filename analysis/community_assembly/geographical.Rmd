@@ -25,6 +25,7 @@ names(world_cities) <- c('city_id', 'city_name', 'geometry')
 world_cities = world_cities[world_cities$city_id %in% community_assembly_output$city_id,]
 world_cities = right_join(world_cities, community_assembly_output)
 ```
+
 ```{r}
 country_outlines <- read_sf('../../data/third_party/world_bank_country_outlines/world-administrative-boundaries.shp')
 world_cities <- st_transform(world_cities, crs = st_crs(country_outlines))
