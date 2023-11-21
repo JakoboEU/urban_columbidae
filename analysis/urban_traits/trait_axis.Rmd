@@ -11,6 +11,7 @@ library(tidyr)
 
 library(vegan)
 library(multcomp)
+library(ggpubr)
 ```
 
 # Trait Data
@@ -27,6 +28,7 @@ head(avonet_jetz)
 trophic_trait_pca = rda(avonet_jetz[,c('beak_length', 'beak_width', 'beak_depth')])
 summary(trophic_trait_pca)
 ```
+
 ```{r}
 pc_values = rbind(data.frame(trophic_niche = avonet_jetz$trophic_niche, pc = trophic_trait_pca$Ybar[,1], axis = '1'),
                   rbind(

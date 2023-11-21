@@ -1329,4 +1329,77 @@ wilcox.test(urban_all_species_community_result$mntd_normalised ~ as.factor(urban
 ggplot(urban_all_species_community_result, aes(y = mntd_normalised, x = as.factor(number_of_urban_introduced_species))) + geom_boxplot()
 ```
 
+# Investigate by Realm
+
+```{r}
+head(urban_all_species_community_result)
+```
+
+Load in realms
+```{r}
+cities_to_realms = read_csv('../../data/earth_engine/cities_to_realms.csv')
+names(cities_to_realms) = c('city_id', 'realm')
+head(cities_to_realms[order(cities_to_realms$realm),])
+```
+```{r}
+by_realm_urban_all_species_community_result = full_join(cities_to_realms, urban_all_species_community_result)
+by_realm_urban_all_species_community_result$urban_richness = as.factor(by_realm_urban_all_species_community_result$urban_pool_size)
+```
+
+## MNTD
+
+```{r, fig.height=6, fig.width=6}
+ggplot(by_realm_urban_all_species_community_result, aes(x = mntd_normalised, fill = urban_richness)) + 
+  geom_histogram(position='stack', color = "#000000", binwidth = 0.1) +
+  geom_vline(aes(xintercept = 0.5), color = "#000000", size = 1.25) +
+  geom_vline(aes(xintercept = 0), color = "#000000", size = 1, linetype = "dashed") +
+  geom_vline(aes(xintercept = 1), color = "#000000", size = 1, linetype = "dashed") + 
+  ylab("Number of cities") + xlab("Normalised Response") + 
+  ylim(c(0, 50)) +
+  labs(title = "MNTD") + 
+  facet_wrap( ~ realm) + 
+  theme(legend.position="bottom")
+```
+
+```{r, fig.height=6, fig.width=6}
+ggplot(by_realm_urban_all_species_community_result, aes(x = mntd_normalised, fill = as.factor(number_of_urban_introduced_species))) + 
+  geom_histogram(position='stack', color = "#000000", binwidth = 0.1) +
+  geom_vline(aes(xintercept = 0.5), color = "#000000", size = 1.25) +
+  geom_vline(aes(xintercept = 0), color = "#000000", size = 1, linetype = "dashed") +
+  geom_vline(aes(xintercept = 1), color = "#000000", size = 1, linetype = "dashed") + 
+  ylab("Number of cities") + xlab("Normalised Response") + 
+  ylim(c(0, 50)) +
+  labs(title = "MNTD") + 
+  facet_wrap( ~ realm) + 
+  theme(legend.position="bottom")
+```
+
+## FD
+
+```{r, fig.height=6, fig.width=6}
+ggplot(by_realm_urban_all_species_community_result, aes(x = fd_normalised, fill = urban_richness)) + 
+  geom_histogram(color = "#000000", position='stack', binwidth = 0.1) +
+  geom_vline(aes(xintercept = 0.5), color = "#000000", size = 1.25) +
+  geom_vline(aes(xintercept = 0), color = "#000000", size = 1, linetype = "dashed") +
+  geom_vline(aes(xintercept = 1), color = "#000000", size = 1, linetype = "dashed") + 
+  ylab("Number of cities") + xlab("Normalised Response") + 
+  ylim(c(0, 50)) +
+  labs(title = "FD") + 
+  facet_wrap( ~ realm) + 
+  theme(legend.position="bottom")
+```
+## FRic
+
+```{r, fig.height=6, fig.width=6}
+ggplot(by_realm_urban_all_species_community_result, aes(x = FRic_normalised, fill = urban_richness)) + 
+  geom_histogram(color = "#000000", position='stack', binwidth = 0.1) +
+  geom_vline(aes(xintercept = 0.5), color = "#000000", size = 1.25) +
+  geom_vline(aes(xintercept = 0), color = "#000000", size = 1, linetype = "dashed") +
+  geom_vline(aes(xintercept = 1), color = "#000000", size = 1, linetype = "dashed") + 
+  ylab("Number of cities") + xlab("Normalised Response") + 
+  ylim(c(0, 50)) +
+  labs(title = "FRic") + 
+  facet_wrap( ~ realm) + 
+  theme(legend.position="bottom")
+```
 

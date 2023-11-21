@@ -1511,7 +1511,7 @@ window.initializeCodeFolding = function(show) {
     $(this).detach().appendTo(div);
 
     // add a show code button right above
-    var showCodeText = $('<span>' + (showThis ? 'Hide' : 'Code') + '</span>');
+    var showCodeText = $('<span>' + (showThis ? 'Hide' : 'Show') + '</span>');
     var showCodeButton = $('<button type="button" class="btn btn-default btn-xs btn-secondary btn-sm code-folding-btn pull-right float-right"></button>');
     showCodeButton.append(showCodeText);
     showCodeButton
@@ -1537,7 +1537,7 @@ window.initializeCodeFolding = function(show) {
     //   * Change text
     //   * add a class for intermediate states styling
     div.on('hide.bs.collapse', function () {
-      showCodeText.text('Code');
+      showCodeText.text('Show');
       showCodeButton.addClass('btn-collapsing');
     });
     div.on('hidden.bs.collapse', function () {
@@ -1772,8 +1772,8 @@ library(phytools)</code></pre>
 <!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYWxsX2NvbHVtYmlkYWVfcHJlc2VuY2UgPSByZWFkX2NzdignLi4vLi4vZGF0YS9iaWdxdWVyeS9jb2x1bWJpZGFlX2pldHpfX3VyYmFuX2xvY2F0aW9ucy5jc3YnKVxuYGBgIn0= -->
 <pre class="r"><code>all_columbidae_presence = read_csv(&#39;../../data/bigquery/columbidae_jetz__urban_locations.csv&#39;)</code></pre>
 <!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiUm93czogMzI3NCBDb2x1bW5zOiA44pSA4pSAIENvbHVtbiBzcGVjaWZpY2F0aW9uIOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgFxuRGVsaW1pdGVyOiBcIixcIlxuY2hyICg0KTogY2l0eV9uYW1lLCBqZXR6X3NjaWVudGlmaWNfbmFtZSwgc2Vhc29uLCBvcmlnaW5cbmRibCAoMyk6IGNpdHlfaWQsIHNlYXNvbl9jb2RlLCBvcmlnaW5fY29kZVxubGdsICgxKTogcHJlc2VudF9pbl9jaXR5XG7ihLkgVXNlIGBzcGVjKClgIHRvIHJldHJpZXZlIHRoZSBmdWxsIGNvbHVtbiBzcGVjaWZpY2F0aW9uIGZvciB0aGlzIGRhdGEuXG7ihLkgU3BlY2lmeSB0aGUgY29sdW1uIHR5cGVzIG9yIHNldCBgc2hvd19jb2xfdHlwZXMgPSBGQUxTRWAgdG8gcXVpZXQgdGhpcyBtZXNzYWdlLlxuIn0= -->
-<pre><code>Rows: 3274 Columns: 8── Column specification ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+<!-- rnb-output-begin eyJkYXRhIjoiUm93czogMzI3NCBDb2x1bW5zOiA44pSA4pSAIENvbHVtbiBzcGVjaWZpY2F0aW9uIOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgFxuRGVsaW1pdGVyOiBcIixcIlxuY2hyICg0KTogY2l0eV9uYW1lLCBqZXR6X3NjaWVudGlmaWNfbmFtZSwgc2Vhc29uLCBvcmlnaW5cbmRibCAoMyk6IGNpdHlfaWQsIHNlYXNvbl9jb2RlLCBvcmlnaW5fY29kZVxubGdsICgxKTogcHJlc2VudF9pbl9jaXR5XG7ihLkgVXNlIGBzcGVjKClgIHRvIHJldHJpZXZlIHRoZSBmdWxsIGNvbHVtbiBzcGVjaWZpY2F0aW9uIGZvciB0aGlzIGRhdGEuXG7ihLkgU3BlY2lmeSB0aGUgY29sdW1uIHR5cGVzIG9yIHNldCBgc2hvd19jb2xfdHlwZXMgPSBGQUxTRWAgdG8gcXVpZXQgdGhpcyBtZXNzYWdlLlxuIn0= -->
+<pre><code>Rows: 3274 Columns: 8── Column specification ─────────────────────────────────────────────────────────────────────────────────────────
 Delimiter: &quot;,&quot;
 chr (4): city_name, jetz_scientific_name, season, origin
 dbl (3): city_id, season_code, origin_code
@@ -1784,7 +1784,7 @@ lgl (1): present_in_city
 <!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuaGVhZChhbGxfY29sdW1iaWRhZV9wcmVzZW5jZSlcbmBgYCJ9 -->
 <pre class="r"><code>head(all_columbidae_presence)</code></pre>
 <!-- rnb-source-end -->
-<!-- rnb-frame-begin eyJtZXRhZGF0YSI6eyJjbGFzc2VzIjpbInRibF9kZiIsInRibCIsImRhdGEuZnJhbWUiXSwibnJvdyI6NiwibmNvbCI6OCwic3VtbWFyeSI6eyJBIHRpYmJsZSI6WyI2IMOXIDgiXX19LCJyZGYiOiJINHNJQUFBQUFBQUFBNjFUTzA4Y01SRDJMYmZIM2thUVJCQ2xTY0VmNEJxYWRFRWlJb21FVWhDUTZGYURkN2dNOHRrcjI4Y2pGVDg1ZFFxTzhaNE50NXVHUEN6Wm52bm05WTAxUHY1NHRsZWVsVUtJTlRITU1yR1dzeWp5MDVQRDNmZUNFVllHWWlqRzRiNWhweTBXQ3Q2YnZFY2Zmb3AyN2QrOWV0Yk5Ld2lqbUxENGJMUlJjeldQK3ZBQUZQMngzTTM1OXB1bjZReThhVkFSVlBJN2FkU09YRFJ2SFhEQjJUbHBxQnB3RGkxTHY1czhxQWFrOGFuUTYwOW92TDJkR2wzTmpQYXdFcVBBd2hXNWdOZm96ZHdtMDVzamJEeW5VRndwNUVXUzJEZzJsQzNicHpVUTNkVjUyZWZlL1pjOVJrYzFhdi9mOWNodnYvZ25mdVVYN2EycDV4THJpSXkrZ3Fjci9HdXRPNnE1aGhtNldMU0k0TG9rZjF0UnFqaHUxZUFZZ2UxTDlEOHFKNG43cEF1U3E3YVhqVVhIZUVXNkNuRVJmdUVRSEUrRk5QVWpvU1dVSEl5bEtYVWRsbENQOGRpYTYwbGl2Y0U3dStOanNWajg2cmNtRlE5dWJDMkJaUTBlSmhjMkVCYml2aGV5YmhwUFJuTlFGcjV2M2dzZTJCN3d6aUxVTzZBVTAyNi9SQTFZTFI5QWh2eWxlSnJhalNpUFZ1UmlXVDlieEx4NTZodzFONTdlSVZkd2ppb3FtOXgrMi8yazRTK1p4cTVrMUUzNEYwSHlLNWxSUXRwR3hmMERFY2M3NGNJRUFBQT0ifQ== -->
+<!-- rnb-frame-begin eyJtZXRhZGF0YSI6eyJjbGFzc2VzIjpbInRibF9kZiIsInRibCIsImRhdGEuZnJhbWUiXSwibnJvdyI6NiwibmNvbCI6OCwic3VtbWFyeSI6eyJBIHRpYmJsZSI6WyI2IMOXIDgiXX19LCJyZGYiOiJINHNJQUFBQUFBQUFBNjFUTzA4Y01SRDJQZmJZMndoQ1JCQk5DdjRBMTZSSkZ5UWlRaVNVZ2lRUzNXcndEcGVKZlBiSzl2Rkl4VSttcHVBWTc5bmhkbWtnaVNYYk05Kzh2ckhHSjU5TzN4ZW5oUkJpSUlhRG5oaGtMSXJzeC9mRHZROUNEUHVzOU1SUWpNTjl4VTViTE9TOE4zaVBQdDZLWnUzZmJEN3I1aFdFVVV5WUh4bHQxRnpOb3o0OEFFVXZsdHM1ZDc1NW1zN0FteG9WUVNsL2trYnR5RVh6MWdFWG5KMlJocklHNTlDeTlOVGtRZFVnalUrRjNueEc0KzMxMU9oeVpyU0hsUmdGRmk3SUJieENiK1kybWJhUHNmYWNRbkdsa0JkSll1M1lVRFJzSDFkUHRGZnJaWjk3ZDEvMkJCMVZxUDEvMXlPLy9meWYrQlZmdExlbW1rdXNJakw2Q3A0dThLKzE5cWhtR21ib1l0RThnbXVTL0hWSnFlSzRVWU5qQk43K1F2KzdkSks0VHpvbnVXcDdYVnQwakpla3l4QVg0VmNPd2ZGVVNGUDlJYlNFa29PeE5LVzJ3eExxTUI1YmN6bEpyTmQ1OTIvNFdDd1dkOTNXcE9MQmphMGxzS2pBdytUY0JzSkMzSGRDMWt6dHlXZ082b2Z2bTNXQ2U3WUR2TE1JMVM0b3hiU2JMMUVCbHNzSGtDRi9JUjZuZGozS294VTVYOWJ2TDJMZUxIV09taHRQNzVBcE9FTVZsUTF1ditsK1V2T1hUR05YTU9vbS9Jc2crUlhNS0NGTm8rTCtBYkJUREFIQ0JBQUEifQ== -->
 <div data-pagedtable="false">
 <script data-pagedtable-source type="application/json">
 {"columns":[{"label":["city_id"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["city_name"],"name":[2],"type":["chr"],"align":["left"]},{"label":["jetz_scientific_name"],"name":[3],"type":["chr"],"align":["left"]},{"label":["present_in_city"],"name":[4],"type":["lgl"],"align":["right"]},{"label":["season_code"],"name":[5],"type":["dbl"],"align":["right"]},{"label":["season"],"name":[6],"type":["chr"],"align":["left"]},{"label":["origin_code"],"name":[7],"type":["dbl"],"align":["right"]},{"label":["origin"],"name":[8],"type":["chr"],"align":["left"]}],"data":[{"1":"1","2":"Honolulu","3":"Stigmatopelia_chinensis","4":"FALSE","5":"1","6":"Resident","7":"3","8":"Introduced"},{"1":"514","2":"Cali","3":"Columbina_passerina","4":"FALSE","5":"1","6":"Resident","7":"1","8":"Native"},{"1":"514","2":"Cali","3":"Columbina_talpacoti","4":"TRUE","5":"1","6":"Resident","7":"1","8":"Native"},{"1":"514","2":"Cali","3":"Geotrygon_montana","4":"FALSE","5":"1","6":"Resident","7":"1","8":"Native"},{"1":"514","2":"Cali","3":"Claravis_mondetoura","4":"FALSE","5":"1","6":"Resident","7":"1","8":"Native"},{"1":"514","2":"Cali","3":"Leptotila_plumbeiceps","4":"FALSE","5":"1","6":"Resident","7":"1","8":"Native"}],"options":{"columns":{"min":{},"max":[10],"total":[8]},"rows":{"min":[10],"max":[10],"total":[6]},"pages":{}}}
@@ -1803,13 +1803,13 @@ lgl (1): present_in_city
 <pre class="r"><code>source(&quot;../../data/third_party/columbidae_jetz__avonet.R&quot;)
 avonet_jetz = avonet_in_jetz_taxonomy()</code></pre>
 <!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiUm93czogMzUzIENvbHVtbnM6IDM34pSA4pSAIENvbHVtbiBzcGVjaWZpY2F0aW9uIOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgFxuRGVsaW1pdGVyOiBcIixcIlxuY2hyICgxMyk6IFNwZWNpZXMxLCBGYW1pbHkxLCBPcmRlcjEsIEF2aWJhc2UuSUQxLCBNYXNzLlNvdXJjZSwgTWFzcy5SZWZzLk90aGVyLCBJbmZlcmVuY2UsIFRyYWl0cy5pbmZlcnJlZCwgUmVmZXJlbmNlLnNwZWNpZXMsIEhhYml0YXQsIFRyb3BoaWMuTGV2ZWwsIFRyb3BoaWMuTmljLi4uXG5kYmwgKDI0KTogU2VxdWVuY2UsIFRvdGFsLmluZGl2aWR1YWxzLCBGZW1hbGUsIE1hbGUsIFVua25vd24sIENvbXBsZXRlLm1lYXN1cmVzLCBCZWFrLkxlbmd0aF9DdWxtZW4sIEJlYWsuTGVuZ3RoX05hcmVzLCBCZWFrLldpZHRoLCBCZWFrLkRlcHRoLCBUYXJzdXMuTGVuZ3RoLCBXaW4uLi5cbuKEuSBVc2UgYHNwZWMoKWAgdG8gcmV0cmlldmUgdGhlIGZ1bGwgY29sdW1uIHNwZWNpZmljYXRpb24gZm9yIHRoaXMgZGF0YS5cbuKEuSBTcGVjaWZ5IHRoZSBjb2x1bW4gdHlwZXMgb3Igc2V0IGBzaG93X2NvbF90eXBlcyA9IEZBTFNFYCB0byBxdWlldCB0aGlzIG1lc3NhZ2UuUm93czogMjEyIENvbHVtbnM6IDLilIDilIAgQ29sdW1uIHNwZWNpZmljYXRpb24g4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSAXG5EZWxpbWl0ZXI6IFwiLFwiXG5jaHIgKDIpOiBzcGVjaWVzX25hbWUsIGpldHpfc2NpZW50aWZpY19uYW1lXG7ihLkgVXNlIGBzcGVjKClgIHRvIHJldHJpZXZlIHRoZSBmdWxsIGNvbHVtbiBzcGVjaWZpY2F0aW9uIGZvciB0aGlzIGRhdGEuXG7ihLkgU3BlY2lmeSB0aGUgY29sdW1uIHR5cGVzIG9yIHNldCBgc2hvd19jb2xfdHlwZXMgPSBGQUxTRWAgdG8gcXVpZXQgdGhpcyBtZXNzYWdlLkpvaW5pbmcgd2l0aCBgYnkgPSBqb2luX2J5KHNwZWNpZXNfbmFtZSlgXG4ifQ== -->
-<pre><code>Rows: 353 Columns: 37── Column specification ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+<!-- rnb-output-begin eyJkYXRhIjoiUm93czogMzUzIENvbHVtbnM6IDM34pSA4pSAIENvbHVtbiBzcGVjaWZpY2F0aW9uIOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgFxuRGVsaW1pdGVyOiBcIixcIlxuY2hyICgxMyk6IFNwZWNpZXMxLCBGYW1pbHkxLCBPcmRlcjEsIEF2aWJhc2UuSUQxLCBNYXNzLlNvdXJjZSwgTWFzcy5SZWZzLk90aGVyLCBJbmZlcmVuY2UsIFRyYWl0cy5pbmZlcnJlZCwgUi4uLlxuZGJsICgyNCk6IFNlcXVlbmNlLCBUb3RhbC5pbmRpdmlkdWFscywgRmVtYWxlLCBNYWxlLCBVbmtub3duLCBDb21wbGV0ZS5tZWFzdXJlcywgQmVhay5MZW5ndGhfQ3VsbWVuLCBCZWFrLkxlbi4uLlxu4oS5IFVzZSBgc3BlYygpYCB0byByZXRyaWV2ZSB0aGUgZnVsbCBjb2x1bW4gc3BlY2lmaWNhdGlvbiBmb3IgdGhpcyBkYXRhLlxu4oS5IFNwZWNpZnkgdGhlIGNvbHVtbiB0eXBlcyBvciBzZXQgYHNob3dfY29sX3R5cGVzID0gRkFMU0VgIHRvIHF1aWV0IHRoaXMgbWVzc2FnZS5Sb3dzOiAyMTIgQ29sdW1uczogMuKUgOKUgCBDb2x1bW4gc3BlY2lmaWNhdGlvbiDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIBcbkRlbGltaXRlcjogXCIsXCJcbmNociAoMik6IHNwZWNpZXNfbmFtZSwgamV0el9zY2llbnRpZmljX25hbWVcbuKEuSBVc2UgYHNwZWMoKWAgdG8gcmV0cmlldmUgdGhlIGZ1bGwgY29sdW1uIHNwZWNpZmljYXRpb24gZm9yIHRoaXMgZGF0YS5cbuKEuSBTcGVjaWZ5IHRoZSBjb2x1bW4gdHlwZXMgb3Igc2V0IGBzaG93X2NvbF90eXBlcyA9IEZBTFNFYCB0byBxdWlldCB0aGlzIG1lc3NhZ2UuSm9pbmluZyB3aXRoIGBieSA9IGpvaW5fYnkoc3BlY2llc19uYW1lKWBcbiJ9 -->
+<pre><code>Rows: 353 Columns: 37── Column specification ─────────────────────────────────────────────────────────────────────────────────────────
 Delimiter: &quot;,&quot;
-chr (13): Species1, Family1, Order1, Avibase.ID1, Mass.Source, Mass.Refs.Other, Inference, Traits.inferred, Reference.species, Habitat, Trophic.Level, Trophic.Nic...
-dbl (24): Sequence, Total.individuals, Female, Male, Unknown, Complete.measures, Beak.Length_Culmen, Beak.Length_Nares, Beak.Width, Beak.Depth, Tarsus.Length, Win...
+chr (13): Species1, Family1, Order1, Avibase.ID1, Mass.Source, Mass.Refs.Other, Inference, Traits.inferred, R...
+dbl (24): Sequence, Total.individuals, Female, Male, Unknown, Complete.measures, Beak.Length_Culmen, Beak.Len...
 ℹ Use `spec()` to retrieve the full column specification for this data.
-ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.Rows: 212 Columns: 2── Column specification ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.Rows: 212 Columns: 2── Column specification ─────────────────────────────────────────────────────────────────────────────────────────
 Delimiter: &quot;,&quot;
 chr (2): species_name, jetz_scientific_name
 ℹ Use `spec()` to retrieve the full column specification for this data.
@@ -1818,10 +1818,10 @@ chr (2): species_name, jetz_scientific_name
 <!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuaGVhZChhdm9uZXRfamV0eilcbmBgYCJ9 -->
 <pre class="r"><code>head(avonet_jetz)</code></pre>
 <!-- rnb-source-end -->
-<!-- rnb-frame-begin eyJtZXRhZGF0YSI6eyJjbGFzc2VzIjpbInRibF9kZiIsInRibCIsImRhdGEuZnJhbWUiXSwibnJvdyI6NiwibmNvbCI6MTMsInN1bW1hcnkiOnsiQSB0aWJibGUiOlsiNiDDlyAxMyJdfX0sInJkZiI6Ikg0c0lBQUFBQUFBQUE2MVV2VzhUTVJSMzAzeTBpVkpDUDRaS0ZIVUZpWWlxdEdvWjRLS1dWa2hJQ0pTS0RrWFhsenNuTVRoM0o5dE5hWWVxY3hkbW1QZ0x1ckF3SW1ZcXhNaFlkV1ZnUnFqQlB0dEo3cENRa0xCa1BiL2Y4OC92dzg5K3VyNjlXTnd1SW9SR1VUYVRRYU01dVVTNXJmckdyUlVrRWFtTW9Dd2FWL0tWM0RRbEYyVTVLM0xtamVGYWpXSlBzQkFId04wTytOQUM3Z0VqT09DRW16MVhheEVOSTB3SnVCUllGd1FZdzlRYVVNME1pQmMySk0yenBzbTFObEF2ak5vUWNaY0Uvc0F5UFd6aEFzdEZRUG9zNlFDNmhMdXQwTWROUm55UTZJU0sxMWs0VnRraForbjlvaHJPUFNPWFBzZkR1V1AwaFdZOCtyeUsxcDJpa1ROdjFIanJGSXpNeHZRenB4VFRGd2M4ZzVmTnZ1dEd0K2ROR0duc2ZWNTlWOGY1YkZYenRrMWNXenVhdnpXcjhUcFArc09HQnhkNmYzUmI2NDBqN1FlUTFwL3JPdlI1eTQvMHVYZU4vY0UzZmY2cWtTc203dVZaRytmdy9ZOXZzTDBXNllZTVcyQ1R5ZnNZQXNZZWQvNUpIem9nNlNxL0lURXUvcE5tMHplMXNQTCtqNlIweHBKNktxYlN3NEJqemtOR2dGcW9qcG55OEhlb3VJa0R6SUNTZm1CL0lnbWFpYmMybFQ4NTN6eWRycTJqdWFNUFQ3N1g1Z29YbjE3djNLalZHeWRmRlg2VC96cWRQanl2WldaVXc1ME4ydU9kenNjemJYTDhSYmNKVkxTK08yK3UvNk5KTS9IK2N3RjBNRGZKbCsxTGZJSEZvY3M5K2RnRmFSTFBWWnRzN0EwTUwxMktnNVpvMndSamFKLzRLY1RIVVI4cENTQTBTU3Z0azZDVmhNb0NHTi9qYVpESlQwRkZRYnkyRGFQUWhnWVJZQ3Q2eGFqU3AveWZ4SUg5b0NKR09zQU9YRXFhc3Q0SDFOS0xzaFZiMk9YazBDTFpEbkNlS3M0NEMvZXJ0a0RxZzh5b0o5YnI5WDZtcStqUm1CMVgwWUpGWDM2STFTWlR0VVBvTWtVcGhKRWdZU0JKR2ZYOTVsTGtFWllDSmoyR1FlQjU2SVlCRnE2NkllVWozcUZIMmF6elErdXk5cHJwbWROeTlySElBcFBBNXA2ajBNQzJnU2RrMG5IT1ZWbThvTi9FRXVWVkVZcEJvM3NodFVpY0hycjhEVStrbXA1NEJnQUEifQ== -->
+<!-- rnb-frame-begin eyJtZXRhZGF0YSI6eyJjbGFzc2VzIjpbInRibF9kZiIsInRibCIsImRhdGEuZnJhbWUiXSwibnJvdyI6NiwibmNvbCI6MTMsInN1bW1hcnkiOnsiQSB0aWJibGUiOlsiNiDDlyAxMyJdfX0sInJkZiI6Ikg0c0lBQUFBQUFBQUE2MVV2VzhUTVJSMzAzeTBpVkpDUDRaS0ZIVUZpWWlxdEdvWjRLS1dWa2hJQ0pTS0RrWFhsenNuTVRoM0o5dE5hWWVxY3hkbW1QZ0x1ckF3SW1ZcXhNaFlkV1ZnUnFqQlB0dEo3cENRa0xCa1BiL2Y4OC92dzg5K3VyNjlXTnd1SW9SR1VYWjBCSTNtNUJMbHR1b2J0MVlReW1ha01vS3lhRnpKVjNMVGxGeVU1YXpJbVRlR2F6V0tQY0ZDSEFCM08rQkRDN2dIak9DQUUyNzJYSzFGTkl3d0plQlNZRjBRWUF4VGEwQTFNeUJlMkpBMHo1b20xOXBBdlRCcVE4UmRFdmdEeS9Td2hRc3NGd0hwczZRRDZCTHV0a0lmTnhueFFhSVRLbDVuNFZobGg1eWw5NHRxT1BlTVhQb2NEK2VPMFJlYThlanpLbHAzaWtiT3ZGSGpyVk13TWh2VHo1eFNURjhjOEF4ZU52dXVHOTJlTjJHa3NmZDU5VjBkNTdOVnpkczJjVzN0YVA3V3JNYnJQT2tQR3g1YzZQM1JiYTAzanJRZlFGcC9ydXZRNXkwLzB1ZmVOZllIMy9UNXEwYXVtTGlYWjIyY3cvYy92c0gyV3FRYk1teUJUU2J2WXdnWWU5ejVKMzNvZ0tTci9JYkV1UGhQbWszZjFNTEsreitTMGhsTDZxbVlTZzhEamprUEdRRnFvVHBteXNQZm9lSW1EakFEU3ZxQi9Za2thQ2JlMmxUKzVIenpkTHEyanVhT1BqejVYcHNyWEh4NnZYT2pWbStjZkZYNFRmN3JkUHJ3dkphWlVRMTNObWlQZHpvZno3VEo4UmZkSmxEUit1Njh1ZjZQSnMzRSs4OEYwTUhjSkYrMkwvRUZGb2N1OStSakY2UkpQRmR0c3JFM01MeDBLUTVhb20wVGpLRjk0cWNRSDBkOXBDU0EwQ1N0dEUrQ1ZoSXFDMkI4ajZkQkpqOEZGUVh4MmphTVFoc2FSSUN0NkJXalNwL3lmeElIOW9PS0dPa0FPM0FwYWNwNkgxQkxMOHBXYkdHWGswT0xaRHZBZWFvNDR5emNyOW9DcVE4eW81NVlyOWY3bWE2aVIyTjJYRVVMRm4zNUlWYWJUTlVPb2NzVXBSQkdnb1NCSkdYVTk1dExrVWRZQ3BqMEdBYUI1NkViQmxpNDZvYVVqM2lISG1XenpnK3R5OXBycG1kT3k5bkhJZ3RNQXB0N2prSUQyd2Fla0VuSE9WZGw4WUorRTB1VVYwVW9CbzN1aGRRaWNYcm84amQxMFIxZWVBWUFBQT09In0= -->
 <div data-pagedtable="false">
 <script data-pagedtable-source type="application/json">
-{"columns":[{"label":["jetz_scientific_name"],"name":[1],"type":["chr"],"align":["left"]},{"label":["beak_length"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["beak_width"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["beak_depth"],"name":[4],"type":["dbl"],"align":["right"]},{"label":["tail_length"],"name":[5],"type":["dbl"],"align":["right"]},{"label":["wing_length"],"name":[6],"type":["dbl"],"align":["right"]},{"label":["tarsus_length"],"name":[7],"type":["dbl"],"align":["right"]},{"label":["trophic_niche"],"name":[8],"type":["chr"],"align":["left"]},{"label":["habitat"],"name":[9],"type":["chr"],"align":["left"]},{"label":["habitat_density"],"name":[10],"type":["dbl"],"align":["right"]},{"label":["primary_lifestyle"],"name":[11],"type":["chr"],"align":["left"]},{"label":["range_size"],"name":[12],"type":["dbl"],"align":["right"]},{"label":["mass"],"name":[13],"type":["dbl"],"align":["right"]}],"data":[{"1":"Alectroenas_madagascariensis","2":"17.5","3":"4.10","4":"4.2","5":"81.50","6":"171.00","7":"22.30","8":"Frugivore","9":"Forest","10":"2","11":"Insessorial","12":"311714.7","13":"173.0"},{"1":"Aplopelia_larvata","2":"21.7","3":"3.30","4":"3.7","5":"92.90","6":"143.10","7":"26.00","8":"Granivore","9":"Forest","10":"2","11":"Terrestrial","12":"2621499.0","13":"155.0"},{"1":"Caloenas_nicobarica","2":"30.7","3":"5.40","4":"7.7","5":"98.80","6":"259.00","7":"43.70","8":"Omnivore","9":"Forest","10":"1","11":"Terrestrial","12":"475640.9","13":"537.9"},{"1":"Chalcophaps_indica","2":"21.8","3":"2.95","4":"4.1","5":"85.45","6":"147.95","7":"25.85","8":"Omnivore","9":"Forest","10":"1","11":"Generalist","12":"5343787.3","13":"136.5"},{"1":"Chalcophaps_stephani","2":"20.7","3":"2.60","4":"3.8","5":"84.40","6":"136.00","7":"24.80","8":"Omnivore","9":"Forest","10":"3","11":"Generalist","12":"866814.3","13":"129.0"},{"1":"Claravis_godefrida","2":"17.4","3":"3.40","4":"3.7","5":"81.80","6":"118.00","7":"22.10","8":"Granivore","9":"Forest","10":"1","11":"Terrestrial","12":"148131.9","13":"43.5"}],"options":{"columns":{"min":{},"max":[10],"total":[13]},"rows":{"min":[10],"max":[10],"total":[6]},"pages":{}}}
+{"columns":[{"label":["jetz_scientific_name"],"name":[1],"type":["chr"],"align":["left"]},{"label":["beak_length"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["beak_width"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["beak_depth"],"name":[4],"type":["dbl"],"align":["right"]},{"label":["tail_length"],"name":[5],"type":["dbl"],"align":["right"]},{"label":["wing_length"],"name":[6],"type":["dbl"],"align":["right"]},{"label":["tarsus_length"],"name":[7],"type":["dbl"],"align":["right"]},{"label":["trophic_niche"],"name":[8],"type":["chr"],"align":["left"]},{"label":["habitat"],"name":[9],"type":["chr"],"align":["left"]},{"label":["habitat_density"],"name":[10],"type":["dbl"],"align":["right"]},{"label":["primary_lifestyle"],"name":[11],"type":["chr"],"align":["left"]},{"label":["range_size"],"name":[12],"type":["dbl"],"align":["right"]},{"label":["mass"],"name":[13],"type":["dbl"],"align":["right"]}],"data":[{"1":"Alectroenas_madagascariensis","2":"17.5","3":"4.10","4":"4.2","5":"81.5","6":"171","7":"22.3","8":"Frugivore","9":"Forest","10":"2","11":"Insessorial","12":"311715","13":"173.0"},{"1":"Aplopelia_larvata","2":"21.7","3":"3.30","4":"3.7","5":"92.9","6":"143","7":"26.0","8":"Granivore","9":"Forest","10":"2","11":"Terrestrial","12":"2621499","13":"155.0"},{"1":"Caloenas_nicobarica","2":"30.7","3":"5.40","4":"7.7","5":"98.8","6":"259","7":"43.7","8":"Omnivore","9":"Forest","10":"1","11":"Terrestrial","12":"475641","13":"537.9"},{"1":"Chalcophaps_indica","2":"21.8","3":"2.95","4":"4.1","5":"85.5","6":"148","7":"25.9","8":"Omnivore","9":"Forest","10":"1","11":"Generalist","12":"5343787","13":"136.5"},{"1":"Chalcophaps_stephani","2":"20.7","3":"2.60","4":"3.8","5":"84.4","6":"136","7":"24.8","8":"Omnivore","9":"Forest","10":"3","11":"Generalist","12":"866814","13":"129.0"},{"1":"Claravis_godefrida","2":"17.4","3":"3.40","4":"3.7","5":"81.8","6":"118","7":"22.1","8":"Granivore","9":"Forest","10":"1","11":"Terrestrial","12":"148132","13":"43.5"}],"options":{"columns":{"min":{},"max":[10],"total":[13]},"rows":{"min":[10],"max":[10],"total":[6]},"pages":{}}}
   </script>
 </div>
 <!-- rnb-frame-end -->
@@ -1853,10 +1853,10 @@ columbidae_branch_lengths$jetz_scientific_name = rownames(columbidae_branch_leng
 rownames(columbidae_branch_lengths) = NULL
 head(columbidae_branch_lengths)</code></pre>
 <!-- rnb-source-end -->
-<!-- rnb-frame-begin eyJtZXRhZGF0YSI6eyJjbGFzc2VzIjpbImRhdGEuZnJhbWUiXSwibnJvdyI6NiwibmNvbCI6Miwic3VtbWFyeSI6eyJEZXNjcmlwdGlvbiI6WyJkZiBbNiDDlyAyXSJdfX0sInJkZiI6Ikg0c0lBQUFBQUFBQUExMVJ3VW9ETVJCTnQ5MHRYV2pWS2oxNEVRcGVoTzVCTDRJSEY2cUM0RWtVZWxDV2JKcmFhRFlwMld3VjZjRnYwQi9RcTEvZ1QzandXeFR4VkUyMkNVZ1d3a3plNUwyWk4zdDZNTmdKQnlFQW9BcHFuZ2VxdmtxQmYzNTIxTnNGQ2xHWENxaUJobzUzNnRHcVNqVFlVaWZZLy82Y3BxOTd6emJHUWYrbFU5LzRpTnVWcmNQdTEzdTgzbjJjWGI1ZHhQN3h6K2JzNUVseGxqWFBDRGI3bkJaWkNoTktwZ1FhY01XQ29wamdYQXFTbTBMYkZ2QVVpenlEakJHWFVqQ0NDRU1TdWcwNFp0RHF0Q3g0VlJDR29XUFNaekREdVJuVU0yQkhZcEVSQm1tU0NzalFPS0dZWGNteHFhNWRZM21mNUloZ0pzbUlvRVJMT0xJTndXOGpLOTNVMGcrZy9BSzNQNkl3dC8wdEdBNmhoTkZJbExwZzdsRHFmQ0lKWjRyazZiL2pPK1NLY0lDbGd1bEpoajAwTHRoTmIxczNLTXVMMHpReCtKZDdpNWJlcjVIeWpWU2c5cUNXYUdlbk1NWFVybGs1TGcxSEUwR1l0RTRVbWtlU1MyamZoWWhUaTVUZXdQd1BkUEp1L3BRQ0FBQT0ifQ== -->
+<!-- rnb-frame-begin eyJtZXRhZGF0YSI6eyJjbGFzc2VzIjpbImRhdGEuZnJhbWUiXSwibnJvdyI6NiwibmNvbCI6Miwic3VtbWFyeSI6eyJEZXNjcmlwdGlvbiI6WyJkZiBbNiDDlyAyXSJdfX0sInJkZiI6Ikg0c0lBQUFBQUFBQUExMVJRVXZETUJST3U3VmpoVTJkc29NWFllQkZXQTk2RVR4WW1BcUNKMUhZUVNscGxtM1JOQjFwdW9uczRHL1FQNkJYZjRGL3dvTy9SUkZQMDZSTFFGSUk3K1Y3K2I3M3Z0ZnpvLzVlMEE4QUFCVlFyVGlnNHNrVWVKY1hKOTE5QUtxdXZEaWdDdW9xM3NsSDZ6SlJZRk1lLy9EN2M1cThIanliR1BtOWwzWnQ2eU5xT1R2SG5hLzNhTFB6T0w5K3U0cTgwNS90K2RtVDVLd3FuaFpzOURKYXBBbU1LWmtTcU1FMUEvSmlnblBCU2E0TExWUEFVOHp6RkRKR2JFckJDQ0lNQ1dnM3lEQ0RScWRwd0ZGQkdJYVdTWS9CRk9kNlVGZURiWUY1U2hpa2NjSWhRK09ZWWpZU1kxM2R1TUhpUHM0UndVeVFJVUd4a3JCazZ6eWJoVWE2b2FRZlFQbjVkbjlFWVc3Nkd6QVlRQUhESVM5MXdjS2kxTEtKSUJtVEpGZjlIYzhpTzl3Q1ZncW1KaGwwMGJoZ3Q5MWQxYUFzTDA5RFIvOWY3aTVidXI5YXl0TlN2dHlEWEtLWm5jSUVVN05tNmJnMEhFNDRZY0k0a1dnZWlreEE4eTVBR1RWSTZRMHMvZ0MyNm9SS2xBSUFBQT09In0= -->
 <div data-pagedtable="false">
 <script data-pagedtable-source type="application/json">
-{"columns":[{"label":[""],"name":["_rn_"],"type":[""],"align":["left"]},{"label":["terminal_branch_length"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["jetz_scientific_name"],"name":[2],"type":["chr"],"align":["left"]}],"data":[{"1":"1.434439","2":"Columba_livia","_rn_":"1"},{"1":"1.434439","2":"Columba_rupestris","_rn_":"2"},{"1":"2.783022","2":"Columba_eversmanni","_rn_":"3"},{"1":"4.501138","2":"Columba_unicincta","_rn_":"4"},{"1":"6.533762","2":"Columba_oenas","_rn_":"5"},{"1":"2.661118","2":"Columba_guinea","_rn_":"6"}],"options":{"columns":{"min":{},"max":[10],"total":[2]},"rows":{"min":[10],"max":[10],"total":[6]},"pages":{}}}
+{"columns":[{"label":[""],"name":["_rn_"],"type":[""],"align":["left"]},{"label":["terminal_branch_length"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["jetz_scientific_name"],"name":[2],"type":["chr"],"align":["left"]}],"data":[{"1":"1.43","2":"Columba_livia","_rn_":"1"},{"1":"1.43","2":"Columba_rupestris","_rn_":"2"},{"1":"2.78","2":"Columba_eversmanni","_rn_":"3"},{"1":"4.50","2":"Columba_unicincta","_rn_":"4"},{"1":"6.53","2":"Columba_oenas","_rn_":"5"},{"1":"2.66","2":"Columba_guinea","_rn_":"6"}],"options":{"columns":{"min":{},"max":[10],"total":[2]},"rows":{"min":[10],"max":[10],"total":[6]},"pages":{}}}
   </script>
 </div>
 <!-- rnb-frame-end -->
@@ -1884,10 +1884,10 @@ head(columbidae_branch_lengths)</code></pre>
 <pre class="r"><code>columbidae_presence = columbidae_presence_tmp[,c(&#39;present_in_city&#39;,  &#39;season&#39;, &#39;origin&#39;, &#39;trophic_niche&#39;, &#39;habitat&#39;, &#39;habitat_density&#39;, &#39;primary_lifestyle&#39;, &#39;terminal_branch_length&#39;)]
 head(columbidae_presence)</code></pre>
 <!-- rnb-source-end -->
-<!-- rnb-frame-begin eyJtZXRhZGF0YSI6eyJjbGFzc2VzIjpbInRibF9kZiIsInRibCIsImRhdGEuZnJhbWUiXSwibnJvdyI6NiwibmNvbCI6OCwic3VtbWFyeSI6eyJBIHRpYmJsZSI6WyI2IMOXIDgiXX19LCJyZGYiOiJINHNJQUFBQUFBQUFBN1ZVUVl2VFFCU2VaamR0R3UxMlZmVGdYa1E4aWUxbEwzdmJIR1RWZ3dycmluc0wwMlM2ZVRpWktaTkp0YmNWdk9oZjhCOG9lRkpCOEtnaS9nRTlDM29XUEFnZXRyNjBlZHMyaUtCb1lETHpmWm52elh4dlhtYjc0dTY2ditzenhwYllzdU93SlJlSHpMMjVzOVhaWU1nZ3FMRmwxaXo2dXpqcEJBNDhiSVdpem1aUGpTMCtxNVB2VTZHM0xUS0loYkwvSEMrdTQxOVIxdWc0ajBSY012VnIzTUpRL0RWYWpOKzhaTGlDb1RZMHpidWVMdUEvbnpCSFZISjJTK3RZY2tWT21qY1NrL2ZtaUpYTGVjclZtYXM2aGo3TURHOWhxTXorRnFHMlFJRTNQYW1nUERIQ20xOS8zVmMyZUdSSG1DS2NBUzcvTjBVN1hudTFmLy85NHdmQjBVY2ZoL2Zlbk43ODl2VHpoN2VmV3NHNTd5K2VQN3VRQnFzbno3NTgrTzU0MFBoeS9zbmE2MUdsZmwzRlU1R1ZOcnlTYkE5d0ZTeWxFRlFZZ1IxUnJqTEJNNjBJYVFON1FLaUZSVFpJSUFvVlJBa2RaQ1BoUGJDY2N0MHVZWWhsbXMzQ0hoc1lTTGtaaFJMNmFHNGtTWDdLQ3BPQzRqTHNZVUZFU1NpRjJyTkp4VUhUNkR0ZGN0SEM1dXpqYXp3ZS82aGFqU1RQeUNxUmZzd3Q3L1lONmhFZFZDUU5QYkNnRllxYzRoOTNLK0thcVJEdFhCVTdpVHRSa3F2Ym5YVTJ2UlBvSG1pVjQvcmMySnN1Nll6TFVDNmxGNzJDb2xTNGt2Y0VsY0VLT3A0WTdtTG1EaThBSDltc2E3VTlMQmMvMHBLWWlUZDI4Qk1Qd1BKUDJnUUFBQT09In0= -->
+<!-- rnb-frame-begin eyJtZXRhZGF0YSI6eyJjbGFzc2VzIjpbInRibF9kZiIsInRibCIsImRhdGEuZnJhbWUiXSwibnJvdyI6NiwibmNvbCI6OCwic3VtbWFyeSI6eyJBIHRpYmJsZSI6WyI2IMOXIDgiXX19LCJyZGYiOiJINHNJQUFBQUFBQUFBN1ZVejR2VFFCU2Uva2liUnJ0ZEZUMjRGeEZQWW52Wnk5NDJCMW4xb01LNjR0N0NOSmx1SGs1bXltUlM3VzBGTC9vditCOG9lRkpCOEtnaS9nTjZGdlFzZUJBOGJIMXA4N1p0RUVIUndHVG0rekxmbS9uZXZNejJ4ZDExYjlkampOVll2VlpoTlFlSHpMbTVzOVhkWUt4ZVJWQmhkZGJLKzdzNDZRUU9YR3k1b3NIbVQ0VXRQNnZUN3pPaHV5MVNpSVN5L3h3dnIrTmRVZGJvS0F0RlZEQ05hOXpDU1B3MVdvN2Z1bVM0Z3BFMk5NMjluaXpoUDUrd1FKUnlka3ZyU0hKRlRsbzNZcFAxRjRpVnkxbkMxWm1yT29JQnpBMXZZYWpVL2hhaE5rZStPenNwdnpneHdwdGZmOTJYTm5oa1I1ZzhuQUV1L3pkRk8xNTd0WC8vL2VNSC90RkhIMGYzM3B6ZS9QYjA4NGUzbjlyK3VlOHZuais3a1Bpcko4KytmUGp1dU4vOGN2N0oydXR4cVg0ZHhST1JGamJjZ3V3TWNSVXNwUUJVRUlJZFU2NVN3Vk90Q0drRGUwQ29qVVUyakNFTUZJUXhIV1F6NW4yd25ITGRLV0NBWlpyT3d4NGJHa2k0R1FjU0JtaHVMRWwreWdxVGdPSXk2R05CaEhFZ2hkcXpjY2xCeStnN1BYTFJ4bGJkeDlka012bFJ0aHBLbnBKVklyMklXOTRiR05Rak9paEptbnBvUVNzVVZmTi8zQ21KSzZaRWRES1Y3eVRxaG5HbWJuZlgyZXhPb0h1Z1hZd2JDMk4zdG1SMVVvUnlLTDNvRlJTbHdwRzhMNmdNVnREeDFIQVBNM2Q0QVhqSXBqMnI3V0c1ZUtHV3hFeTlzWU9mejZncFl0b0VBQUE9In0= -->
 <div data-pagedtable="false">
 <script data-pagedtable-source type="application/json">
-{"columns":[{"label":["present_in_city"],"name":[1],"type":["lgl"],"align":["right"]},{"label":["season"],"name":[2],"type":["chr"],"align":["left"]},{"label":["origin"],"name":[3],"type":["chr"],"align":["left"]},{"label":["trophic_niche"],"name":[4],"type":["chr"],"align":["left"]},{"label":["habitat"],"name":[5],"type":["chr"],"align":["left"]},{"label":["habitat_density"],"name":[6],"type":["dbl"],"align":["right"]},{"label":["primary_lifestyle"],"name":[7],"type":["chr"],"align":["left"]},{"label":["terminal_branch_length"],"name":[8],"type":["dbl"],"align":["right"]}],"data":[{"1":"FALSE","2":"Resident","3":"Introduced","4":"Granivore","5":"Woodland","6":"3","7":"Terrestrial","8":"6.934084"},{"1":"FALSE","2":"Resident","3":"Native","4":"Omnivore","5":"Shrubland","6":"2","7":"Terrestrial","8":"3.576096"},{"1":"TRUE","2":"Resident","3":"Native","4":"Granivore","5":"Human Modified","6":"3","7":"Terrestrial","8":"1.230200"},{"1":"FALSE","2":"Resident","3":"Native","4":"Omnivore","5":"Forest","6":"1","7":"Terrestrial","8":"10.483816"},{"1":"FALSE","2":"Resident","3":"Native","4":"Granivore","5":"Forest","6":"1","7":"Terrestrial","8":"4.020640"},{"1":"FALSE","2":"Resident","3":"Native","4":"Granivore","5":"Forest","6":"1","7":"Terrestrial","8":"2.987386"}],"options":{"columns":{"min":{},"max":[10],"total":[8]},"rows":{"min":[10],"max":[10],"total":[6]},"pages":{}}}
+{"columns":[{"label":["present_in_city"],"name":[1],"type":["lgl"],"align":["right"]},{"label":["season"],"name":[2],"type":["chr"],"align":["left"]},{"label":["origin"],"name":[3],"type":["chr"],"align":["left"]},{"label":["trophic_niche"],"name":[4],"type":["chr"],"align":["left"]},{"label":["habitat"],"name":[5],"type":["chr"],"align":["left"]},{"label":["habitat_density"],"name":[6],"type":["dbl"],"align":["right"]},{"label":["primary_lifestyle"],"name":[7],"type":["chr"],"align":["left"]},{"label":["terminal_branch_length"],"name":[8],"type":["dbl"],"align":["right"]}],"data":[{"1":"FALSE","2":"Resident","3":"Introduced","4":"Granivore","5":"Woodland","6":"3","7":"Terrestrial","8":"6.93"},{"1":"FALSE","2":"Resident","3":"Native","4":"Omnivore","5":"Shrubland","6":"2","7":"Terrestrial","8":"3.58"},{"1":"TRUE","2":"Resident","3":"Native","4":"Granivore","5":"Human Modified","6":"3","7":"Terrestrial","8":"1.23"},{"1":"FALSE","2":"Resident","3":"Native","4":"Omnivore","5":"Forest","6":"1","7":"Terrestrial","8":"10.48"},{"1":"FALSE","2":"Resident","3":"Native","4":"Granivore","5":"Forest","6":"1","7":"Terrestrial","8":"4.02"},{"1":"FALSE","2":"Resident","3":"Native","4":"Granivore","5":"Forest","6":"1","7":"Terrestrial","8":"2.99"}],"options":{"columns":{"min":{},"max":[10],"total":[8]},"rows":{"min":[10],"max":[10],"total":[6]},"pages":{}}}
   </script>
 </div>
 <!-- rnb-frame-end -->
@@ -1922,12 +1922,12 @@ result that other species.</p>
 <pre class="r"><code>chisq_season = chisq.test(table(columbidae_presence$present_in_city, columbidae_presence$season))
 chisq_season</code></pre>
 <!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiXG5cdFBlYXJzb24ncyBDaGktc3F1YXJlZCB0ZXN0XG5cbmRhdGE6ICB0YWJsZShjb2x1bWJpZGFlX3ByZXNlbmNlJHByZXNlbnRfaW5fY2l0eSwgY29sdW1iaWRhZV9wcmVzZW5jZSRzZWFzb24pXG5YLXNxdWFyZWQgPSA1OS45OCwgZGYgPSAzLCBwLXZhbHVlID0gNS45MzZlLTEzXG4ifQ== -->
+<!-- rnb-output-begin eyJkYXRhIjoiXG5cdFBlYXJzb24ncyBDaGktc3F1YXJlZCB0ZXN0XG5cbmRhdGE6ICB0YWJsZShjb2x1bWJpZGFlX3ByZXNlbmNlJHByZXNlbnRfaW5fY2l0eSwgY29sdW1iaWRhZV9wcmVzZW5jZSRzZWFzb24pXG5YLXNxdWFyZWQgPSA2MCwgZGYgPSAzLCBwLXZhbHVlID0gNmUtMTNcbiJ9 -->
 <pre><code>
     Pearson&#39;s Chi-squared test
 
 data:  table(columbidae_presence$present_in_city, columbidae_presence$season)
-X-squared = 59.98, df = 3, p-value = 5.936e-13</code></pre>
+X-squared = 60, df = 3, p-value = 6e-13</code></pre>
 <!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
@@ -1976,12 +1976,12 @@ X-squared = 59.98, df = 3, p-value = 5.936e-13</code></pre>
 <pre class="r"><code>chisq_origin = chisq.test(table(columbidae_presence$present_in_city, columbidae_presence$origin))
 chisq_origin</code></pre>
 <!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiXG5cdFBlYXJzb24ncyBDaGktc3F1YXJlZCB0ZXN0IHdpdGggWWF0ZXMnIGNvbnRpbnVpdHkgY29ycmVjdGlvblxuXG5kYXRhOiAgdGFibGUoY29sdW1iaWRhZV9wcmVzZW5jZSRwcmVzZW50X2luX2NpdHksIGNvbHVtYmlkYWVfcHJlc2VuY2Ukb3JpZ2luKVxuWC1zcXVhcmVkID0gMTAxLjA0LCBkZiA9IDEsIHAtdmFsdWUgPCAyLjJlLTE2XG4ifQ== -->
+<!-- rnb-output-begin eyJkYXRhIjoiXG5cdFBlYXJzb24ncyBDaGktc3F1YXJlZCB0ZXN0IHdpdGggWWF0ZXMnIGNvbnRpbnVpdHkgY29ycmVjdGlvblxuXG5kYXRhOiAgdGFibGUoY29sdW1iaWRhZV9wcmVzZW5jZSRwcmVzZW50X2luX2NpdHksIGNvbHVtYmlkYWVfcHJlc2VuY2Ukb3JpZ2luKVxuWC1zcXVhcmVkID0gMTAxLCBkZiA9IDEsIHAtdmFsdWUgPDJlLTE2XG4ifQ== -->
 <pre><code>
     Pearson&#39;s Chi-squared test with Yates&#39; continuity correction
 
 data:  table(columbidae_presence$present_in_city, columbidae_presence$origin)
-X-squared = 101.04, df = 1, p-value &lt; 2.2e-16</code></pre>
+X-squared = 101, df = 1, p-value &lt;2e-16</code></pre>
 <!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
@@ -2035,12 +2035,12 @@ X-squared = 101.04, df = 1, p-value &lt; 2.2e-16</code></pre>
 <!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuY2hpc3FfaGFiaXRhdFxuYGBgIn0= -->
 <pre class="r"><code>chisq_habitat</code></pre>
 <!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiXG5cdFBlYXJzb24ncyBDaGktc3F1YXJlZCB0ZXN0XG5cbmRhdGE6ICB0YWJsZShjb2x1bWJpZGFlX3ByZXNlbmNlJHByZXNlbnRfaW5fY2l0eSwgY29sdW1iaWRhZV9wcmVzZW5jZSRoYWJpdGF0KVxuWC1zcXVhcmVkID0gMTEwNS41LCBkZiA9IDYsIHAtdmFsdWUgPCAyLjJlLTE2XG4ifQ== -->
+<!-- rnb-output-begin eyJkYXRhIjoiXG5cdFBlYXJzb24ncyBDaGktc3F1YXJlZCB0ZXN0XG5cbmRhdGE6ICB0YWJsZShjb2x1bWJpZGFlX3ByZXNlbmNlJHByZXNlbnRfaW5fY2l0eSwgY29sdW1iaWRhZV9wcmVzZW5jZSRoYWJpdGF0KVxuWC1zcXVhcmVkID0gMTEwNiwgZGYgPSA2LCBwLXZhbHVlIDwyZS0xNlxuIn0= -->
 <pre><code>
     Pearson&#39;s Chi-squared test
 
 data:  table(columbidae_presence$present_in_city, columbidae_presence$habitat)
-X-squared = 1105.5, df = 6, p-value &lt; 2.2e-16</code></pre>
+X-squared = 1106, df = 6, p-value &lt;2e-16</code></pre>
 <!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
@@ -2089,12 +2089,12 @@ X-squared = 1105.5, df = 6, p-value &lt; 2.2e-16</code></pre>
 <pre class="r"><code>chisq_habitat_density = chisq.test(table(columbidae_presence$present_in_city, columbidae_presence$habitat_density))
 chisq_habitat_density</code></pre>
 <!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiXG5cdFBlYXJzb24ncyBDaGktc3F1YXJlZCB0ZXN0XG5cbmRhdGE6ICB0YWJsZShjb2x1bWJpZGFlX3ByZXNlbmNlJHByZXNlbnRfaW5fY2l0eSwgY29sdW1iaWRhZV9wcmVzZW5jZSRoYWJpdGF0X2RlbnNpdHkpXG5YLXNxdWFyZWQgPSA0NTcuMDQsIGRmID0gMiwgcC12YWx1ZSA8IDIuMmUtMTZcbiJ9 -->
+<!-- rnb-output-begin eyJkYXRhIjoiXG5cdFBlYXJzb24ncyBDaGktc3F1YXJlZCB0ZXN0XG5cbmRhdGE6ICB0YWJsZShjb2x1bWJpZGFlX3ByZXNlbmNlJHByZXNlbnRfaW5fY2l0eSwgY29sdW1iaWRhZV9wcmVzZW5jZSRoYWJpdGF0X2RlbnNpdHkpXG5YLXNxdWFyZWQgPSA0NTcsIGRmID0gMiwgcC12YWx1ZSA8MmUtMTZcbiJ9 -->
 <pre><code>
     Pearson&#39;s Chi-squared test
 
 data:  table(columbidae_presence$present_in_city, columbidae_presence$habitat_density)
-X-squared = 457.04, df = 2, p-value &lt; 2.2e-16</code></pre>
+X-squared = 457, df = 2, p-value &lt;2e-16</code></pre>
 <!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
@@ -2143,12 +2143,12 @@ X-squared = 457.04, df = 2, p-value &lt; 2.2e-16</code></pre>
 <pre class="r"><code>chisq_trophic = chisq.test(table(columbidae_presence$present_in_city, columbidae_presence$trophic_niche))
 chisq_trophic</code></pre>
 <!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiXG5cdFBlYXJzb24ncyBDaGktc3F1YXJlZCB0ZXN0XG5cbmRhdGE6ICB0YWJsZShjb2x1bWJpZGFlX3ByZXNlbmNlJHByZXNlbnRfaW5fY2l0eSwgY29sdW1iaWRhZV9wcmVzZW5jZSR0cm9waGljX25pY2hlKVxuWC1zcXVhcmVkID0gMTk0LjE0LCBkZiA9IDIsIHAtdmFsdWUgPCAyLjJlLTE2XG4ifQ== -->
+<!-- rnb-output-begin eyJkYXRhIjoiXG5cdFBlYXJzb24ncyBDaGktc3F1YXJlZCB0ZXN0XG5cbmRhdGE6ICB0YWJsZShjb2x1bWJpZGFlX3ByZXNlbmNlJHByZXNlbnRfaW5fY2l0eSwgY29sdW1iaWRhZV9wcmVzZW5jZSR0cm9waGljX25pY2hlKVxuWC1zcXVhcmVkID0gMTk0LCBkZiA9IDIsIHAtdmFsdWUgPDJlLTE2XG4ifQ== -->
 <pre><code>
     Pearson&#39;s Chi-squared test
 
 data:  table(columbidae_presence$present_in_city, columbidae_presence$trophic_niche)
-X-squared = 194.14, df = 2, p-value &lt; 2.2e-16</code></pre>
+X-squared = 194, df = 2, p-value &lt;2e-16</code></pre>
 <!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
@@ -2197,12 +2197,12 @@ X-squared = 194.14, df = 2, p-value &lt; 2.2e-16</code></pre>
 <pre class="r"><code>chisq_primary_lifestyle = chisq.test(table(columbidae_presence$present_in_city, columbidae_presence$primary_lifestyle))
 chisq_primary_lifestyle</code></pre>
 <!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiXG5cdFBlYXJzb24ncyBDaGktc3F1YXJlZCB0ZXN0XG5cbmRhdGE6ICB0YWJsZShjb2x1bWJpZGFlX3ByZXNlbmNlJHByZXNlbnRfaW5fY2l0eSwgY29sdW1iaWRhZV9wcmVzZW5jZSRwcmltYXJ5X2xpZmVzdHlsZSlcblgtc3F1YXJlZCA9IDIwOS43NSwgZGYgPSAyLCBwLXZhbHVlIDwgMi4yZS0xNlxuIn0= -->
+<!-- rnb-output-begin eyJkYXRhIjoiXG5cdFBlYXJzb24ncyBDaGktc3F1YXJlZCB0ZXN0XG5cbmRhdGE6ICB0YWJsZShjb2x1bWJpZGFlX3ByZXNlbmNlJHByZXNlbnRfaW5fY2l0eSwgY29sdW1iaWRhZV9wcmVzZW5jZSRwcmltYXJ5X2xpZmVzdHlsZSlcblgtc3F1YXJlZCA9IDIxMCwgZGYgPSAyLCBwLXZhbHVlIDwyZS0xNlxuIn0= -->
 <pre><code>
     Pearson&#39;s Chi-squared test
 
 data:  table(columbidae_presence$present_in_city, columbidae_presence$primary_lifestyle)
-X-squared = 209.75, df = 2, p-value &lt; 2.2e-16</code></pre>
+X-squared = 210, df = 2, p-value &lt;2e-16</code></pre>
 <!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
@@ -2243,8 +2243,8 @@ X-squared = 209.75, df = 2, p-value &lt; 2.2e-16</code></pre>
 <!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubWVhbihjb2x1bWJpZGFlX3ByZXNlbmNlJHRlcm1pbmFsX2JyYW5jaF9sZW5ndGhbY29sdW1iaWRhZV9wcmVzZW5jZSRwcmVzZW50X2luX2NpdHldKVxuYGBgIn0= -->
 <pre class="r"><code>mean(columbidae_presence$terminal_branch_length[columbidae_presence$present_in_city])</code></pre>
 <!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDMuNDI5MTU1XG4ifQ== -->
-<pre><code>[1] 3.429155</code></pre>
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDMuNDNcbiJ9 -->
+<pre><code>[1] 3.43</code></pre>
 <!-- rnb-output-end -->
 <!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucHJpbnQoJ01lYW4gZXZvbHV0aW9uYXJ5IGFnZSBmb3Igc3BlY2llcyBOT1QgaW4gY2l0aWVzJylcbmBgYCJ9 -->
 <pre class="r"><code>print(&#39;Mean evolutionary age for species NOT in cities&#39;)</code></pre>
@@ -2255,20 +2255,20 @@ X-squared = 209.75, df = 2, p-value &lt; 2.2e-16</code></pre>
 <!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubWVhbihjb2x1bWJpZGFlX3ByZXNlbmNlJHRlcm1pbmFsX2JyYW5jaF9sZW5ndGhbIWNvbHVtYmlkYWVfcHJlc2VuY2UkcHJlc2VudF9pbl9jaXR5XSlcbmBgYCJ9 -->
 <pre class="r"><code>mean(columbidae_presence$terminal_branch_length[!columbidae_presence$present_in_city])</code></pre>
 <!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDUuNzY4NTA2XG4ifQ== -->
-<pre><code>[1] 5.768506</code></pre>
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDUuNzdcbiJ9 -->
+<pre><code>[1] 5.77</code></pre>
 <!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-chunk-begin -->
 <!-- rnb-source-begin eyJkYXRhIjoiYGBgclxud2lsY294LnRlc3QoY29sdW1iaWRhZV9wcmVzZW5jZSR0ZXJtaW5hbF9icmFuY2hfbGVuZ3RoW2NvbHVtYmlkYWVfcHJlc2VuY2UkcHJlc2VudF9pbl9jaXR5XSwgY29sdW1iaWRhZV9wcmVzZW5jZSR0ZXJtaW5hbF9icmFuY2hfbGVuZ3RoWyFjb2x1bWJpZGFlX3ByZXNlbmNlJHByZXNlbnRfaW5fY2l0eV0pXG5gYGAifQ== -->
 <pre class="r"><code>wilcox.test(columbidae_presence$terminal_branch_length[columbidae_presence$present_in_city], columbidae_presence$terminal_branch_length[!columbidae_presence$present_in_city])</code></pre>
 <!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiXG5cdFdpbGNveG9uIHJhbmsgc3VtIHRlc3Qgd2l0aCBjb250aW51aXR5IGNvcnJlY3Rpb25cblxuZGF0YTogIGNvbHVtYmlkYWVfcHJlc2VuY2UkdGVybWluYWxfYnJhbmNoX2xlbmd0aFtjb2x1bWJpZGFlX3ByZXNlbmNlJHByZXNlbnRfaW5fY2l0eV0gYW5kIGNvbHVtYmlkYWVfcHJlc2VuY2UkdGVybWluYWxfYnJhbmNoX2xlbmd0aFshY29sdW1iaWRhZV9wcmVzZW5jZSRwcmVzZW50X2luX2NpdHldXG5XID0gNzQyODMwLCBwLXZhbHVlIDwgMi4yZS0xNlxuYWx0ZXJuYXRpdmUgaHlwb3RoZXNpczogdHJ1ZSBsb2NhdGlvbiBzaGlmdCBpcyBub3QgZXF1YWwgdG8gMFxuIn0= -->
+<!-- rnb-output-begin eyJkYXRhIjoiXG5cdFdpbGNveG9uIHJhbmsgc3VtIHRlc3Qgd2l0aCBjb250aW51aXR5IGNvcnJlY3Rpb25cblxuZGF0YTogIGNvbHVtYmlkYWVfcHJlc2VuY2UkdGVybWluYWxfYnJhbmNoX2xlbmd0aFtjb2x1bWJpZGFlX3ByZXNlbmNlJHByZXNlbnRfaW5fY2l0eV0gYW5kIGNvbHVtYmlkYWVfcHJlc2VuY2UkdGVybWluYWxfYnJhbmNoX2xlbmd0aFshY29sdW1iaWRhZV9wcmVzZW5jZSRwcmVzZW50X2luX2NpdHldXG5XID0gN2UrMDUsIHAtdmFsdWUgPDJlLTE2XG5hbHRlcm5hdGl2ZSBoeXBvdGhlc2lzOiB0cnVlIGxvY2F0aW9uIHNoaWZ0IGlzIG5vdCBlcXVhbCB0byAwXG4ifQ== -->
 <pre><code>
     Wilcoxon rank sum test with continuity correction
 
 data:  columbidae_presence$terminal_branch_length[columbidae_presence$present_in_city] and columbidae_presence$terminal_branch_length[!columbidae_presence$present_in_city]
-W = 742830, p-value &lt; 2.2e-16
+W = 7e+05, p-value &lt;2e-16
 alternative hypothesis: true location shift is not equal to 0</code></pre>
 <!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
@@ -2315,10 +2315,10 @@ columbidae_urban_tolerance_tmp = right_join(columbidae_urban_tolerance_tmp, avon
 <pre class="r"><code>columbidae_tolerance = columbidae_urban_tolerance_tmp[,c(&#39;jetz_scientific_name&#39;, &#39;urban_tolerance&#39;,  &#39;regional_pools&#39;, &#39;urban_pools&#39;, &#39;trophic_niche&#39;, &#39;habitat&#39;, &#39;habitat_density&#39;, &#39;primary_lifestyle&#39;, &#39;terminal_branch_length&#39;)]
 head(columbidae_tolerance)</code></pre>
 <!-- rnb-source-end -->
-<!-- rnb-frame-begin eyJtZXRhZGF0YSI6eyJjbGFzc2VzIjpbInRibF9kZiIsInRibCIsImRhdGEuZnJhbWUiXSwibnJvdyI6NiwibmNvbCI6OSwic3VtbWFyeSI6eyJBIHRpYmJsZSI6WyI2IMOXIDkiXX19LCJyZGYiOiJINHNJQUFBQUFBQUFBNjFVdlc4VE1SUjNMcm1XUzVVUFdtQmlZa0VNaVZSMVFRS3BpWXBTZFVLcWl0VE5lcmx6Y2dhZmZiS2RsREN4Z0JBU1lrWXM4Qit3SWtZV2R2NEdCalpXR0Jyc3hHNlBBOExDS1luOWZ1L3o5KzY5SE40NTNxa2YxeEZDVlZRTEFsUU56UldGOTQ0R25adklJRWFvb0JxSzdQblFHRzJaaXhYYTVydm1GRmY3ak1SYUNzSkI0UXdTR0lPS1FWTENGVlhPNW1JL1p5SW5qQUptSUtlZ3dTbTI5b0F0UFRtTnhkQzR4VjYxdVpjQ2kwV2VRcTR3NVVsUlk0TEFsQ284RmdrWlNacWNoL09hVFBDRWFER1JZT0Rtb3R5L1BMdHYrclcyK2Z4QjFYQitGVWU3YXMxZHZFWkJYM3lDd3IzWXBtZ2dKMk02RlpKNFlGOENMd0lYN21ZcjVkOGNDc0N2dWRZR0JsUDZQMG11ZnoxSHlwKzczMWFmcFpvMkRyZ2lTZ2xKZ1hub2lFaWJZVFZVM3llY1NHRDByTEIvK2ZtQ3IyOC9POVNzMmJ1QlAzOTkrK3BqNzliMzZQV1hkN2Q3TzA4T1BqeDkrYUxYdm56dC9mTlBtLzRzRFh6SUlTUEtzWWdjZU9rKzBZK3dpczEwYXpxaU1iWkdUdGVheUNGd3JBVXo1ZkxZdzAxSnhsUndZRGdYZ3ZtTjJGZ2FGNkdHV2FJOHRURnBuSHJ2OVJTR1ZJT24zbklpVHV4NjZabmZyMXpTRE9RTU16b3lYWmd4NzM1RkU1bFJtM3hvYTBveEkzeXMweExWU0lxVHJxZHJoenA0Ykg3bTgvbVBjazlpQnNyM3hJUDF4T3h6ZHlSdEp4QTZMYm1zaTF3YitzWXBzUDhlWWNtNUlrdEFhOEp0SlVrblRpZjhRV2ZiSmtETEZVU3V1Z3BhcnAyL1I4dVV3ZHlGQ3YwQUc2NlUrMWFFRElhRW5iMFVjYklnM0RXZDQ3NjdkWU9xcmhiNmZQaGk4MzRjc3VDR1RuOENrb3F0UlRRRkFBQT0ifQ== -->
+<!-- rnb-frame-begin eyJtZXRhZGF0YSI6eyJjbGFzc2VzIjpbInRibF9kZiIsInRibCIsImRhdGEuZnJhbWUiXSwibnJvdyI6NiwibmNvbCI6OSwic3VtbWFyeSI6eyJBIHRpYmJsZSI6WyI2IMOXIDkiXX19LCJyZGYiOiJINHNJQUFBQUFBQUFBNjFVdlc4VE1SUjNQcTdsVWlVTkxUQXhzU0NHUktxeUlJSFVSRVdwT2lGVlJlcG12Zmljbk1HeFQ3YVRFaVlXRUVKQ3pJZ0YvZ05XeE1qQ3p0L0F3TVlLUTRPZDJPMXhRRmc0SmJIZjczMyszcjJYd3p2SG5kcHhEU0ZVUWRWS0NWVWllMFhSdmFOKzZ5WkMxYklWU3FpS1luYyt0RWJiOXVLRXB2MnVlY1hWSHFmRUtFa0ZhRHlHQkVhZ0NTaEdoV2JhMjF6c1pWeG1sRFBBSE5RVURIakY5aDd3cGFkZ1JBNnNHd21xcmIwVU9KRlpDcG5HVENSNWpRMENVNmJ4U0NaMHFGaHlIaTVveGxJazFNaUpBZ3MzRnVYKzVkbDkwNnMyN2VjUHFycjNLM25hRldmdTQ5VnordnhUenQzemJZcjdhakppVTZsb0FQWVZpRHh3NGU1NHBmeWJRdzc0TmRkYTMyTGEvQ2ZKOTYvclNZVno5OXZxczFEVHhvSFFWR3VwR1BBQUhWSGxNcXlHYXZ0VVVBV2NuUlgyTDc5UThQV2RaNGVHTjdvMzhPZXZiMTk5N043NkhyLys4dTUydC9QazRNUFRseSs2emN2WDNqLy90QlhPd3NCSEFzWlVleGF4QnkvZHArWVIxc1JPdDJGRFJyQXo4cnJOaVJxQXdFWnlXNjRnQVc0b09tSlNBTWVabER4c3hNYlNPQS9WN1JKbHFZdkpTQnE4MTFNWU1BT0IrcVlYY2VMV3k4ekNmbVdLalVITk1HZEQyNFVaRCs1WERGVmo1cElQWEUwcDVsU01URnFnR2l0NTBnNTAzVkNYSDl1ZitYeitvOWdUd2tHSG5nU3dsdGg5YmcrVjZ3UkNwd1dYZFprWlM5ODZsZDIvUjFSd0xxa0MwSndJVjBuU0l1bEVQR2gxZGx3R3ROeEI1TXNyb2VYZWhYdTh6Rm1lKzFoUm1HQkxsb25RaTRqRGdQS3p0eUpQRm96YnRuVWl0TGRtVWQwMjBweFBIN0V2eUNNTGN1ajBKN08wdFk0MUJRQUEifQ== -->
 <div data-pagedtable="false">
 <script data-pagedtable-source type="application/json">
-{"columns":[{"label":["jetz_scientific_name"],"name":[1],"type":["chr"],"align":["left"]},{"label":["urban_tolerance"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["regional_pools"],"name":[3],"type":["int"],"align":["right"]},{"label":["urban_pools"],"name":[4],"type":["int"],"align":["right"]},{"label":["trophic_niche"],"name":[5],"type":["chr"],"align":["left"]},{"label":["habitat"],"name":[6],"type":["chr"],"align":["left"]},{"label":["habitat_density"],"name":[7],"type":["dbl"],"align":["right"]},{"label":["primary_lifestyle"],"name":[8],"type":["chr"],"align":["left"]},{"label":["terminal_branch_length"],"name":[9],"type":["dbl"],"align":["right"]}],"data":[{"1":"Alectroenas_madagascariensis","2":"0.00000000","3":"1","4":"0","5":"Frugivore","6":"Forest","7":"2","8":"Insessorial","9":"11.59674"},{"1":"Aplopelia_larvata","2":"0.00000000","3":"9","4":"0","5":"Granivore","6":"Forest","7":"2","8":"Terrestrial","9":"12.68716"},{"1":"Caloenas_nicobarica","2":"0.00000000","3":"3","4":"0","5":"Omnivore","6":"Forest","7":"1","8":"Terrestrial","9":"27.97280"},{"1":"Chalcophaps_indica","2":"0.03174603","3":"63","4":"2","5":"Omnivore","6":"Forest","7":"1","8":"Generalist","9":"19.52066"},{"1":"Claravis_godefrida","2":"0.00000000","3":"14","4":"0","5":"Granivore","6":"Forest","7":"1","8":"Terrestrial","9":"4.02064"},{"1":"Claravis_mondetoura","2":"0.00000000","3":"13","4":"0","5":"Granivore","6":"Forest","7":"1","8":"Terrestrial","9":"4.02064"}],"options":{"columns":{"min":{},"max":[10],"total":[9]},"rows":{"min":[10],"max":[10],"total":[6]},"pages":{}}}
+{"columns":[{"label":["jetz_scientific_name"],"name":[1],"type":["chr"],"align":["left"]},{"label":["urban_tolerance"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["regional_pools"],"name":[3],"type":["int"],"align":["right"]},{"label":["urban_pools"],"name":[4],"type":["int"],"align":["right"]},{"label":["trophic_niche"],"name":[5],"type":["chr"],"align":["left"]},{"label":["habitat"],"name":[6],"type":["chr"],"align":["left"]},{"label":["habitat_density"],"name":[7],"type":["dbl"],"align":["right"]},{"label":["primary_lifestyle"],"name":[8],"type":["chr"],"align":["left"]},{"label":["terminal_branch_length"],"name":[9],"type":["dbl"],"align":["right"]}],"data":[{"1":"Alectroenas_madagascariensis","2":"0.0000","3":"1","4":"0","5":"Frugivore","6":"Forest","7":"2","8":"Insessorial","9":"11.60"},{"1":"Aplopelia_larvata","2":"0.0000","3":"9","4":"0","5":"Granivore","6":"Forest","7":"2","8":"Terrestrial","9":"12.69"},{"1":"Caloenas_nicobarica","2":"0.0000","3":"3","4":"0","5":"Omnivore","6":"Forest","7":"1","8":"Terrestrial","9":"27.97"},{"1":"Chalcophaps_indica","2":"0.0317","3":"63","4":"2","5":"Omnivore","6":"Forest","7":"1","8":"Generalist","9":"19.52"},{"1":"Claravis_godefrida","2":"0.0000","3":"14","4":"0","5":"Granivore","6":"Forest","7":"1","8":"Terrestrial","9":"4.02"},{"1":"Claravis_mondetoura","2":"0.0000","3":"13","4":"0","5":"Granivore","6":"Forest","7":"1","8":"Terrestrial","9":"4.02"}],"options":{"columns":{"min":{},"max":[10],"total":[9]},"rows":{"min":[10],"max":[10],"total":[6]},"pages":{}}}
   </script>
 </div>
 <!-- rnb-frame-end -->
@@ -2352,10 +2352,10 @@ head(columbidae_tolerance)</code></pre>
 <pre class="r"><code>columbidae_urban_tolerance_seasonal = columbidae_urban_tolerance_seasonal_tmp[,c(&#39;urban_tolerance&#39;,  &#39;season&#39;)]
 head(columbidae_urban_tolerance_seasonal)</code></pre>
 <!-- rnb-source-end -->
-<!-- rnb-frame-begin eyJtZXRhZGF0YSI6eyJjbGFzc2VzIjpbInRibF9kZiIsInRibCIsImRhdGEuZnJhbWUiXSwibnJvdyI6NiwibmNvbCI6Miwic3VtbWFyeSI6eyJBIHRpYmJsZSI6WyI2IMOXIDIiXX19LCJyZGYiOiJINHNJQUFBQUFBQUFBNjFReTA3RE1CRGN1bkdnbHZxUStJN2tBQmR1Q0FueEFSVkl2U0UzY1V1RVdWZTJJemp5S1h3bmg0WjFZaU9JNElabEo3dGp6NHpINjV2TmhkZ0lBSmhDeGhoTU9aWEE3Kzl1aTBzZ2hKb0paREFMLzFjNmRFWkZBQmUwY3ZoalhMMWZaeXVhdjJ5dGV0NGdlTHBXcnFrVituL3ZmMTZjbzN4V0xwcXpDQzVidTVYNDRJMVdWbUtsSXB3N0paM0JrY0xNbXBjeXFjeUR5aHQ5dXE3N0dGdFZXcnBrbFVCUlN5L0xuU1UrZGNjUjVjUWNmR09RU0N3OExoK1JKM1lFTEZzTU42bUw2ckhGcCtJOEdQVGJ3NWpIT3Y5V3M4R1NkVkdLcDdBSzl3Mm02RnpMcmRLeFdWRGlQbkI1c00zWEN3dENYZW1ObCttY3FJeE9TSjhOanA5cmdUd3NVd0lBQUE9PSJ9 -->
+<!-- rnb-frame-begin eyJtZXRhZGF0YSI6eyJjbGFzc2VzIjpbInRibF9kZiIsInRibCIsImRhdGEuZnJhbWUiXSwibnJvdyI6NiwibmNvbCI6Miwic3VtbWFyeSI6eyJBIHRpYmJsZSI6WyI2IMOXIDIiXX19LCJyZGYiOiJINHNJQUFBQUFBQUFBNjFRd1U3RUlCUjhwYVc2SkxzMjhUdmFnM3Z4Wmt5TUg3RFJaRytHYlZFYkVUWkFvMGMveGUvMHNQWFJnbEdpTndtMDd3M01ETVBtYXJ0bVd3WUFPUlI1QmpuRkV1anR6WFY5RGxBUWJESW9ZT0gvcjNqb0ZBc1BybkNWOE1lNGVMOHNLcHkvYkZVVGJ4WTgzZ2piZDBLNWYrOS9YcHdxL2l4c01DY0JQQm5NanFzN3A2VXdYTFVpd0tVVjNHcVZLQ3lNZm1taXl0S3J2T0ZuSE1lUDFLcVYzRWFyQ0xLT085N2NHK1JqZDBnb1IzcnZlcTJRUlB6ajBvU2NtUVNvQnVWdjB0WHQ0NkNlNnZXWmQ1ajI1N0VNZGZtdEpyTW5HWU1XaldtRmV1aFZ6RTRsM3drWm1oVkduaEkzZTlOL1BURkQxRFpPT3g3UHNWYkxpRXpoNFBBSjh0UVp0RlFDQUFBPSJ9 -->
 <div data-pagedtable="false">
 <script data-pagedtable-source type="application/json">
-{"columns":[{"label":["urban_tolerance"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["season"],"name":[2],"type":["chr"],"align":["left"]}],"data":[{"1":"0.00000000","2":"Resident"},{"1":"0.00000000","2":"Resident"},{"1":"0.00000000","2":"Resident"},{"1":"0.03174603","2":"Resident"},{"1":"0.00000000","2":"Resident"},{"1":"0.00000000","2":"Resident"}],"options":{"columns":{"min":{},"max":[10],"total":[2]},"rows":{"min":[10],"max":[10],"total":[6]},"pages":{}}}
+{"columns":[{"label":["urban_tolerance"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["season"],"name":[2],"type":["chr"],"align":["left"]}],"data":[{"1":"0.0000","2":"Resident"},{"1":"0.0000","2":"Resident"},{"1":"0.0000","2":"Resident"},{"1":"0.0317","2":"Resident"},{"1":"0.0000","2":"Resident"},{"1":"0.0000","2":"Resident"}],"options":{"columns":{"min":{},"max":[10],"total":[2]},"rows":{"min":[10],"max":[10],"total":[6]},"pages":{}}}
   </script>
 </div>
 <!-- rnb-frame-end -->
@@ -2366,12 +2366,12 @@ head(columbidae_urban_tolerance_seasonal)</code></pre>
 <!-- rnb-source-begin eyJkYXRhIjoiYGBgclxua3J1c2thbC50ZXN0KGNvbHVtYmlkYWVfdXJiYW5fdG9sZXJhbmNlX3NlYXNvbmFsJHVyYmFuX3RvbGVyYW5jZSB+IGNvbHVtYmlkYWVfdXJiYW5fdG9sZXJhbmNlX3NlYXNvbmFsJHNlYXNvbilcbmBgYCJ9 -->
 <pre class="r"><code>kruskal.test(columbidae_urban_tolerance_seasonal$urban_tolerance ~ columbidae_urban_tolerance_seasonal$season)</code></pre>
 <!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiXG5cdEtydXNrYWwtV2FsbGlzIHJhbmsgc3VtIHRlc3RcblxuZGF0YTogIGNvbHVtYmlkYWVfdXJiYW5fdG9sZXJhbmNlX3NlYXNvbmFsJHVyYmFuX3RvbGVyYW5jZSBieSBjb2x1bWJpZGFlX3VyYmFuX3RvbGVyYW5jZV9zZWFzb25hbCRzZWFzb25cbktydXNrYWwtV2FsbGlzIGNoaS1zcXVhcmVkID0gMi4xMTYyLCBkZiA9IDMsIHAtdmFsdWUgPSAwLjU0ODdcbiJ9 -->
+<!-- rnb-output-begin eyJkYXRhIjoiXG5cdEtydXNrYWwtV2FsbGlzIHJhbmsgc3VtIHRlc3RcblxuZGF0YTogIGNvbHVtYmlkYWVfdXJiYW5fdG9sZXJhbmNlX3NlYXNvbmFsJHVyYmFuX3RvbGVyYW5jZSBieSBjb2x1bWJpZGFlX3VyYmFuX3RvbGVyYW5jZV9zZWFzb25hbCRzZWFzb25cbktydXNrYWwtV2FsbGlzIGNoaS1zcXVhcmVkID0gMiwgZGYgPSAzLCBwLXZhbHVlID0gMC41XG4ifQ== -->
 <pre><code>
     Kruskal-Wallis rank sum test
 
 data:  columbidae_urban_tolerance_seasonal$urban_tolerance by columbidae_urban_tolerance_seasonal$season
-Kruskal-Wallis chi-squared = 2.1162, df = 3, p-value = 0.5487</code></pre>
+Kruskal-Wallis chi-squared = 2, df = 3, p-value = 0.5</code></pre>
 <!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
@@ -2426,10 +2426,10 @@ P value adjustment method: holm </code></pre>
 <pre class="r"><code>columbidae_urban_tolerance_origin = columbidae_urban_tolerance_origin_tmp[,c(&#39;jetz_scientific_name&#39;, &#39;urban_tolerance&#39;,  &#39;regional_pools&#39;, &#39;urban_pools&#39;, &#39;origin&#39;)]
 head(columbidae_urban_tolerance_origin)</code></pre>
 <!-- rnb-source-end -->
-<!-- rnb-frame-begin eyJtZXRhZGF0YSI6eyJjbGFzc2VzIjpbImdyb3VwZWRfZGYiLCJ0YmxfZGYiLCJ0YmwiLCJkYXRhLmZyYW1lIl0sIm5yb3ciOjYsIm5jb2wiOjUsInN1bW1hcnkiOnsiQSB0aWJibGUiOlsiNiDDlyA1Il0sIkdyb3VwcyI6WyJqZXR6X3NjaWVudGlmaWNfbmFtZSBbNl0iXX19LCJyZGYiOiJINHNJQUFBQUFBQUFBNjFTejAvQ01CUXVZNXNCQTZKNDlGOWdGMlBpelJDTVJ3OUdFMjdMb3l0UUxlM1NGakNlL0ZQOE96MkFiMXVMYzlHYnpkcTlmdC9YMS9lakQ3ZlR5KzYwU3docGt6QUlTRHRDazBSUGozZWphNElJYmxva0pKM2kvNHFpWWNIaUhPQ01IWEV4Rm94YXJaZ0VrNjRnZ3dVWUNwb3phYmh4bXROeExsVE9CSWRVZ042QUJVY01KeUNxazVKVE5jTmoxRk5ua3lVSXF2SWw1Q2JsTXFzejZBUTIzS1FMbGJHNTV0bTNPOCtzbE15WVZXc05DUGZMY1A4WU54L2pjSURmTDFUUG5Xdmg3SlJGUXJuejE2dng5UkhVN0hxWjRudXdmTVArYWZlek54RVZZSXk3MElQZERNdWN6RFdzbXZLT1Z0dEVJbTVjRHNFN0x2djkvclBwMTRzR1pkOHI4UHlaMmJmVVVHeXc1WE5PMDBMa3VKTzFub0ZNclJKTWc2UWU3bXUyNEVxQ1NIT2xoSDhVeDVXNERzVks4d1dYYU8wYW9SeXAzS0lMRENhb1A4TEQ2OVFONEdRdGk3aXlFVjJ1NWN2b3FpaUk2NlR2Yk10MXo5dFJkV1c0YnlRY000a3grVndpQVRNbURvbXBiVm1qSk5kY1dsOTVSRTFpbFFXdjYxTE0wU0ZsYm1UM0JTL1JGVWw3QXdBQSJ9 -->
+<!-- rnb-frame-begin eyJtZXRhZGF0YSI6eyJjbGFzc2VzIjpbImdyb3VwZWRfZGYiLCJ0YmxfZGYiLCJ0YmwiLCJkYXRhLmZyYW1lIl0sIm5yb3ciOjYsIm5jb2wiOjUsInN1bW1hcnkiOnsiQSB0aWJibGUiOlsiNiDDlyA1Il0sIkdyb3VwcyI6WyJqZXR6X3NjaWVudGlmaWNfbmFtZSBbNl0iXX19LCJyZGYiOiJINHNJQUFBQUFBQUFBNjFTejAvQ01CVHV4allEQnB6aTBYOEJMc1RFbXlFWWp4Nk1KdHlXUjFlZ1d0cWxMV2c4K2FmNGQzb0EzMGFMYzlHYnpkcTlmdC9YMS9lajl6ZlRVV2ZhSVlTMFNOUUtTQ3RHazhTUEQ3ZURLMEtpRURjQmlVaTcvTCtpcUYreU9GT2NpU011eG9KUnF4V1RZTElWNUxBQVEwRnpKZzAzVG5NNkxvUXFtT0NRQ2RBYnNPQ0kvZ1RFL3FUa1ZNM3dHUFhVMldRSmdxcGlDWVhKdU16ckREcUJEVGZaUXVWc3Jubis3YzR6S3lWelp0VmFBOEs5S3R3L3h2WEhPRXJ4KzRYcXVuTUJ6blpWSkpRN2Y5MGFYeDloemE2WEtia0R5emZzbjNZL2V4TlRBY2E0Q3ozWXliSE13N21HVlZQZTF1cGxLQkUzTG9md0haZmRidmZaOU90RmFkWDNQWGoreE94YlppZzIyUEk1cDFrcGN0ekpXczlBWmxZSnBrRlNEL2MwVzNBbFFXU0ZVc0kvaXVPOXVBNGxTdk1GbDJodEc2RWNxY0tpQ3d3bXJEL0N3K3ZVRFNCZHl6S3VmRUNYYS9rOEdGMldGWEd0OUswTlhQdThIZS92akhhTmpCTW1NU2lmVEN4Z3hzUWhNL1ZTRldsWWFDNnRMejJpWm1pVkJhL3JVRXpTSVZWeVpQc0ZzSmJMTzN3REFBQT0ifQ== -->
 <div data-pagedtable="false">
 <script data-pagedtable-source type="application/json">
-{"columns":[{"label":["jetz_scientific_name"],"name":[1],"type":["chr"],"align":["left"]},{"label":["urban_tolerance"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["regional_pools"],"name":[3],"type":["int"],"align":["right"]},{"label":["urban_pools"],"name":[4],"type":["int"],"align":["right"]},{"label":["origin"],"name":[5],"type":["chr"],"align":["left"]}],"data":[{"1":"Alectroenas_madagascariensis","2":"0.00000000","3":"1","4":"0","5":"Native"},{"1":"Aplopelia_larvata","2":"0.00000000","3":"9","4":"0","5":"Native"},{"1":"Caloenas_nicobarica","2":"0.00000000","3":"3","4":"0","5":"Native"},{"1":"Chalcophaps_indica","2":"0.03174603","3":"63","4":"2","5":"Native"},{"1":"Claravis_godefrida","2":"0.00000000","3":"14","4":"0","5":"Native"},{"1":"Claravis_mondetoura","2":"0.00000000","3":"13","4":"0","5":"Native"}],"options":{"columns":{"min":{},"max":[10],"total":[5]},"rows":{"min":[10],"max":[10],"total":[6]},"pages":{}}}
+{"columns":[{"label":["jetz_scientific_name"],"name":[1],"type":["chr"],"align":["left"]},{"label":["urban_tolerance"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["regional_pools"],"name":[3],"type":["int"],"align":["right"]},{"label":["urban_pools"],"name":[4],"type":["int"],"align":["right"]},{"label":["origin"],"name":[5],"type":["chr"],"align":["left"]}],"data":[{"1":"Alectroenas_madagascariensis","2":"0.0000","3":"1","4":"0","5":"Native"},{"1":"Aplopelia_larvata","2":"0.0000","3":"9","4":"0","5":"Native"},{"1":"Caloenas_nicobarica","2":"0.0000","3":"3","4":"0","5":"Native"},{"1":"Chalcophaps_indica","2":"0.0317","3":"63","4":"2","5":"Native"},{"1":"Claravis_godefrida","2":"0.0000","3":"14","4":"0","5":"Native"},{"1":"Claravis_mondetoura","2":"0.0000","3":"13","4":"0","5":"Native"}],"options":{"columns":{"min":{},"max":[10],"total":[5]},"rows":{"min":[10],"max":[10],"total":[6]},"pages":{}}}
   </script>
 </div>
 <!-- rnb-frame-end -->
@@ -2441,10 +2441,10 @@ head(columbidae_urban_tolerance_origin)</code></pre>
 <!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuY29sdW1iaWRhZV91cmJhbl90b2xlcmFuY2Vfb3JpZ2luW2NvbHVtYmlkYWVfdXJiYW5fdG9sZXJhbmNlX29yaWdpbiRvcmlnaW4gPT0gJ0ludHJvZHVjZWQnLF1cbmBgYCJ9 -->
 <pre class="r"><code>columbidae_urban_tolerance_origin[columbidae_urban_tolerance_origin$origin == &#39;Introduced&#39;,]</code></pre>
 <!-- rnb-source-end -->
-<!-- rnb-frame-begin eyJtZXRhZGF0YSI6eyJjbGFzc2VzIjpbImdyb3VwZWRfZGYiLCJ0YmxfZGYiLCJ0YmwiLCJkYXRhLmZyYW1lIl0sIm5yb3ciOjYsIm5jb2wiOjUsInN1bW1hcnkiOnsiQSB0aWJibGUiOlsiNiDDlyA1Il0sIkdyb3VwcyI6WyJqZXR6X3NjaWVudGlmaWNfbmFtZSBbNl0iXX19LCJyZGYiOiJINHNJQUFBQUFBQUFBN1ZTeTA3RE1CQjBIeWswMEljRUVvaC9hQzlJaUZzUElCQTNSS25VVytTNjI5VGcyc0YyS09MRVQvRmZuRGswYkZJYjB0eFp5ZDN0ek1qWjJmWEQ5ZlE4bklhRWtBWnAxdXVrRVdCSmdzbmp6ZUNTSUlKL2FxUkoybmwrUTlGUnp1THA0Mms1b25PbFJMcWEwVWp3VjA0ZDJMOEZsWURnTkRKV2MybzlmaksyUEY1UjYwaTI1QktrNGNiUlo3dTBBUWt4RldYRjZkaHFTTHhBS3dNcTF0d0EvYnVoeEZ0TjVVc0tNNm81bzhoMjg3NUhYNlFJbjZzeCtwd1VVWUk2aFY5Qzd2SGtROWt2QmtQSW9jdFYza2ZONWZLOHdqdHB0WnFuRE9iL2lPd3VMMkNDR3VNYThXQTR4NzBNRjVxdW9DSnZhN1VlU3NTTjgxYi93SjhzeTc2cjkzcFJ2M2dZVy9ENENleDdaQmdIYWZtQ3N5Z1hPYTZYNmhtVmtWVUNjRFhNdzEwTk1WZVNpaWhSU3ZoZEgyekZaYWlsTkkrNXhHcFRhV1ZQSlJhdndHYnE1VmY2KzN4MUJlaWxNdTlyUG1ETFZENFBMdktCbERiV2NYV3JWQWZiVHpheml1RVdTT3pKZXdrRW5ZSDROYWJXeFl5R2llYlMrc2tqYW9aV1dlcDFJVU9QRGltOGtjMFBqM0hHNFp3REFBQT0ifQ== -->
+<!-- rnb-frame-begin eyJtZXRhZGF0YSI6eyJjbGFzc2VzIjpbImdyb3VwZWRfZGYiLCJ0YmxfZGYiLCJ0YmwiLCJkYXRhLmZyYW1lIl0sIm5yb3ciOjYsIm5jb2wiOjUsInN1bW1hcnkiOnsiQSB0aWJibGUiOlsiNiDDlyA1Il0sIkdyb3VwcyI6WyJqZXR6X3NjaWVudGlmaWNfbmFtZSBbNl0iXX19LCJyZGYiOiJINHNJQUFBQUFBQUFBN1ZTVFU4Q01SQXRINHV5Q3BKb292RS93SVhFZU9PZzBYZ3pJZ20zVFNuRFVpM3QybmJWZVBKUCtiODhlMkNkWFZwYzl1NGtaWWIzWHJyelp2cHdQUjJHMDVBUTBpRE5SbzAwQWl4Sk1IbTg2VjhTMHF6am54cHBrbmFlMzFGMG5MTjRlbmhhanVoY0taR3VaalFTL0pWVEIvWnVRU1VnT0kyTTFaeGFqNStPTFk5WDFEcVNMYmtFYWJoeDlQa3ViVUJDVEVWWmNUYTJHaEl2ME1xQWlqVTNRUDl1S1BGV1UvbVN3b3hxemlpeTNienYwVGNwd3VkcWpMNG1SWlNnVHVHWGtIczgrVkQyaThFUWN1aHlsZmRSYzdrOHIvQk9XcTNtS1lQNVB5Szd5d3VZb01hNFJqd1l6bkV2ZzRXbUs2akkyMXE5RFNUaXhubXJmK0pQbG1VLzFYdTlxRmM4akExNDhnVDJJektNZzdSOHdWbVVpeHgzbE9vWmxaRlZBbkExek1OZERURlhrb29vVVVyNFhSOXN4R1dvcFRTUHVjUnFYV2xsVHlVV3I4Qm02dVZYdW4yK3VnTDBVcG4zTmUrelpTcWYrOE9MZkNLbGxYVmMzU3JWd2VhYnpheml1QVVTbS9KbUFrRm5JTGJPMUZzeHBFR2l1YlIrOUlpYWdWV1dlbDNJMEtSRENuTmsvUXZQWWkzNW5RTUFBQT09In0= -->
 <div data-pagedtable="false">
 <script data-pagedtable-source type="application/json">
-{"columns":[{"label":["jetz_scientific_name"],"name":[1],"type":["chr"],"align":["left"]},{"label":["urban_tolerance"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["regional_pools"],"name":[3],"type":["int"],"align":["right"]},{"label":["urban_pools"],"name":[4],"type":["int"],"align":["right"]},{"label":["origin"],"name":[5],"type":["chr"],"align":["left"]}],"data":[{"1":"Columba_livia","2":"1.00000000","3":"80","4":"80","5":"Introduced"},{"1":"Geopelia_striata","2":"1.00000000","3":"2","4":"2","5":"Introduced"},{"1":"Stigmatopelia_chinensis","2":"0.00000000","3":"8","4":"0","5":"Introduced"},{"1":"Stigmatopelia_senegalensis","2":"0.00000000","3":"1","4":"0","5":"Introduced"},{"1":"Streptopelia_roseogrisea","2":"0.08333333","3":"12","4":"1","5":"Introduced"},{"1":"Streptopelia_tranquebarica","2":"0.00000000","3":"1","4":"0","5":"Introduced"}],"options":{"columns":{"min":{},"max":[10],"total":[5]},"rows":{"min":[10],"max":[10],"total":[6]},"pages":{}}}
+{"columns":[{"label":["jetz_scientific_name"],"name":[1],"type":["chr"],"align":["left"]},{"label":["urban_tolerance"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["regional_pools"],"name":[3],"type":["int"],"align":["right"]},{"label":["urban_pools"],"name":[4],"type":["int"],"align":["right"]},{"label":["origin"],"name":[5],"type":["chr"],"align":["left"]}],"data":[{"1":"Columba_livia","2":"1.0000","3":"80","4":"80","5":"Introduced"},{"1":"Geopelia_striata","2":"1.0000","3":"2","4":"2","5":"Introduced"},{"1":"Stigmatopelia_chinensis","2":"0.0000","3":"8","4":"0","5":"Introduced"},{"1":"Stigmatopelia_senegalensis","2":"0.0000","3":"1","4":"0","5":"Introduced"},{"1":"Streptopelia_roseogrisea","2":"0.0833","3":"12","4":"1","5":"Introduced"},{"1":"Streptopelia_tranquebarica","2":"0.0000","3":"1","4":"0","5":"Introduced"}],"options":{"columns":{"min":{},"max":[10],"total":[5]},"rows":{"min":[10],"max":[10],"total":[6]},"pages":{}}}
   </script>
 </div>
 <!-- rnb-frame-end -->
@@ -2457,10 +2457,10 @@ head(columbidae_urban_tolerance_origin)</code></pre>
 <pre class="r"><code>introduced_species_names = columbidae_urban_tolerance_origin$jetz_scientific_name[columbidae_urban_tolerance_origin$origin == &#39;Introduced&#39;]
 columbidae_tolerance[columbidae_tolerance$jetz_scientific_name %in% introduced_species_names,]</code></pre>
 <!-- rnb-source-end -->
-<!-- rnb-frame-begin eyJtZXRhZGF0YSI6eyJjbGFzc2VzIjpbInRibF9kZiIsInRibCIsImRhdGEuZnJhbWUiXSwibnJvdyI6NiwibmNvbCI6OSwic3VtbWFyeSI6eyJBIHRpYmJsZSI6WyI2IMOXIDkiXX19LCJyZGYiOiJINHNJQUFBQUFBQUFBN1ZVTVc4VE1SUjIweWJwWFpTMHFCVWdXS2pFU0xJd3RJSWhKNEZhR0xxUUlqb2duWHgzVHM3Z3N3K2ZMeVZNUlVKSUxBejhBamFrL29heU1GWmlabU5uQXlHQkJGTEQ4OFZPMDFNSGxscngyZjdlcy8yK3orL2x3ZDNkbSs2dWl4Q2FSd3VWQ3BxdndoUlZIKzVzdGpjUUlMQ1lRd3ZJMGVOemNGcUJpVjRzUTY4WlEvT09ZSGtTWUovUkljVUdYTjRpSWlXTVlqOVRrbUpsOFVzOVJRY0pWc1lZeHBRVG50SE1tSytjTm1lRWt3Rm1zeDZYZTBxUzFEcElrUkV4a0RRaitPU0VHYnVTbUQvTFNZQWxEVEZZV3pydTduZFVORHVXVy9mVC9ldnY0TmM5RXR2ZlBxNS8wQndMdmdoOWhkNkEvaFo2WXM1N2ZJYmROaTNnU2trdlp3dUNva01oeWZrQXAyOXIzY3NUeks5dGk0ajJLWWtNdXZoSWlJaGgvcjlycHhmTFBEalR3WWpxTFU0WWU0YjVkRjNHVDhTWkRiT3hRNlFrUmE2dzg0WnNHdno2T1F3T2JyLzMzTitIN2Q3cm9YZjFjUC9WMGNFYk8zYi92dnh5WTIxenphdm5uMy9jV2gyVjZxSEtjVUl5UThNeDRPb1RvbDc0V1VnSlY2QjM2R3NuWTF2S1pZQzVyd1FqOEZhaGhWdVNES2pnbVBtcEVNeW1lV1BpUEFzMWxSUnByTStrWVd4MzEyTWNVSVdWdmNNcy9ValhqQm9aK0VJcWFZTGxDRXEwRHlxTW1OMStVUkdaVUgxNW9HT0tmYWkxZ1lwTFZCMHA5anFXcms3MXlqNTh4dVB4bjdJbUljT1oxY1NDYmdUbDMrbExyUVJDeDZVdGRaRXFvQStiS3JwUXFxWE5jN0lFTE9WY1J4SzF3empuVDl2citvTENQR2xOTTYvTnpKM0psWld4T2FwcWpxb0JWL2o3c2JFekhCQTJmUlN4VnhEdWdITGNxdXNDbW5XVVVOTzhja040SDRNVTNORHhQNWphejkxVEJRQUEifQ== -->
+<!-- rnb-frame-begin eyJtZXRhZGF0YSI6eyJjbGFzc2VzIjpbInRibF9kZiIsInRibCIsImRhdGEuZnJhbWUiXSwibnJvdyI6NiwibmNvbCI6OSwic3VtbWFyeSI6eyJBIHRpYmJsZSI6WyI2IMOXIDkiXX19LCJyZGYiOiJINHNJQUFBQUFBQUFBN1ZVdjI4VE1SUjJmdmN1U2docUJRZ1dLakdTTEIxYXdaQklvQmFHTHFTSURrZ24zNTJUTS9qczRQT2xoS2xJQ0ltRmdiK0FEYWwvUTFrWUt6R3pzYk9Ca0VBQ3FlSDVZcWZwcVFOTHJmaHNmKy9aZnQvbjkvTGc3dTZhdStzaWhFcW9YQ3FnVWdXbXFQSndaN085Z1ZDNUNJc0NLaU5IajgvQmFSa21ldEdDWGpXR3hoM0IwdGpISHFOamlnM1kyaUppUkJqRlhxSWt4Y3JpbC91S0RtT3NqREdJS0NjOG9Za3hYejF0VGdnblE4d1dQYTcwbFNRajZ5QkZRc1JRMG9UZ2t4TVc3RXBpL2l3bFBwWTB3R0J0NnJpNzMxSFc3Smh2M1UvM2I3eURYL2RJYkgvN3VQNUJjOHo0SXZRVmVoMzZXK2l4T2UveEdYYmJ0SURMT2IyY0xRaUtqb1VrNXdPY3ZxMTVMNDB4djc0dFFqcWdKRFRvMGlNaFFvYjUvNjZkZmlSVC8wd0hJMnB2YWNhNFo1alAxM244Ukp6Rk1PczdSRXFTNVFvN2I4aW13YStmWS8vZzl2dWUrL3V3M1g4OTdsMDczSDkxZFBER2p0Mi9MNy9jWE4xYzdkWFN6ejl1clV4eTlWRGhPQ2FKb2VFWWNPVUpVUys4SktDRUs5QTc4TFNUc1YxSXBZKzVwd1FqOEZhQmhadVNES25nbUhraklaaE44L3JNZVJGcUtDbEdrVDZUQnBIZFhZdXdUeFZXOWc2ejlFSmRNMnBpNElzalNXTXNKMUNpQTFCaHd1ejJTNHJJbU9yTGZSMVQ1RUd0RFZXVW8rcElzZGV4ZEhXcUYvZmhNNTFPLytRMUNSaE9yQ1lXZEVNby84NUFhaVVRT3M1dHFZbVJBdnF3cWFnTHBaTGJYSkE1b0pWeUhVbllEcUtVUDIydnJlc2JNdnVzTmN5OHVqQjNabmNXcCthc2lqbXJDbVRoLzhjR3o3QlAyUHhWeEY3R3VBUFNjU3V2QzJqU1VVTE5FOHNONElFTWtwRkR4LzhBN1d4RkJsUUZBQUE9In0= -->
 <div data-pagedtable="false">
 <script data-pagedtable-source type="application/json">
-{"columns":[{"label":["jetz_scientific_name"],"name":[1],"type":["chr"],"align":["left"]},{"label":["urban_tolerance"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["regional_pools"],"name":[3],"type":["int"],"align":["right"]},{"label":["urban_pools"],"name":[4],"type":["int"],"align":["right"]},{"label":["trophic_niche"],"name":[5],"type":["chr"],"align":["left"]},{"label":["habitat"],"name":[6],"type":["chr"],"align":["left"]},{"label":["habitat_density"],"name":[7],"type":["dbl"],"align":["right"]},{"label":["primary_lifestyle"],"name":[8],"type":["chr"],"align":["left"]},{"label":["terminal_branch_length"],"name":[9],"type":["dbl"],"align":["right"]}],"data":[{"1":"Columba_livia","2":"1.0000000","3":"222","4":"222","5":"Granivore","6":"Human Modified","7":"3","8":"Terrestrial","9":"1.434439"},{"1":"Geopelia_striata","2":"1.0000000","3":"11","4":"11","5":"Granivore","6":"Woodland","7":"2","8":"Terrestrial","9":"3.370964"},{"1":"Stigmatopelia_chinensis","2":"0.0000000","3":"142","4":"0","5":"Granivore","6":"Woodland","7":"3","8":"Terrestrial","9":"6.934084"},{"1":"Stigmatopelia_senegalensis","2":"0.0000000","3":"109","4":"0","5":"Granivore","6":"Woodland","7":"3","8":"Terrestrial","9":"6.934084"},{"1":"Streptopelia_roseogrisea","2":"0.1428571","3":"14","4":"2","5":"Granivore","6":"Shrubland","7":"2","8":"Terrestrial","9":"1.719199"},{"1":"Streptopelia_tranquebarica","2":"0.2065217","3":"92","4":"19","5":"Granivore","6":"Woodland","7":"2","8":"Terrestrial","9":"2.932522"}],"options":{"columns":{"min":{},"max":[10],"total":[9]},"rows":{"min":[10],"max":[10],"total":[6]},"pages":{}}}
+{"columns":[{"label":["jetz_scientific_name"],"name":[1],"type":["chr"],"align":["left"]},{"label":["urban_tolerance"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["regional_pools"],"name":[3],"type":["int"],"align":["right"]},{"label":["urban_pools"],"name":[4],"type":["int"],"align":["right"]},{"label":["trophic_niche"],"name":[5],"type":["chr"],"align":["left"]},{"label":["habitat"],"name":[6],"type":["chr"],"align":["left"]},{"label":["habitat_density"],"name":[7],"type":["dbl"],"align":["right"]},{"label":["primary_lifestyle"],"name":[8],"type":["chr"],"align":["left"]},{"label":["terminal_branch_length"],"name":[9],"type":["dbl"],"align":["right"]}],"data":[{"1":"Columba_livia","2":"1.000","3":"222","4":"222","5":"Granivore","6":"Human Modified","7":"3","8":"Terrestrial","9":"1.43"},{"1":"Geopelia_striata","2":"1.000","3":"11","4":"11","5":"Granivore","6":"Woodland","7":"2","8":"Terrestrial","9":"3.37"},{"1":"Stigmatopelia_chinensis","2":"0.000","3":"142","4":"0","5":"Granivore","6":"Woodland","7":"3","8":"Terrestrial","9":"6.93"},{"1":"Stigmatopelia_senegalensis","2":"0.000","3":"109","4":"0","5":"Granivore","6":"Woodland","7":"3","8":"Terrestrial","9":"6.93"},{"1":"Streptopelia_roseogrisea","2":"0.143","3":"14","4":"2","5":"Granivore","6":"Shrubland","7":"2","8":"Terrestrial","9":"1.72"},{"1":"Streptopelia_tranquebarica","2":"0.207","3":"92","4":"19","5":"Granivore","6":"Woodland","7":"2","8":"Terrestrial","9":"2.93"}],"options":{"columns":{"min":{},"max":[10],"total":[9]},"rows":{"min":[10],"max":[10],"total":[6]},"pages":{}}}
   </script>
 </div>
 <!-- rnb-frame-end -->
@@ -2471,12 +2471,12 @@ columbidae_tolerance[columbidae_tolerance$jetz_scientific_name %in% introduced_s
 <!-- rnb-source-begin eyJkYXRhIjoiYGBgclxud2lsY294LnRlc3QoY29sdW1iaWRhZV91cmJhbl90b2xlcmFuY2Vfb3JpZ2luJHVyYmFuX3RvbGVyYW5jZSB+IGNvbHVtYmlkYWVfdXJiYW5fdG9sZXJhbmNlX29yaWdpbiRvcmlnaW4pXG5gYGAifQ== -->
 <pre class="r"><code>wilcox.test(columbidae_urban_tolerance_origin$urban_tolerance ~ columbidae_urban_tolerance_origin$origin)</code></pre>
 <!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiXG5cdFdpbGNveG9uIHJhbmsgc3VtIHRlc3Qgd2l0aCBjb250aW51aXR5IGNvcnJlY3Rpb25cblxuZGF0YTogIGNvbHVtYmlkYWVfdXJiYW5fdG9sZXJhbmNlX29yaWdpbiR1cmJhbl90b2xlcmFuY2UgYnkgY29sdW1iaWRhZV91cmJhbl90b2xlcmFuY2Vfb3JpZ2luJG9yaWdpblxuVyA9IDU2MSwgcC12YWx1ZSA9IDAuNDM0NVxuYWx0ZXJuYXRpdmUgaHlwb3RoZXNpczogdHJ1ZSBsb2NhdGlvbiBzaGlmdCBpcyBub3QgZXF1YWwgdG8gMFxuIn0= -->
+<!-- rnb-output-begin eyJkYXRhIjoiXG5cdFdpbGNveG9uIHJhbmsgc3VtIHRlc3Qgd2l0aCBjb250aW51aXR5IGNvcnJlY3Rpb25cblxuZGF0YTogIGNvbHVtYmlkYWVfdXJiYW5fdG9sZXJhbmNlX29yaWdpbiR1cmJhbl90b2xlcmFuY2UgYnkgY29sdW1iaWRhZV91cmJhbl90b2xlcmFuY2Vfb3JpZ2luJG9yaWdpblxuVyA9IDU2MSwgcC12YWx1ZSA9IDAuNFxuYWx0ZXJuYXRpdmUgaHlwb3RoZXNpczogdHJ1ZSBsb2NhdGlvbiBzaGlmdCBpcyBub3QgZXF1YWwgdG8gMFxuIn0= -->
 <pre><code>
     Wilcoxon rank sum test with continuity correction
 
 data:  columbidae_urban_tolerance_origin$urban_tolerance by columbidae_urban_tolerance_origin$origin
-W = 561, p-value = 0.4345
+W = 561, p-value = 0.4
 alternative hypothesis: true location shift is not equal to 0</code></pre>
 <!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
@@ -2492,8 +2492,8 @@ alternative hypothesis: true location shift is not equal to 0</code></pre>
 <!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubWVhbihjb2x1bWJpZGFlX3VyYmFuX3RvbGVyYW5jZV9vcmlnaW4kdXJiYW5fdG9sZXJhbmNlW2NvbHVtYmlkYWVfdXJiYW5fdG9sZXJhbmNlX29yaWdpbiRvcmlnaW4gPT0gJ05hdGl2ZSddKVxuYGBgIn0= -->
 <pre class="r"><code>mean(columbidae_urban_tolerance_origin$urban_tolerance[columbidae_urban_tolerance_origin$origin == &#39;Native&#39;])</code></pre>
 <!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDAuMTk1NzY4OVxuIn0= -->
-<pre><code>[1] 0.1957689</code></pre>
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDAuMTk2XG4ifQ== -->
+<pre><code>[1] 0.196</code></pre>
 <!-- rnb-output-end -->
 <!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucHJpbnQoXCJNZWFuIHRvbGVybmFjZSBvZiBpbnRyb2R1Y2VkIHNwZWNpZXNcIilcbmBgYCJ9 -->
 <pre class="r"><code>print(&quot;Mean tolernace of introduced species&quot;)</code></pre>
@@ -2504,8 +2504,8 @@ alternative hypothesis: true location shift is not equal to 0</code></pre>
 <!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubWVhbihjb2x1bWJpZGFlX3VyYmFuX3RvbGVyYW5jZV9vcmlnaW4kdXJiYW5fdG9sZXJhbmNlW2NvbHVtYmlkYWVfdXJiYW5fdG9sZXJhbmNlX29yaWdpbiRvcmlnaW4gIT0gJ05hdGl2ZSddKVxuYGBgIn0= -->
 <pre class="r"><code>mean(columbidae_urban_tolerance_origin$urban_tolerance[columbidae_urban_tolerance_origin$origin != &#39;Native&#39;])</code></pre>
 <!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDAuMzQ3MjIyMlxuIn0= -->
-<pre><code>[1] 0.3472222</code></pre>
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDAuMzQ3XG4ifQ== -->
+<pre><code>[1] 0.347</code></pre>
 <!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
@@ -2517,12 +2517,12 @@ alternative hypothesis: true location shift is not equal to 0</code></pre>
 <!-- rnb-source-begin eyJkYXRhIjoiYGBgclxua3J1c2thbC50ZXN0KGNvbHVtYmlkYWVfdG9sZXJhbmNlJHVyYmFuX3RvbGVyYW5jZSB+IGNvbHVtYmlkYWVfdG9sZXJhbmNlJGhhYml0YXQpXG5gYGAifQ== -->
 <pre class="r"><code>kruskal.test(columbidae_tolerance$urban_tolerance ~ columbidae_tolerance$habitat)</code></pre>
 <!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiXG5cdEtydXNrYWwtV2FsbGlzIHJhbmsgc3VtIHRlc3RcblxuZGF0YTogIGNvbHVtYmlkYWVfdG9sZXJhbmNlJHVyYmFuX3RvbGVyYW5jZSBieSBjb2x1bWJpZGFlX3RvbGVyYW5jZSRoYWJpdGF0XG5LcnVza2FsLVdhbGxpcyBjaGktc3F1YXJlZCA9IDUxLjIwNywgZGYgPSA2LCBwLXZhbHVlID0gMi42OTJlLTA5XG4ifQ== -->
+<!-- rnb-output-begin eyJkYXRhIjoiXG5cdEtydXNrYWwtV2FsbGlzIHJhbmsgc3VtIHRlc3RcblxuZGF0YTogIGNvbHVtYmlkYWVfdG9sZXJhbmNlJHVyYmFuX3RvbGVyYW5jZSBieSBjb2x1bWJpZGFlX3RvbGVyYW5jZSRoYWJpdGF0XG5LcnVza2FsLVdhbGxpcyBjaGktc3F1YXJlZCA9IDUxLCBkZiA9IDYsIHAtdmFsdWUgPSAzZS0wOVxuIn0= -->
 <pre><code>
     Kruskal-Wallis rank sum test
 
 data:  columbidae_tolerance$urban_tolerance by columbidae_tolerance$habitat
-Kruskal-Wallis chi-squared = 51.207, df = 6, p-value = 2.692e-09</code></pre>
+Kruskal-Wallis chi-squared = 51, df = 6, p-value = 3e-09</code></pre>
 <!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
@@ -2531,19 +2531,19 @@ Kruskal-Wallis chi-squared = 51.207, df = 6, p-value = 2.692e-09</code></pre>
 <!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucGFpcndpc2Uud2lsY294LnRlc3QoY29sdW1iaWRhZV90b2xlcmFuY2UkdXJiYW5fdG9sZXJhbmNlLCBjb2x1bWJpZGFlX3RvbGVyYW5jZSRoYWJpdGF0KVxuYGBgIn0= -->
 <pre class="r"><code>pairwise.wilcox.test(columbidae_tolerance$urban_tolerance, columbidae_tolerance$habitat)</code></pre>
 <!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiXG5cdFBhaXJ3aXNlIGNvbXBhcmlzb25zIHVzaW5nIFdpbGNveG9uIHJhbmsgc3VtIHRlc3Qgd2l0aCBjb250aW51aXR5IGNvcnJlY3Rpb24gXG5cbmRhdGE6ICBjb2x1bWJpZGFlX3RvbGVyYW5jZSR1cmJhbl90b2xlcmFuY2UgYW5kIGNvbHVtYmlkYWVfdG9sZXJhbmNlJGhhYml0YXQgXG5cbiAgICAgICAgICAgICAgIERlc2VydCBGb3Jlc3QgIEdyYXNzbGFuZCBIdW1hbiBNb2RpZmllZCBSb2NrICBTaHJ1YmxhbmRcbkZvcmVzdCAgICAgICAgIDEuMDAwICAtICAgICAgIC0gICAgICAgICAtICAgICAgICAgICAgICAtICAgICAtICAgICAgICBcbkdyYXNzbGFuZCAgICAgIDEuMDAwICAxLjAwMCAgIC0gICAgICAgICAtICAgICAgICAgICAgICAtICAgICAtICAgICAgICBcbkh1bWFuIE1vZGlmaWVkIDEuMDAwICA2LjllLTA3IDEuMDAwICAgICAtICAgICAgICAgICAgICAtICAgICAtICAgICAgICBcblJvY2sgICAgICAgICAgIDEuMDAwICAxLjAwMCAgIDEuMDAwICAgICAwLjc1OSAgICAgICAgICAtICAgICAtICAgICAgICBcblNocnVibGFuZCAgICAgIDEuMDAwICAxLjRlLTA2IDEuMDAwICAgICAwLjc4MSAgICAgICAgICAxLjAwMCAtICAgICAgICBcbldvb2RsYW5kICAgICAgIDEuMDAwICAwLjAzMyAgIDEuMDAwICAgICAwLjAxOCAgICAgICAgICAxLjAwMCAxLjAwMCAgICBcblxuUCB2YWx1ZSBhZGp1c3RtZW50IG1ldGhvZDogaG9sbSBcbiJ9 -->
+<!-- rnb-output-begin eyJkYXRhIjoiXG5cdFBhaXJ3aXNlIGNvbXBhcmlzb25zIHVzaW5nIFdpbGNveG9uIHJhbmsgc3VtIHRlc3Qgd2l0aCBjb250aW51aXR5IGNvcnJlY3Rpb24gXG5cbmRhdGE6ICBjb2x1bWJpZGFlX3RvbGVyYW5jZSR1cmJhbl90b2xlcmFuY2UgYW5kIGNvbHVtYmlkYWVfdG9sZXJhbmNlJGhhYml0YXQgXG5cbiAgICAgICAgICAgICAgIERlc2VydCBGb3Jlc3QgR3Jhc3NsYW5kIEh1bWFuIE1vZGlmaWVkIFJvY2sgU2hydWJsYW5kXG5Gb3Jlc3QgICAgICAgICAxLjAwICAgLSAgICAgIC0gICAgICAgICAtICAgICAgICAgICAgICAtICAgIC0gICAgICAgIFxuR3Jhc3NsYW5kICAgICAgMS4wMCAgIDEuMDAgICAtICAgICAgICAgLSAgICAgICAgICAgICAgLSAgICAtICAgICAgICBcbkh1bWFuIE1vZGlmaWVkIDEuMDAgICA3ZS0wNyAgMS4wMCAgICAgIC0gICAgICAgICAgICAgIC0gICAgLSAgICAgICAgXG5Sb2NrICAgICAgICAgICAxLjAwICAgMS4wMCAgIDEuMDAgICAgICAwLjc2ICAgICAgICAgICAtICAgIC0gICAgICAgIFxuU2hydWJsYW5kICAgICAgMS4wMCAgIDFlLTA2ICAxLjAwICAgICAgMC43OCAgICAgICAgICAgMS4wMCAtICAgICAgICBcbldvb2RsYW5kICAgICAgIDEuMDAgICAwLjAzICAgMS4wMCAgICAgIDAuMDIgICAgICAgICAgIDEuMDAgMS4wMCAgICAgXG5cblAgdmFsdWUgYWRqdXN0bWVudCBtZXRob2Q6IGhvbG0gXG4ifQ== -->
 <pre><code>
     Pairwise comparisons using Wilcoxon rank sum test with continuity correction 
 
 data:  columbidae_tolerance$urban_tolerance and columbidae_tolerance$habitat 
 
-               Desert Forest  Grassland Human Modified Rock  Shrubland
-Forest         1.000  -       -         -              -     -        
-Grassland      1.000  1.000   -         -              -     -        
-Human Modified 1.000  6.9e-07 1.000     -              -     -        
-Rock           1.000  1.000   1.000     0.759          -     -        
-Shrubland      1.000  1.4e-06 1.000     0.781          1.000 -        
-Woodland       1.000  0.033   1.000     0.018          1.000 1.000    
+               Desert Forest Grassland Human Modified Rock Shrubland
+Forest         1.00   -      -         -              -    -        
+Grassland      1.00   1.00   -         -              -    -        
+Human Modified 1.00   7e-07  1.00      -              -    -        
+Rock           1.00   1.00   1.00      0.76           -    -        
+Shrubland      1.00   1e-06  1.00      0.78           1.00 -        
+Woodland       1.00   0.03   1.00      0.02           1.00 1.00     
 
 P value adjustment method: holm </code></pre>
 <!-- rnb-output-end -->
@@ -2567,12 +2567,12 @@ P value adjustment method: holm </code></pre>
 <!-- rnb-source-begin eyJkYXRhIjoiYGBgclxua3J1c2thbC50ZXN0KGNvbHVtYmlkYWVfdG9sZXJhbmNlJHVyYmFuX3RvbGVyYW5jZSB+IGNvbHVtYmlkYWVfdG9sZXJhbmNlJGhhYml0YXRfZGVuc2l0eSlcbmBgYCJ9 -->
 <pre class="r"><code>kruskal.test(columbidae_tolerance$urban_tolerance ~ columbidae_tolerance$habitat_density)</code></pre>
 <!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiXG5cdEtydXNrYWwtV2FsbGlzIHJhbmsgc3VtIHRlc3RcblxuZGF0YTogIGNvbHVtYmlkYWVfdG9sZXJhbmNlJHVyYmFuX3RvbGVyYW5jZSBieSBjb2x1bWJpZGFlX3RvbGVyYW5jZSRoYWJpdGF0X2RlbnNpdHlcbktydXNrYWwtV2FsbGlzIGNoaS1zcXVhcmVkID0gMzEuMDY0LCBkZiA9IDIsIHAtdmFsdWUgPSAxLjc5N2UtMDdcbiJ9 -->
+<!-- rnb-output-begin eyJkYXRhIjoiXG5cdEtydXNrYWwtV2FsbGlzIHJhbmsgc3VtIHRlc3RcblxuZGF0YTogIGNvbHVtYmlkYWVfdG9sZXJhbmNlJHVyYmFuX3RvbGVyYW5jZSBieSBjb2x1bWJpZGFlX3RvbGVyYW5jZSRoYWJpdGF0X2RlbnNpdHlcbktydXNrYWwtV2FsbGlzIGNoaS1zcXVhcmVkID0gMzEsIGRmID0gMiwgcC12YWx1ZSA9IDJlLTA3XG4ifQ== -->
 <pre><code>
     Kruskal-Wallis rank sum test
 
 data:  columbidae_tolerance$urban_tolerance by columbidae_tolerance$habitat_density
-Kruskal-Wallis chi-squared = 31.064, df = 2, p-value = 1.797e-07</code></pre>
+Kruskal-Wallis chi-squared = 31, df = 2, p-value = 2e-07</code></pre>
 <!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
@@ -2584,15 +2584,15 @@ Kruskal-Wallis chi-squared = 31.064, df = 2, p-value = 1.797e-07</code></pre>
 <!-- rnb-output-begin eyJkYXRhIjoiV2FybmluZzogY2Fubm90IGNvbXB1dGUgZXhhY3QgcC12YWx1ZSB3aXRoIHRpZXNcbiJ9 -->
 <pre><code>Warning: cannot compute exact p-value with ties</code></pre>
 <!-- rnb-output-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiXG5cdFBhaXJ3aXNlIGNvbXBhcmlzb25zIHVzaW5nIFdpbGNveG9uIHJhbmsgc3VtIHRlc3Qgd2l0aCBjb250aW51aXR5IGNvcnJlY3Rpb24gXG5cbmRhdGE6ICBjb2x1bWJpZGFlX3RvbGVyYW5jZSR1cmJhbl90b2xlcmFuY2UgYW5kIGNvbHVtYmlkYWVfdG9sZXJhbmNlJGhhYml0YXRfZGVuc2l0eSBcblxuICAxICAgICAgIDIgICAgICBcbjIgMC4wMDE2NCAtICAgICAgXG4zIDMuMmUtMDcgMC4wMDA0MlxuXG5QIHZhbHVlIGFkanVzdG1lbnQgbWV0aG9kOiBob2xtIFxuIn0= -->
+<!-- rnb-output-begin eyJkYXRhIjoiXG5cdFBhaXJ3aXNlIGNvbXBhcmlzb25zIHVzaW5nIFdpbGNveG9uIHJhbmsgc3VtIHRlc3Qgd2l0aCBjb250aW51aXR5IGNvcnJlY3Rpb24gXG5cbmRhdGE6ICBjb2x1bWJpZGFlX3RvbGVyYW5jZSR1cmJhbl90b2xlcmFuY2UgYW5kIGNvbHVtYmlkYWVfdG9sZXJhbmNlJGhhYml0YXRfZGVuc2l0eSBcblxuICAxICAgICAyICAgIFxuMiAwLjAwMiAtICAgIFxuMyAzZS0wNyA0ZS0wNFxuXG5QIHZhbHVlIGFkanVzdG1lbnQgbWV0aG9kOiBob2xtIFxuIn0= -->
 <pre><code>
     Pairwise comparisons using Wilcoxon rank sum test with continuity correction 
 
 data:  columbidae_tolerance$urban_tolerance and columbidae_tolerance$habitat_density 
 
-  1       2      
-2 0.00164 -      
-3 3.2e-07 0.00042
+  1     2    
+2 0.002 -    
+3 3e-07 4e-04
 
 P value adjustment method: holm </code></pre>
 <!-- rnb-output-end -->
@@ -2616,12 +2616,12 @@ P value adjustment method: holm </code></pre>
 <!-- rnb-source-begin eyJkYXRhIjoiYGBgclxua3J1c2thbC50ZXN0KGNvbHVtYmlkYWVfdG9sZXJhbmNlJHVyYmFuX3RvbGVyYW5jZSB+IGNvbHVtYmlkYWVfdG9sZXJhbmNlJHRyb3BoaWNfbmljaGUpXG5gYGAifQ== -->
 <pre class="r"><code>kruskal.test(columbidae_tolerance$urban_tolerance ~ columbidae_tolerance$trophic_niche)</code></pre>
 <!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiXG5cdEtydXNrYWwtV2FsbGlzIHJhbmsgc3VtIHRlc3RcblxuZGF0YTogIGNvbHVtYmlkYWVfdG9sZXJhbmNlJHVyYmFuX3RvbGVyYW5jZSBieSBjb2x1bWJpZGFlX3RvbGVyYW5jZSR0cm9waGljX25pY2hlXG5LcnVza2FsLVdhbGxpcyBjaGktc3F1YXJlZCA9IDE1LjUwNCwgZGYgPSAyLCBwLXZhbHVlID0gMC4wMDA0Mjk5XG4ifQ== -->
+<!-- rnb-output-begin eyJkYXRhIjoiXG5cdEtydXNrYWwtV2FsbGlzIHJhbmsgc3VtIHRlc3RcblxuZGF0YTogIGNvbHVtYmlkYWVfdG9sZXJhbmNlJHVyYmFuX3RvbGVyYW5jZSBieSBjb2x1bWJpZGFlX3RvbGVyYW5jZSR0cm9waGljX25pY2hlXG5LcnVza2FsLVdhbGxpcyBjaGktc3F1YXJlZCA9IDE2LCBkZiA9IDIsIHAtdmFsdWUgPSA0ZS0wNFxuIn0= -->
 <pre><code>
     Kruskal-Wallis rank sum test
 
 data:  columbidae_tolerance$urban_tolerance by columbidae_tolerance$trophic_niche
-Kruskal-Wallis chi-squared = 15.504, df = 2, p-value = 0.0004299</code></pre>
+Kruskal-Wallis chi-squared = 16, df = 2, p-value = 4e-04</code></pre>
 <!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
@@ -2630,15 +2630,15 @@ Kruskal-Wallis chi-squared = 15.504, df = 2, p-value = 0.0004299</code></pre>
 <!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucGFpcndpc2Uud2lsY294LnRlc3QoY29sdW1iaWRhZV90b2xlcmFuY2UkdXJiYW5fdG9sZXJhbmNlLCBjb2x1bWJpZGFlX3RvbGVyYW5jZSR0cm9waGljX25pY2hlKVxuYGBgIn0= -->
 <pre class="r"><code>pairwise.wilcox.test(columbidae_tolerance$urban_tolerance, columbidae_tolerance$trophic_niche)</code></pre>
 <!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiXG5cdFBhaXJ3aXNlIGNvbXBhcmlzb25zIHVzaW5nIFdpbGNveG9uIHJhbmsgc3VtIHRlc3Qgd2l0aCBjb250aW51aXR5IGNvcnJlY3Rpb24gXG5cbmRhdGE6ICBjb2x1bWJpZGFlX3RvbGVyYW5jZSR1cmJhbl90b2xlcmFuY2UgYW5kIGNvbHVtYmlkYWVfdG9sZXJhbmNlJHRyb3BoaWNfbmljaGUgXG5cbiAgICAgICAgICBGcnVnaXZvcmUgR3Jhbml2b3JlXG5HcmFuaXZvcmUgMC4wMDE0ICAgIC0gICAgICAgIFxuT21uaXZvcmUgIDAuOTc0NiAgICAwLjAwNzYgICBcblxuUCB2YWx1ZSBhZGp1c3RtZW50IG1ldGhvZDogaG9sbSBcbiJ9 -->
+<!-- rnb-output-begin eyJkYXRhIjoiXG5cdFBhaXJ3aXNlIGNvbXBhcmlzb25zIHVzaW5nIFdpbGNveG9uIHJhbmsgc3VtIHRlc3Qgd2l0aCBjb250aW51aXR5IGNvcnJlY3Rpb24gXG5cbmRhdGE6ICBjb2x1bWJpZGFlX3RvbGVyYW5jZSR1cmJhbl90b2xlcmFuY2UgYW5kIGNvbHVtYmlkYWVfdG9sZXJhbmNlJHRyb3BoaWNfbmljaGUgXG5cbiAgICAgICAgICBGcnVnaXZvcmUgR3Jhbml2b3JlXG5HcmFuaXZvcmUgMC4wMDEgICAgIC0gICAgICAgIFxuT21uaXZvcmUgIDAuOTc1ICAgICAwLjAwOCAgICBcblxuUCB2YWx1ZSBhZGp1c3RtZW50IG1ldGhvZDogaG9sbSBcbiJ9 -->
 <pre><code>
     Pairwise comparisons using Wilcoxon rank sum test with continuity correction 
 
 data:  columbidae_tolerance$urban_tolerance and columbidae_tolerance$trophic_niche 
 
           Frugivore Granivore
-Granivore 0.0014    -        
-Omnivore  0.9746    0.0076   
+Granivore 0.001     -        
+Omnivore  0.975     0.008    
 
 P value adjustment method: holm </code></pre>
 <!-- rnb-output-end -->
@@ -2662,12 +2662,12 @@ P value adjustment method: holm </code></pre>
 <!-- rnb-source-begin eyJkYXRhIjoiYGBgclxua3J1c2thbC50ZXN0KGNvbHVtYmlkYWVfdG9sZXJhbmNlJHVyYmFuX3RvbGVyYW5jZSB+IGNvbHVtYmlkYWVfdG9sZXJhbmNlJHByaW1hcnlfbGlmZXN0eWxlKVxuYGBgIn0= -->
 <pre class="r"><code>kruskal.test(columbidae_tolerance$urban_tolerance ~ columbidae_tolerance$primary_lifestyle)</code></pre>
 <!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiXG5cdEtydXNrYWwtV2FsbGlzIHJhbmsgc3VtIHRlc3RcblxuZGF0YTogIGNvbHVtYmlkYWVfdG9sZXJhbmNlJHVyYmFuX3RvbGVyYW5jZSBieSBjb2x1bWJpZGFlX3RvbGVyYW5jZSRwcmltYXJ5X2xpZmVzdHlsZVxuS3J1c2thbC1XYWxsaXMgY2hpLXNxdWFyZWQgPSAxMS44ODcsIGRmID0gMiwgcC12YWx1ZSA9IDAuMDAyNjIzXG4ifQ== -->
+<!-- rnb-output-begin eyJkYXRhIjoiXG5cdEtydXNrYWwtV2FsbGlzIHJhbmsgc3VtIHRlc3RcblxuZGF0YTogIGNvbHVtYmlkYWVfdG9sZXJhbmNlJHVyYmFuX3RvbGVyYW5jZSBieSBjb2x1bWJpZGFlX3RvbGVyYW5jZSRwcmltYXJ5X2xpZmVzdHlsZVxuS3J1c2thbC1XYWxsaXMgY2hpLXNxdWFyZWQgPSAxMiwgZGYgPSAyLCBwLXZhbHVlID0gMC4wMDNcbiJ9 -->
 <pre><code>
     Kruskal-Wallis rank sum test
 
 data:  columbidae_tolerance$urban_tolerance by columbidae_tolerance$primary_lifestyle
-Kruskal-Wallis chi-squared = 11.887, df = 2, p-value = 0.002623</code></pre>
+Kruskal-Wallis chi-squared = 12, df = 2, p-value = 0.003</code></pre>
 <!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
@@ -2708,28 +2708,24 @@ P value adjustment method: holm </code></pre>
 <!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc3VtbWFyeShnbG0oZGF0YSA9IGNvbHVtYmlkYWVfdG9sZXJhbmNlLCBmb3JtdWxhID0gdXJiYW5fdG9sZXJhbmNlIH4gdGVybWluYWxfYnJhbmNoX2xlbmd0aCwgZmFtaWx5ID0gXCJnYXVzc2lhblwiKSlcbmBgYCJ9 -->
 <pre class="r"><code>summary(glm(data = columbidae_tolerance, formula = urban_tolerance ~ terminal_branch_length, family = &quot;gaussian&quot;))</code></pre>
 <!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiXG5DYWxsOlxuZ2xtKGZvcm11bGEgPSB1cmJhbl90b2xlcmFuY2UgfiB0ZXJtaW5hbF9icmFuY2hfbGVuZ3RoLCBmYW1pbHkgPSBcImdhdXNzaWFuXCIsIFxuICAgIGRhdGEgPSBjb2x1bWJpZGFlX3RvbGVyYW5jZSlcblxuRGV2aWFuY2UgUmVzaWR1YWxzOiBcbiAgICAgTWluICAgICAgICAxUSAgICBNZWRpYW4gICAgICAgIDNRICAgICAgIE1heCAgXG4tMC4yNTEyNiAgLTAuMjEzNDggIC0wLjE1NDkxICAgMC4wNzkwNyAgIDAuODczMjUgIFxuXG5Db2VmZmljaWVudHM6XG4gICAgICAgICAgICAgICAgICAgICAgICBFc3RpbWF0ZSBTdGQuIEVycm9yIHQgdmFsdWUgUHIoPnx0fCkgICAgXG4oSW50ZXJjZXB0KSAgICAgICAgICAgICAwLjI1MzEzMSAgIDAuMDM5NjE1ICAgNi4zOTAgMS43OGUtMDkgKioqXG50ZXJtaW5hbF9icmFuY2hfbGVuZ3RoIC0wLjAwOTg2MyAgIDAuMDA1MDcxICAtMS45NDUgICAwLjA1MzUgLiAgXG4tLS1cblNpZ25pZi4gY29kZXM6ICAwIOKAmCoqKuKAmSAwLjAwMSDigJgqKuKAmSAwLjAxIOKAmCrigJkgMC4wNSDigJgu4oCZIDAuMSDigJgg4oCZIDFcblxuKERpc3BlcnNpb24gcGFyYW1ldGVyIGZvciBnYXVzc2lhbiBmYW1pbHkgdGFrZW4gdG8gYmUgMC4xMDA4MjMpXG5cbiAgICBOdWxsIGRldmlhbmNlOiAxNi4zMTEgIG9uIDE1OSAgZGVncmVlcyBvZiBmcmVlZG9tXG5SZXNpZHVhbCBkZXZpYW5jZTogMTUuOTMwICBvbiAxNTggIGRlZ3JlZXMgb2YgZnJlZWRvbVxuQUlDOiA5MC45NDZcblxuTnVtYmVyIG9mIEZpc2hlciBTY29yaW5nIGl0ZXJhdGlvbnM6IDJcbiJ9 -->
+<!-- rnb-output-begin eyJkYXRhIjoiXG5DYWxsOlxuZ2xtKGZvcm11bGEgPSB1cmJhbl90b2xlcmFuY2UgfiB0ZXJtaW5hbF9icmFuY2hfbGVuZ3RoLCBmYW1pbHkgPSBcImdhdXNzaWFuXCIsIFxuICAgIGRhdGEgPSBjb2x1bWJpZGFlX3RvbGVyYW5jZSlcblxuQ29lZmZpY2llbnRzOlxuICAgICAgICAgICAgICAgICAgICAgICBFc3RpbWF0ZSBTdGQuIEVycm9yIHQgdmFsdWUgUHIoPnx0fCkgICAgXG4oSW50ZXJjZXB0KSAgICAgICAgICAgICAwLjI1MzEzICAgIDAuMDM5NjEgICAgNi4zOSAgMS44ZS0wOSAqKipcbnRlcm1pbmFsX2JyYW5jaF9sZW5ndGggLTAuMDA5ODYgICAgMC4wMDUwNyAgIC0xLjk1ICAgIDAuMDU0IC4gIFxuLS0tXG5TaWduaWYuIGNvZGVzOiAgMCDigJgqKirigJkgMC4wMDEg4oCYKirigJkgMC4wMSDigJgq4oCZIDAuMDUg4oCYLuKAmSAwLjEg4oCYIOKAmSAxXG5cbihEaXNwZXJzaW9uIHBhcmFtZXRlciBmb3IgZ2F1c3NpYW4gZmFtaWx5IHRha2VuIHRvIGJlIDAuMTAxKVxuXG4gICAgTnVsbCBkZXZpYW5jZTogMTYuMzExICBvbiAxNTkgIGRlZ3JlZXMgb2YgZnJlZWRvbVxuUmVzaWR1YWwgZGV2aWFuY2U6IDE1LjkzMCAgb24gMTU4ICBkZWdyZWVzIG9mIGZyZWVkb21cbkFJQzogOTAuOTVcblxuTnVtYmVyIG9mIEZpc2hlciBTY29yaW5nIGl0ZXJhdGlvbnM6IDJcbiJ9 -->
 <pre><code>
 Call:
 glm(formula = urban_tolerance ~ terminal_branch_length, family = &quot;gaussian&quot;, 
     data = columbidae_tolerance)
 
-Deviance Residuals: 
-     Min        1Q    Median        3Q       Max  
--0.25126  -0.21348  -0.15491   0.07907   0.87325  
-
 Coefficients:
-                        Estimate Std. Error t value Pr(&gt;|t|)    
-(Intercept)             0.253131   0.039615   6.390 1.78e-09 ***
-terminal_branch_length -0.009863   0.005071  -1.945   0.0535 .  
+                       Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept)             0.25313    0.03961    6.39  1.8e-09 ***
+terminal_branch_length -0.00986    0.00507   -1.95    0.054 .  
 ---
 Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
-(Dispersion parameter for gaussian family taken to be 0.100823)
+(Dispersion parameter for gaussian family taken to be 0.101)
 
     Null deviance: 16.311  on 159  degrees of freedom
 Residual deviance: 15.930  on 158  degrees of freedom
-AIC: 90.946
+AIC: 90.95
 
 Number of Fisher Scoring iterations: 2</code></pre>
 <!-- rnb-output-end -->
