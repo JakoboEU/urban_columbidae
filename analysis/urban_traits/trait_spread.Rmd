@@ -135,6 +135,21 @@ ggplot(species, aes(y = trophic_trait, x = realm, color = record_type)) +
 ggsave('./figures/trophic_trait_spread_by_realm.jpg')
 ```
 
+## Convex hull around all species
+```{r fig.width=10, fig.height=10}
+regional_hull <- species %>% filter(record_type == 'Regional') %>% slice(chull(trophic_trait, locomotory_trait))
+urban_hull <- species %>% filter(record_type == 'Urban') %>% slice(chull(trophic_trait, locomotory_trait))
+  
+ggplot(data = species, aes(x = trophic_trait, y = locomotory_trait)) +
+         geom_point(aes(color = record_type)) +
+         geom_polygon(data = regional_hull, alpha = 0.2, color = 'green') +
+         geom_polygon(data = urban_hull, alpha = 0.4, color = 'red') +
+         theme_bw() + scale_color_manual(values=c("green", "red")) +
+         xlab('Trophic Trait (Granivore -> Frugivore)') + ylab('Locomotory Trait (Migratory -> Non-Migratory)') + theme(legend.position="bottom")
+
+ggsave('./figures/trait_space.jpg')
+```
+
 ## City by city plots with convex hulls around trait space
 
 ```{r fig.width=10, fig.height=22}
@@ -146,11 +161,13 @@ plot_trait_space = function(realm_to_plot) {
   urban_hull <- species_in_realm %>% filter(record_type == 'Urban') %>% group_by(city_label) %>% slice(chull(trophic_trait, locomotory_trait))
 
   ggplot(data = species_in_realm, aes(x = trophic_trait, y = locomotory_trait)) +
-         geom_point(aes(color = origin)) +
+         geom_point(aes(color = record_type, pch = origin)) +
          facet_wrap( ~ city_label, ncol=6) + 
          geom_polygon(data = regional_hull, alpha = 0.2, color = 'green') +
          geom_polygon(data = urban_hull, alpha = 0.4, color = 'red') +
-         theme_bw() + scale_color_manual(values=c("orange", "black")) +
+         theme_bw() + 
+         scale_color_manual(values=c("green", "red"), limits = c("Regional", "Urban")) +
+         scale_shape_manual(values=c(16, 15), limits = c("Native", "Introduced")) +
          xlab('Trophic Trait (Granivore -> Frugivore)') + ylab('Locomotory Trait (Migratory -> Non-Migratory)') + theme(legend.position="bottom") +
          labs(title = realm_to_plot)
 }

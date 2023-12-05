@@ -51,5 +51,40 @@ ggsave('./figures/geographical_mntd.jpg', width = 3000, units = "px")
 ```
 
 
+## FD
+```{r}
+ggplot() +  
+  geom_sf(data = country_outlines, aes(geometry = geometry)) +
+  geom_sf(data = world_cities, aes(geometry = geometry, size = regional_pool_size)) +
+  geom_sf(data = world_cities, aes(geometry = geometry, color = fd_normalised, size = urban_pool_size), show.legend = "point") +
+  theme_bw() + theme(legend.position="bottom") + scale_colour_gradient2(
+  low = "red",
+  mid = "yellow",
+  high = "darkgreen",
+  midpoint = 0.5,
+  space = "Lab",
+  na.value = "grey50",
+  guide = "colourbar",
+  aesthetics = "colour"
+)
+ggsave('./figures/geographical_fd.jpg', width = 3000, units = "px")
+```
 
-
+## FRic
+```{r}
+ggplot() +  
+  geom_sf(data = country_outlines, aes(geometry = geometry)) +
+  geom_sf(data = world_cities, aes(geometry = geometry, size = regional_pool_size)) +
+  geom_sf(data = world_cities, aes(geometry = geometry, color = FRic_normalised, size = urban_pool_size), show.legend = "point") +
+  theme_bw() + theme(legend.position="bottom") + scale_colour_gradient2(
+  low = "red",
+  mid = "yellow",
+  high = "darkgreen",
+  midpoint = 0.5,
+  space = "Lab",
+  na.value = "grey50",
+  guide = "colourbar",
+  aesthetics = "colour"
+)
+ggsave('./figures/geographical_fd.jpg', width = 3000, units = "px")
+```
